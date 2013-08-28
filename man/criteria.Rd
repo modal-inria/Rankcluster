@@ -1,0 +1,51 @@
+\name{criteria}
+\alias{criteria}
+\title{criteria estimation}
+\usage{
+  criteria(data, proportion, pi, mu, m, Ql = 500, Bl = 100)
+}
+\arguments{
+  \item{data}{a matrix in which each row is a rank (partial
+  or not; for partial rank, missing elements of a rank are
+  put to 0 ).}
+
+  \item{proportion}{a vector (which sums to 1) containing
+  the K mixture proportions.}
+
+  \item{pi}{a matrix of size K*p, where K is the number of
+  clusters and p the number of dimension, containing the
+  probabilities of a good comparaison of the model
+  (dispersion parameters).}
+
+  \item{mu}{a matrix of size K*sum(m), containing the modal
+  ranks. Each row contains the modal rank for a cluster. In
+  the case of multivariate ranks, the reference rank for
+  each dimension are set successively on the same row.}
+
+  \item{m}{a vector containing the size of ranks for each
+  dimension.}
+
+  \item{Ql}{number of iterations of the Gibbs sampler used
+  for the estimation of the log-likelihood.}
+
+  \item{Bl}{burn-in period of the Gibbs sampler.}
+}
+\value{
+  a list containing: \item{ll}{the estimated
+  log-likelihood.} \item{bic}{the estimated BIC criterion.}
+  \item{icl}{the estimated ICL criterion.}
+}
+\description{
+  This function estimates the loglikelihood of a mixture of
+  multidimensional ISR model, as well as the BIC and ICL
+  model selection criteria.
+}
+\examples{
+data(quiz)
+res=rankclust(quiz$data,m=quiz$m,K=2)
+crit=criteria(quiz$data,res[2]@proportion,res[2]@pi,res[2]@mu,quiz$m)
+}
+\author{
+  Quentin Grimonprez
+}
+

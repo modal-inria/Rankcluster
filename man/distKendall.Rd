@@ -1,0 +1,31 @@
+\name{distKendall}
+\alias{distKendall}
+\title{Kendall distance between two ranks}
+\usage{
+  distKendall(x, y, type = "ordering")
+}
+\arguments{
+  \item{x,y}{two ranks of size m.}
+
+  \item{type}{type of the rank representation ("ordering"
+  ou "ranking").}
+}
+\value{
+  an integer, the Kendall distance between x and y.
+}
+\description{
+  The Kendall distance between two ranks is the number of
+  pairs that are in different order in the two ranks.
+}
+\examples{
+x=1:5
+y=c(2,3,1,4,5)
+distKendall(x,y,type="ordering")
+}
+\author{
+  Julien Jacques
+}
+\references{
+  A New Measure of Rank Correlation, M. G. Kendall
+}
+
