@@ -20,8 +20,8 @@ The heterogeneity of the rank population is modelled by a mixture of ISR, wherea
 \tabular{ll}{
 Package: \tab Rankcluster\cr
 Type: \tab Package\cr
-Version: \tab 0.89\cr
-Date: \tab 2013-09-02\cr
+Version: \tab 0.90.1\cr
+Date: \tab 2013-08-30\cr
 License: \tab GPL (>=2) \cr
 }
 }

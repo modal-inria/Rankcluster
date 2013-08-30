@@ -7,7 +7,7 @@
 //#include <RcppEigen.h>
 #include <vector>
 #include <set>
-#include <Eigen/Dense>
+#include "Eigen/Dense"
 
 #include "functions.h"
 

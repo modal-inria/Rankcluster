@@ -30,8 +30,8 @@
 #'[2] J.Jacques and C.Biernacki (2012), Model-based clustering for multivariate partial ranking data, Inria Research Report n 8113.
 #'
 #' @examples
-#' data(quiz)
-#' result=rankclust(quiz$data,K=2,m=quiz$m)
+#' data(big4)
+#' result=rankclust(big4$data,K=2,m=big4$m,Ql=200,Bl=100,maxTry=2)
 #' 
 #' @seealso See \code{\link{Output-class}} and \code{\link{Rankclust-class}} for available output.
 #' 

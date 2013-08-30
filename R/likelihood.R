@@ -13,9 +13,9 @@
 #'   \item{bic}{the estimated BIC criterion.}
 #'   \item{icl}{the estimated ICL criterion.}
 #' @examples
-#' data(quiz)
-#' res=rankclust(quiz$data,m=quiz$m,K=2)
-#' crit=criteria(quiz$data,res[2]@@proportion,res[2]@@pi,res[2]@@mu,quiz$m)
+#' data(big4)
+#' res=rankclust(big4$data,m=big4$m,K=2,Ql=100,Bl=50,maxTry=2)
+#' crit=criteria(big4$data,res[2]@@proportion,res[2]@@pi,res[2]@@mu,big4$m,Ql=200,Bl=100)
 #' @export
 criteria <-function(data,proportion,pi,mu,m,Ql=500,Bl=100)
 {

@@ -471,7 +471,13 @@ void RankCluster::simuM(int indexDim,int indCl)
 			}
 
 			for(int ordre(1);ordre<6;ordre++)
-				lnp1Plusp2+=(long double) 1/ordre*exp(diffln*ordre)*pow(-1,ordre-1);
+			{
+				//* (long double) std::pow((int) -1,(int) ordre-1)
+				int sign=1;
+				if(ordre%2==1)
+					sign=-1;
+				lnp1Plusp2+=(long double) sign/ordre*exp(diffln*ordre);
+			}
 
             alea=(long double) rand()/RAND_MAX;
 
