@@ -1,9 +1,9 @@
-3dfba59edc2ed425c4f20e7c8dcfd9eb *DESCRIPTION
+a495fcd327e086e75d7488132767779c *DESCRIPTION
 01aa5f9fbb84ed1a38fe8f427de99428 *NAMESPACE
 b7208f9dcfa6ff3da45043eb38653023 *R/RankDistance.R
 7d66dd9a9e0f9747181bd4e49fe5acda *R/RankFunctions.R
 ca3f13183a0d41bf034c159a1790f1d3 *R/conversion.R
-f215c9b3b1e164f68574338a70dd236b *R/likelihood.R
+56a94b99801fb35d6be26cff01a2b1a7 *R/likelihood.R
 6ae81fa7306287a02e85669496d6b99b *R/mixtureSEM.R
 f88ea4296aa9e646f8f37f0322c7e671 *R/rankclust.R
 5bbb8cbaad84b62ea43da5e67abe1b1e *R/resultClass.R
@@ -17,10 +17,10 @@ d43c6ff6c3cb6f4647bd76efcf4a0607 *data/quiz.rda
 0cb2cb5e66a5429fd6ee25b0f90c71a7 *man/APA.Rd
 1454fd9417dc9852bcd8cc3ee88bdc08 *man/Output-class.Rd
 326ffefd3532c31eaae45d7ed848d8a7 *man/Rankclust-class.Rd
-58e78b8ec3559c3a9631be13158a8f0d *man/Rankcluster-package.Rd
+32df8518f0e3fb45d16edbc23a707f2e *man/Rankcluster-package.Rd
 b5c3fbe98e9162afee899dde376b2a1c *man/big4.Rd
 d18fc3a1ce262dc4a6e512f3f5bbc543 *man/convertRank.Rd
-1be1d2e319575429abb881b94d1ee44e *man/criteria.Rd
+e5a35128574317b39c36bc9132c6d113 *man/criteria.Rd
 190f10baaf956380aa45ee3359cd2559 *man/distCayley.Rd
 37474d5c92e8aef00ecac47e395f18f5 *man/distHamming.Rd
 a10ee7f881430c63e7597d5d1fe543c7 *man/distKendall.Rd

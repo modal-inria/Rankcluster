@@ -42,8 +42,9 @@
 }
 \examples{
 data(big4)
-res=rankclust(big4$data,m=big4$m,K=2,Ql=100,Bl=50,maxTry=2)
-crit=criteria(big4$data,res[2]@proportion,res[2]@pi,res[2]@mu,big4$m,Ql=200,Bl=100)
+res=rankclust(big4$data,m=big4$m,K=2,Ql=100,Bl=50,maxTry=3)
+if(res@convergence==TRUE)
+	crit=criteria(big4$data,res[2]@proportion,res[2]@pi,res[2]@mu,big4$m,Ql=200,Bl=100)
 }
 \author{
   Quentin Grimonprez
