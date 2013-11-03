@@ -18,7 +18,7 @@ void simulMixtureISR(vector<vector<int> > &simul,int const& n,int const& m,vecto
     bool compar,avance;
 
     vector<double> limite(prop.size()+1,0);
-    for(int i(1);i<limite.size();i++)
+    for(int i(1); i < (int) limite.size(); i++)
     	limite[i]=limite[i-1]+prop[i-1];
 
     for(int i(0);i<m;i++)
@@ -28,7 +28,7 @@ void simulMixtureISR(vector<vector<int> > &simul,int const& n,int const& m,vecto
     {
     	//tirage aléatoire de la classe
     	alea=(double) rand()/RAND_MAX;
-        for(int j(0);j<prop.size();j++)
+        for(int j(0); j < (int) prop.size(); j++)
         {
             if((alea>limite[j]) & (alea<limite[j+1]))
             {
@@ -186,6 +186,7 @@ double khi2partial(vector<Rank > &data,vector<double> const& p,vector<double> co
 	int indexData;
 
 	//pour les rang non partiels
+	//doit être fait avant car utilisé pour les rangs partiels
 	for(int i(0);i<n;i++)
 	{
 		if(!data[i].isPartial)
@@ -226,26 +227,27 @@ double khi2partial(vector<Rank > &data,vector<double> const& p,vector<double> co
 
 			if(somme!=0)//si un des rangs possibles apparait: effemp+= freq d'apparition
 			{
-				for(int j(0);j<indexTemp.size();j++)
+				for(int j(0); j< (int) indexTemp.size(); j++)
 					effEmpPartiel[indexTemp[j]-1]=effTemp[j]/somme;
 			}
 			else//sinon effemp +=1/nb rang possible
 			{	double div=(double) 1/indexTemp.size();
-				for(int j(0);j<indexTemp.size();j++)
+				for(int j(0);j < (int) indexTemp.size(); j++)
 					effEmpPartiel[indexTemp[j]-1]+=div;
 			}
-		}		
+		}
 
 	}
 
 	for(int i(0);i<factM;i++)
-		effEmp[i]+=effEmpPartiel[i];
+		effEmp[i] += effEmpPartiel[i];
 
 	//************** distance du khi2
 	for(int i(0);i<factM;i++)
-		dkhi2+=pow(effTheo[i]-effEmp[i],2);
+		dkhi2 += pow(effTheo[i]-effEmp[i],2);
 
-
+//cout<<effTheo<<endl;
+//cout<<effEmp<<endl;
 
 	//************** evaluation de la loi de dKhi2 sous H0: modele = ISR
 	vector<vector<int> > simulation(n,vector<int> (m,0));
@@ -255,35 +257,48 @@ double khi2partial(vector<Rank > &data,vector<double> const& p,vector<double> co
 	{
 		vector<double> effSim(factM,0);
 		simulMixtureISR(simulation,n,m,mu,p,prop);
-		for(int i(0);i<n;i++)
-		{//on réintroduit des 0 dans la simualtion au même endroit
+		for(int i(0); i < n; i++)
+		{
+		  //on réintroduit des 0 dans la simulation au même endroit
 			if(data[i].isPartial)
 			{
+			  //nbMiss : nombre d'element manquant
 				int nbMiss(data[i].missingIndex.size()),indexPerm(0);
 				double somme(0);
+
 				vector<double> effTemp(factorial(nbMiss));
+
 				vector<int> indexTemp(factorial(nbMiss));
 				vector<int> missingNumber(nbMiss);
+
+				vector<int> index(nbMiss);
+				for(int j = 0; j< nbMiss; j++)
+				  index[j]=j;
+
 				for(int j(0);j<nbMiss;j++)//on prends les numéro manquant
 					missingNumber[j]=simulation[i][data[i].missingIndex[j]];
+//				cout<<simulation[i]<<endl;
+//				cout<<missingNumber<<endl;
 				do
 				{
-					for(int compteur=0; compteur<nbMiss; compteur++)
-					{
-						simulation[i][data[i].missingIndex[compteur]]=missingNumber[compteur];
-						compteur++;
-					}
-
+					for(int compteur=0; compteur < nbMiss; compteur++)
+						simulation[i][data[i].missingIndex[compteur]]=missingNumber[index[compteur]];
+//					cout<<simulation[i]<<endl;
 					indexData=rank2index(simulation[i],tabFact);
 					indexTemp[indexPerm]=indexData;
 					effTemp[indexPerm]=effTheo[indexData-1];
 					somme+=effTheo[indexData-1];
 					indexPerm++;
 				}
-				while (next_permutation(missingNumber.begin(),missingNumber.end()) );
+				while (next_permutation(index.begin(),index.end()) );
 
-				for(int j(0);j<indexTemp.size();j++)
-					effSim[indexTemp[j]-1]+=effTemp[j]/somme;
+				//cout<<indexTemp<<endl;
+
+
+				for(int j(0);j < (int) indexTemp.size(); j++)
+				  effSim[indexTemp[j]-1] += effTemp[j]/somme;
+
+
 
 			}
 			else//cas normal
@@ -294,10 +309,11 @@ double khi2partial(vector<Rank > &data,vector<double> const& p,vector<double> co
 
 		}
 //cout<<effSim<<endl;
+//cout<<effTheo<<endl;
 		dkhi2Sim=0;
-		for(int i(0);i<factM;i++)
-			dkhi2Sim+=pow(effTheo[i]-effSim[i],2);
-//cout<<dkhi2Sim<<endl;
+		for(int i(0); i < factM; i++)
+			dkhi2Sim += pow(effTheo[i]-effSim[i],2);
+//cout<<dkhi2Sim<<"  "<<dkhi2<<endl;
 		if(dkhi2Sim>dkhi2)
 			pvalue++;
 

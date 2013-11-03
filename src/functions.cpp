@@ -219,16 +219,16 @@ vector<int> index2rank(int index,int const& m)
         index--;
         r[0]=index/factorial(m-1)+1;
 
-        for(unsigned int i(0);i<m;i++)
+        for(int i(0); i < m; i++)
             liste[i]=i+1;
 
         //on supprime l'élément égale à r[0]
         liste.erase(remove_if(liste.begin(), liste.end(), bind2nd(equal_to<int>(), r[0])), liste.end());
 
-        for(unsigned int j(1);j<m-1;j++)
+        for(int j(1); j < m-1; j++)
         {
             temp=index;
-            for(int k(1);k<j+1;k++)
+            for(int k(1); k < j+1; k++)
                 temp%=factorial(m-k);
 
             temp2=temp/factorial(m-j-1);

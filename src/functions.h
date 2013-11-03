@@ -9,7 +9,7 @@
 #define FUNCTIONS_H_
 
 #include<vector>
-
+#include<set>
 /**
  * search the position of i in x
  * @param x rank
@@ -173,5 +173,7 @@ std::vector<std::vector<int> > simulISR(int const& n,int const& m,std::vector<in
  */
 std::pair<std::vector<std::vector<std::vector<int> > >,std::vector<int> >
 freqMulti(std::vector<std::vector<std::vector<int> > > const& listeRang);
+
+
 
 #endif /* FUNCTIONS_H_ */

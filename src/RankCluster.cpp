@@ -165,7 +165,7 @@ void RankCluster::initialization()
 
 
     //partial data and order of presentation initialization
-    set<int>::iterator itset(0);
+    set<int>::iterator itset;
     for(int dim(0);dim<d_;dim++)
     {
         vector<int> rankTemp(m_[dim]);
@@ -338,7 +338,7 @@ void RankCluster::gibbsX(int indexDim)
 
             for(int iter(0);iter<parameter_.nGibbsSE[indexDim];iter++)
             {
-                for(int i(0);i<data_[indexDim][ind].missingIndex.size()-1;i++)
+                for(int i(0); i < (int) data_[indexDim][ind].missingIndex.size()-1; i++)
                 {
                     //nouveau x à tester, ancien x auquel on inverse 2 éléments partiels
                     x2=x;
@@ -879,7 +879,7 @@ double RankCluster::computeLikelihood(vector<vector<vector<int> > > const& mu,ve
                     proba1X=proba1.row(J);
                     p1x=(proba1X*prop).sum();
 
-                    for(int k(0);k<(data_[J][ind].missingIndex).size()-1;k++)//Gibbs sur les x
+                    for(int k(0); k < (int) (data_[J][ind].missingIndex).size()-1; k++)//Gibbs sur les x
                     {
                         //nouveau x à tester
                         x2=x[J];
@@ -1046,7 +1046,7 @@ void RankCluster::computeDistance(vector<vector<double> > const& resProp,vector<
 	output_.distPartialRank=vector<vector<vector<int> > > (resDonneesPartiel.size());
 	vector<int> rangTemp(d_);
 
-	for(int iter(0);iter<distRangPartiel.size();iter++)
+	for(int iter(0); iter < (int) distRangPartiel.size(); iter++)
 	{
 		for(int dim(0);dim<d_;dim++)
 			compteurElemPartiel[dim]=0;
@@ -1189,7 +1189,7 @@ void RankCluster::run()
 				for(int j(0);j<g_;j++)
 				{
 					if(output_.tik(i,j)!=0)
-						output_.entropy(i)-=output_.tik(i,j)*log(output_.tik(i,j));
+						output_.entropy(i)-=output_.tik(i,j)*std::log(output_.tik(i,j));
 				}
 				output_.icl+=2*output_.entropy(i);
 			}
@@ -1228,7 +1228,7 @@ void RankCluster::estimateCriterion(double &L,double &bic,double &icl)
 
     /**initialisation partial rank and order of presentation*/
     //partial data and order of presentation initialization
-    set<int>::iterator itset(0);
+    set<int>::iterator itset;
     for(int dim(0);dim<d_;dim++)
     {
         vector<int> rankTemp(m_[dim]);
@@ -1355,7 +1355,7 @@ void RankCluster::estimateCriterion(double &L,double &bic,double &icl)
                     proba1X=proba1.row(J);
                     p1x=(proba1X*prop).sum();
 
-                    for(int k(0);k<(data_[J][ind].missingIndex).size()-1;k++)//Gibbs sur les x
+                    for(int k(0); k < (int) (data_[J][ind].missingIndex).size()-1; k++)//Gibbs sur les x
                     {
                         //nouveau x à tester
                         x2=x[J];
@@ -1420,7 +1420,7 @@ void RankCluster::estimateCriterion(double &L,double &bic,double &icl)
 		for(int j(0);j<g_;j++)
 		{
 			if(tik(i,j)!=0)
-				entropy(i)-=tik(i,j)*log(tik(i,j));
+				entropy(i)-=tik(i,j)*std::log(tik(i,j));
 		}
 		icl+=2*entropy(i);
 	}
