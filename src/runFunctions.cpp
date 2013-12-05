@@ -34,9 +34,7 @@ vector<vector<vector<int> > > numMat2vvvInt(NumericMatrix XR,vector<int> const& 
                 donnees[k][j][indiceElement]=XR[j+i*g];
                 indiceElement++;
             }
-
         }
-
     }
 
     return donnees;
@@ -62,12 +60,12 @@ RcppExport SEXP freqMultiR(SEXP X,SEXP m)
 
 	vector<vector<int> > data(res.first[0].size(),vector<int>(taille));
 
-	for(int j(0);j<data.size();j++)
+	for(int j(0); j < (int) data.size(); j++)
 	{
 		compteur=0;
 		for(int i(0);i<d;i++)
 		{
-			for(int k(0);k<M[i];k++)
+			for(int k(0); k < M[i]; k++)
 			{
 				data[j][compteur]=res.first[i][j][k];
 				compteur++;
