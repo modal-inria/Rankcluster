@@ -11,7 +11,9 @@
   \item{data}{a matrix in which each row is a ranking
   (partial or not; for partial ranking, missing elements
   must be 0). For multivariate rankings, the rankings of
-  each dimension are placed end to end in each row.}
+  each dimension are placed end to end in each row. The
+  data must be in ordering notation (see Details or
+  \link{convertRank} functions).}
 
   \item{m}{a vector composed of the sizes of the rankings
   of each dimension (default value is the number of column
@@ -72,6 +74,22 @@
   data using the multivariate ISR model. The estimation is
   performed thanks to a SEM-Gibbs algorithm in the general
   case.
+}
+\details{
+  The ranking representation r=(r_1,...,r_m) contains the
+  ranks assigned to the objects, and means that the ith
+  object is in r_ith position.
+
+  The ordering representation o=(o_1,...,o_m) means that
+  object o_i is in the ith position.
+
+  Let us consider the following example to illustrate both
+  notations: a judge, which has to rank three holidays
+  destinations according to its preferences, O1 =
+  Countryside, O2 =Mountain and O3 = Sea, ranks first Sea,
+  second Countryside, and last Mountain. The ordering
+  result of the judge is o = (3, 1, 2) whereas the ranking
+  result is r = (2, 3, 1).
 }
 \examples{
 data(big4)

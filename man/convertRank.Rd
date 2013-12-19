@@ -16,7 +16,8 @@
 \description{
   convertRank converts a rank from its ranking
   representation to its ordering representation, and
-  vice-versa. The transformation to convert a rank from
+  vice-versa. The function does not work with partial
+  ranking. The transformation to convert a rank from
   ordering to ranking representation is the same that from
   ranking to ordering representation, there is no need to
   precise the representation of rank x.
@@ -27,7 +28,7 @@
   object is in r_ith position.
 
   The ordering representation o=(o_1,...,o_m) means that
-  o_i is in the ith position.
+  object o_i is in the ith position.
 
   Let us consider the following example to illustrate both
   notations: a judge, which has to rank three holidays
