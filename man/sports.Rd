@@ -4,7 +4,11 @@
 \title{rank data : sports}
 \format{A list containing :
 \describe{
-\item{data}{a matrix containing 130 ranks of size 7.}
+\item{data}{a matrix containing 130 ranks of size 7 in ranking representation.
+
+  The ranking representation r=(r_1,...,r_m) contains the  ranks assigned to the objects, and means that the ith object is in r_ith position.
+
+For example, if the ranking representation of a rank is (4,3,1,2,5), it means that judge ranks the first object in 4th position, second object in 3rd position, ...}
 
 \item{frequency}{a matrix with 123 differents ranks of size 7. In each row the first 7 columns correspond to one observed ranking and the last column contains the observation frequency.}
 \item{m}{ the size of the rankings (m=7).}
@@ -19,8 +23,8 @@ Statistics and Applied Probability". Chapman & Hall, London, 1995.
 \description{
 This data set is due to Louis Roussos who asked 130 students at the
 University of Illinois to rank seven sports according to their preference in participating:
-1 = Baseball, 2 = Football, 3 = Basketball, 4 = Tennis, 5 = Cycling, 6 =
-Swimming, 7 = Jogging.
+A = Baseball, B = Football, C = Basketball, D = Tennis, E = Cycling, F =
+Swimming, G = Jogging.
 
 	
 }

@@ -16,4 +16,3 @@
 
   This function shows the output from \code{rankclust}.
 }
-

@@ -2,7 +2,7 @@
 \alias{kullback}
 \title{Kullback-Leibler divergence}
 \usage{
-  kullback(proportion1, pi1, mu1, proportion2, pi2, mu2, m)
+kullback(proportion1, pi1, mu1, proportion2, pi2, mu2, m)
 }
 \arguments{
   \item{proportion1,proportion2}{vectors (which sums to 1)
@@ -23,12 +23,11 @@
   dimension.}
 }
 \value{
-  a real, the Kullback-Leibler divergence.
+a real, the Kullback-Leibler divergence.
 }
 \description{
-  This function computes the Kullback-Leibler divergence
-  between two mixtures of multidimensional ISR
-  distributions.
+This function computes the Kullback-Leibler divergence
+between two mixtures of multidimensional ISR distributions.
 }
 \examples{
 proportion1=c(0.4,0.6)
@@ -40,9 +39,9 @@ mu2=matrix(c(1,2,3,4,4,2,1,3),nrow=2,byrow=TRUE)
 dK=kullback(proportion1,pi1,mu1,proportion2,pi2,mu2,4)
 }
 \author{
-  Quentin Grimonprez
+Quentin Grimonprez
 }
 \references{
-  http://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence
+http://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence
 }
 

@@ -2,7 +2,7 @@
 \alias{khi2}
 \title{khi2 test}
 \usage{
-  khi2(data, proportion, mu, pi, nBoot = 1000)
+khi2(data, proportion, mu, pi, nBoot = 1000)
 }
 \arguments{
   \item{data}{a matrix in which each row is a rank of size
@@ -23,11 +23,11 @@
   estimate the khi2 adequation test p-value.}
 }
 \value{
-  a real, the p-value of the khi2 adequation test.
+a real, the p-value of the khi2 adequation test.
 }
 \description{
-  This function computes the p-value of the khi2 adequation
-  test (only for univariate data).
+This function computes the p-value of the khi2 adequation
+test (only for univariate data).
 }
 \examples{
 proportion=c(0.4,0.6)
@@ -39,6 +39,6 @@ simulISR(proportion[2]*100,pi[2],mu[2,]))
 pval=khi2(data,proportion,mu,pi)
 }
 \author{
-  Quentin Grimonprez
+Quentin Grimonprez
 }
 

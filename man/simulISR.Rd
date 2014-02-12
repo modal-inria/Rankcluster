@@ -2,7 +2,7 @@
 \alias{simulISR}
 \title{simulate a sample of ISR(pi,mu)}
 \usage{
-  simulISR(n, pi, mu)
+simulISR(n, pi, mu)
 }
 \arguments{
   \item{n}{size of the sample.}
@@ -14,21 +14,40 @@
   representation.}
 }
 \value{
-  a matrix with simulated ranks.
+a matrix with simulated ranks.
 }
 \description{
-  This function simulates univariate rankings data
-  according to the ISR(pi,mu).
+This function simulates univariate rankings data (ordering
+representation) according to the ISR(pi,mu).
+}
+\details{
+The ranking representation r=(r_1,...,r_m) contains the
+ranks assigned to the objects, and means that the ith
+object is in r_ith position.
+
+The ordering representation o=(o_1,...,o_m) means that
+object o_i is in the ith position.
+
+Let us consider the following example to illustrate both
+notations: a judge, which has to rank three holidays
+destinations according to its preferences, O1 =
+Countryside, O2 =Mountain and O3 = Sea, ranks first Sea,
+second Countryside, and last Mountain. The ordering result
+of the judge is o = (3, 1, 2) whereas the ranking result is
+r = (2, 3, 1).
+
+You can see the \link{convertRank} function to convert the
+simualted ranking drom ordering to ranking representation.
 }
 \examples{
 x=simulISR(30,0.8,1:4)
 }
 \author{
-  Julien Jacques
+Julien Jacques
 }
 \references{
-  [1] C.Biernacki and J.Jacques (2013), A generative model
-  for rank data based on sorting algorithm, Computational
-  Statistics and Data Analysis, 58, 162-176.
+[1] C.Biernacki and J.Jacques (2013), A generative model
+for rank data based on sorting algorithm, Computational
+Statistics and Data Analysis, 58, 162-176.
 }
 

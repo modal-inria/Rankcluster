@@ -1,57 +1,75 @@
+\docType{class}
 \name{Output-class}
 \alias{Output-class}
 \title{Constructor of Output class}
 \description{
-  This class contains a result of a run.
+This class contains a result of a run. Let K be the total
+number of cluster, p the number of dimension m the p-vector
+containing the size of each dimension.
 }
 \details{
-  \describe{ \item{proportion}{a vector of size K (number
-  of clusters), containing the estimated mixture
-  proportions.} \item{pi}{a matrix of size K*p (p= number
-  of dimensions), containing the estimated probabilities of
-  good paired comparison (dispersion parameters).}
-  \item{mu}{a matrix with K rows containing the estimates
-  modal rankings.} \item{ll}{the estimated log-likelihood.}
-  \item{bic}{the estimated BIC criterion.} \item{icl}{the
-  estimated ICL criterion.} \item{tik}{a matrix of size n*K
-  (n= sample size) containing the posterior probability for
-  the ith observation to belong to the kth cluster.}
-  \item{partition}{a vector of size n containing the
-  estimated partition of the observations.}
-  \item{entropy}{a matrix of size n*2 containing the
-  entropy of each individual and its estimated cluster.}
-  \item{probability}{a matrix of size n*2 containing the
-  probability of each individual and its estimated
-  cluster.} \item{convergence}{if FALSE, no convergence has
-  been achieved, no result is available.} \item{partial}{if
-  FALSE, there is no partial rank in the data.}
-  \item{partialRank}{a matrix containing the full rankings,
-  observed or estimated (for partial rankings).}
-  \item{distanceProp}{a list containing the distances
-  between final estimation of the proportions and current
-  estimation of the proportions at each iteration of the
-  algorithm.} \item{distancePi}{a list containing the
-  distances between final estimation of dispersion
-  parameters and current estimation of the dispersion
-  parameters at each iteration of the algorithm.}
-  \item{distanceMu}{a list containing the distances between
-  the final modal rankings estimation and current
-  estimation of the modal rankings at each iteration of the
-  algorithm.} \item{distanceZ}{a vector containing the Rand
-  index between final partition and the current partition
-  at each iteration of the algorithm.}
-  \item{distancePartialRank}{a list containing the Kendall
-  distances between final estimation of the partial
-  rankings and current estimation of the partial rankings
-  at each iteration of the algorithm.}
-  \item{proportionInitial}{a vector containing the
-  initialization of the proportions in the algorithm.}
-  \item{piInitial}{a matrix containing the initialization
-  of the probabilities of good paired comparison in the
-  algorithm.} \item{muInitial}{a matrix containing the
-  initialization of modal rankings in the algorithm.}
-  \item{partialRankInitial}{a matrix containing the
-  initialization of the partial rankings in the algorithm.}
-  }
+\describe{ \item{proportion}{a K-vector of proportions.}
+\item{pi}{a K*p-matrix composed of the scale parameters.}
+\item{mu}{a matrix with K lines and sum(m) columns in which
+line k is composed of the location parameters of cluster
+k..} \item{ll}{the estimated log-likelihood.}
+\item{bic}{the estimated BIC criterion.} \item{icl}{the
+estimated ICL criterion.} \item{tik}{a n*K-matrix
+containing the estimation of the conditional probabilities
+for the observed ranks to belong to each cluster..}
+\item{partition}{a n-vector containing the partition
+estimation resulting from the clustering.} \item{entropy}{a
+n*2-matrix containing for each observation its estimated
+cluster and its entropy. The entropy output illustrates the
+confidence in the clustering of each observation (a high
+entropy means a low confidence in the clustering)..}
+\item{probability}{a n*2-matrix similar to the entropy
+output, containing for each observation its estimated
+cluster and its probability p(xi; mk, pk) given its
+cluster. This probability is estimated using the last
+simulation of the presentation orders used for the
+likelihood approximation. The probability output exhibits
+the best representative of each cluster.}
+\item{convergence}{a boolean indicating if none problem of
+empty class has been encountered.} \item{partial}{a boolean
+indicating the presence of partial rankings or ties.}
+\item{partialRank}{a matrix containing the full rankings,
+estimated using the within cluster ISR parameters when the
+ranking is partial. When ranking is full, partialRank
+simply contains the observed ranking. Available only in
+presence of at least one partial ranking.}
+\item{distanceProp}{Distances (MSE) between the final
+estimation and the current value at each iteration of the
+SEM-Gibbs algorithm (except the burning phase) for
+proportions. A list of Qsem-Bsem elements, each element
+being a K*p-matrix. } \item{distancePi}{Distances (MSE)
+between the final estimation and the current value at each
+iteration of the SEM-Gibbs algorithm (except the burning
+phase) for scale parameters. A list of Qsem-Bsem elements,
+each element being a K*p-matrix.}
+\item{distanceMu}{Distances (Kendall distance) between the
+final estimation and the current value at each iteration of
+the SEM-Gibbs algorithm (except the burning phase) for
+proportions. A list of Qsem-Bsem elements, each element
+being a K*p-matrix.} \item{distanceZ}{a vector of size
+Qsem-Bsem containing the rand index between the final
+estimated partition and the current value at each iteration
+of the SEM-Gibbs algorithm (except the burning phase). Let
+precise that the rand index is not affected by label
+switching.} \item{distancePartialRank}{Kendall distance
+between the final estimation of the partial rankings
+(missing positions in such rankings are estimated) and the
+current value at each iteration of the SEM-Gibbs algorithm
+(except the burning phase). distancePartialRank is a list
+of Qsem-Bsem elements, each element being a matrix of size
+n*p. Available only in presence of at least one partial
+ranking.} \item{proportionInitial}{a vector containing the
+initialization of proportions in the algorithm.}
+\item{piInitial}{a matrix containing the initialization of
+the probabilities of good paired comparison in the
+algorithm.} \item{muInitial}{a matrix containing the
+initialization of modal rankings in the algorithm.}
+\item{partialRankInitial}{a matrix containing the
+initialization of the partial rankings in the algorithm.} }
 }
 

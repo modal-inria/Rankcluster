@@ -2,7 +2,7 @@
 #define RUN_H_
 
 #include "RankCluster.h"
-#include <Rcpp.h>
+#include <RcppEigen.h>
 
 RcppExport SEXP semR(SEXP X,SEXP m,SEXP K,SEXP Qsem,SEXP Bsem,SEXP Ql,SEXP Bl,SEXP RjSE,SEXP RjM,SEXP maxTry,SEXP run,SEXP detail);
 

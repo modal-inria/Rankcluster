@@ -14,4 +14,3 @@
   various slots of the output from the function
   \code{\link{rankclust}}.
 }
-

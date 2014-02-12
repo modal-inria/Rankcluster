@@ -98,7 +98,7 @@ RcppExport SEXP simulISRR(SEXP n,SEXP m,SEXP mu,SEXP p)
 
 RcppExport SEXP loglikelihood(SEXP X,SEXP mu,SEXP p, SEXP proportion,SEXP m, SEXP iterL, SEXP burnL)
 {
-    //conversion
+  //conversion
 	NumericMatrix XR(X);
 	int n(XR.nrow()),col(XR.ncol());
 	vector<vector<int> > data(n,vector<int> (col));
@@ -106,9 +106,9 @@ RcppExport SEXP loglikelihood(SEXP X,SEXP mu,SEXP p, SEXP proportion,SEXP m, SEX
 		for(int j(0);j<col;j++)
 			data[i][j]=XR[i+j*n];
 
-    NumericVector proportionR(proportion);
+  NumericVector proportionR(proportion);
 	NumericVector mR(m);
-    vector<int> mC=as<vector<int> > (mR);
+  vector<int> mC=as<vector<int> > (mR);
 	vector<double> prop=as<vector<double> > (proportionR);
 	vector<vector<double> > pC;
 	pC=convertToVVd(p);
@@ -117,7 +117,7 @@ RcppExport SEXP loglikelihood(SEXP X,SEXP mu,SEXP p, SEXP proportion,SEXP m, SEX
 	vector<vector<vector<int> > > muC;
 	muC=numMat2vvvInt(mu,mC);
 
-    SEMparameters param;
+  SEMparameters param;
 	param.nGibbsSE=mC;
 	param.nGibbsM=mC;
 	param.maxIt=1;
@@ -127,10 +127,51 @@ RcppExport SEXP loglikelihood(SEXP X,SEXP mu,SEXP p, SEXP proportion,SEXP m, SEX
 	param.maxTry=1;
 	param.detail=false;
 
-    RankCluster estimLog(data,mC,param,prop,pC,muC);
+  RankCluster estimLog(data,mC,param,prop,pC,muC);
+  if(!estimLog.dataOk())
+  {
+  	return List::create(Named("ll")=wrap("pb"));  
+  }
+  
+  double L,bic,icl;
+  estimLog.estimateCriterion(L,bic,icl);
 
-    double L,bic,icl;
-    estimLog.estimateCriterion(L,bic,icl);
+  return List::create(Named("ll")=wrap(L),Named("bic")=wrap(bic),Named("icl")=wrap(icl));
+}
 
-    return List::create(Named("ll")=wrap(L),Named("bic")=wrap(bic),Named("icl")=wrap(icl));
+
+
+RcppExport SEXP computeProba(SEXP X,SEXP mu,SEXP pi,SEXP m)
+{
+  //conversion
+  NumericVector piR(pi), mR(m);
+  NumericMatrix muR(mu), XR(X);
+  vector<double> piC = as<vector<double> >(piR);
+  vector<vector<int> > muC(mR.size());
+  vector<vector<int> > xC(mR.size());
+
+  for(int i = 0; i < mR.size(); i++)
+  {
+    xC[i].resize(mR[i]);
+    muC[i].resize(mR[i]);
+  }
+
+  int j = 0, k = 0;
+  for(int i = 0; i < muR.ncol(); i++)
+  {
+    if(k == mR[j])
+    {
+      j++;
+      k = 0;
+    }
+    muC[j][k] = muR[i];
+    xC[j][k] = XR[i];
+    
+    k++;
+  }
+
+  double probabi;
+  probabi = proba(xC, muC, piC);
+  
+  return wrap(probabi);
 }

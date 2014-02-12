@@ -2,21 +2,21 @@
 \alias{unfrequence}
 \title{Convert data}
 \usage{
-  unfrequence(data)
+unfrequence(data)
 }
 \arguments{
   \item{data}{a matrix containing rankings and observation
   frequency.}
 }
 \value{
-  a matrix containing all the rankings.
+a matrix containing all the rankings.
 }
 \description{
-  This function takes in input a matrix in which the m
-  first columns are the different observed ranks and the
-  last column contains the observation frequency, and
-  returns a matrix containing all the ranks (ranks with
-  frequency>1 are repeated).
+This function takes in input a matrix in which the m first
+columns are the different observed ranks and the last
+column contains the observation frequency, and returns a
+matrix containing all the ranks (ranks with frequency>1 are
+repeated).
 }
 \examples{
 data(quiz)

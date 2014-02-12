@@ -4,9 +4,13 @@
 \title{Multidimensionnal rank data : quiz}
 \format{A list containing:
 \describe{
-\item{data}{a matrix of size 70*16. The student's answers are in row and the 16 columns correspond to the 4 rankings (for the 4 quizzes) of size 4 (ordering representation).}
+\item{data}{a matrix of size 70*16. The student's answers are in row and the 16 columns correspond to the 4 rankings (for the 4 quizzes) of size 4 (ranking representation).
+
+  The ranking representation r=(r_1,...,r_m) contains the  ranks assigned to the objects, and means that the ith object is in r_ith position.
+
+For example, if the ranking representation of a rank is (4,3,1,2,5), it means that judge ranks the first object in 4th position, second object in 3rd position, ...}
 \item{frequency}{a matrix of size 63*17. Each row corresponds to one of the 63 differents observed
-rankings (ordering representation). Each row contains 4 ranks of size 4 and a last column for the frequency.}
+rankings (ranking representation). Each row contains 4 ranks of size 4 and a last column for the frequency.}
 \item{m}{a vector with the sizes of the ranks for each dimension.}
 
 }
@@ -22,18 +26,18 @@ This dataset contains the answers of 70 students (40 of third year and 30 of fou
 
 \item{Literature Quiz}{
 This quiz consists of ranking four french writers according to chronological order:
- 1=Victor Hugo, 2=Moliere, 3=Albert Camus, 4=Jean-Jacques Rousseau.}
+ A=Victor Hugo, B=Moliere, C=Albert Camus, D=Jean-Jacques Rousseau.}
 
 \item{Football Quiz}{
-This quiz consists of ranking four national football teams according to increasing number of wins in the football World Cup: 1=France, 2=Germany, 3=Brazil, 4=Italy.}
+This quiz consists of ranking four national football teams according to increasing number of wins in the football World Cup: A=France, B=Germany, C=Brazil, D=Italy.}
 
 \item{Mathematics Quiz}{
 This quiz consists of ranking four numbers according to increasing order: 
-1=pi/3, 2=log(1), 3=exp(2), 4=(1+sqrt(5))/2.}
+A=pi/3, B=log(1), C=exp(2), D=(1+sqrt(5))/2.}
 
 \item{Cinema Quiz}{
 This quiz consists of ranking four Tarentino's movies according to chronological order: 
-1=Inglourious Basterds, 2=Pulp Fiction, 3=Reservoir Dogs, 4=Jackie Brown.}
+A=Inglourious Basterds, B=Pulp Fiction, C=Reservoir Dogs, D=Jackie Brown.}
 
 }	
 }

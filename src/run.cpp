@@ -26,8 +26,14 @@ RcppExport SEXP semR(SEXP X,SEXP m,SEXP K,SEXP Qsem,SEXP Bsem,SEXP Ql,SEXP Bl,SE
 			data[i][j]=XR[i+j*n];
 
 	RankCluster semgibbs(data,g,mC,param);
+  if(!semgibbs.dataOk())
+  {
+    vector<double> stock(1,2);
+		return List::create(Named("stock")=wrap(stock),Named("indexPb")=wrap(semgibbs.indexPb()));  
+  }
+  
 	semgibbs.run();
-	
+  
 	//multiple run
 	if(runC>1)
 	{
@@ -62,29 +68,32 @@ RcppExport SEXP semR(SEXP X,SEXP m,SEXP K,SEXP Qsem,SEXP Bsem,SEXP Ql,SEXP Bl,SE
 		int d=mC.size();
 		int n=XR.nrow();
 		vector<vector<vector<int> > > data(d,vector<vector<int> > (n));
-		
+    vector<vector<vector<double> > > scorePart(d,vector<vector<double> > (n));
 
 		for(int i(0);i<n;i++)
 		{
 			for(int dim(0);dim<d;dim++)
 			{
 				data[dim][i]=semgibbs.rank(dim,i);
+        scorePart[dim][i].resize(mC[dim],1);
 			}
 		}
 
-		vector<vector<vector<int> > > dataInit(data);
+  	vector<vector<vector<int> > > dataInit(data);
 
 		if(semgibbs.partial())
 		{
 			vector<vector<vector<int> > > dataInitSEM(semgibbs.initialPartialRank());
 			vector<vector<int> > indexPartial=semgibbs.indexPartialData();
-
+  		vector<vector<vector<double> > > scorePartial(semgibbs.partialRankScore());
+      
 			for(int dim(0);dim<d;dim++)
 			{
 				int compteur(0);
 				for(vector<int>::iterator it=indexPartial[dim].begin();it!=indexPartial[dim].end();it++)
 				{
 					dataInit[dim][*it]=dataInitSEM[dim][compteur];
+          scorePart[dim][*it]=scorePartial[dim][compteur];        
 					compteur++;
 				}
 			}
@@ -111,10 +120,10 @@ RcppExport SEXP semR(SEXP X,SEXP m,SEXP K,SEXP Qsem,SEXP Bsem,SEXP Ql,SEXP Bl,SE
 			Named("initMu")=wrap(semgibbs.initialMu()),
 			Named("initZ")=wrap(semgibbs.initialZ()),
 			Named("initPi")=wrap(semgibbs.initialP()),
-			//Named("initPartialRank")=wrap(semgibbs.initialPartialRank()),
 			Named("initPartialRank")=wrap(dataInit),
-			Named("initProportion")=wrap(semgibbs.initialProportion())//,
-            //Named("indexPartialData")=wrap(semgibbs.indexPartialData())
+			Named("initProportion")=wrap(semgibbs.initialProportion()),
+      Named("scorePartial")=wrap(scorePart)//,
+      //Named("indexPartialData")=wrap(semgibbs.indexPartialData())
 			);
 	}
 	else

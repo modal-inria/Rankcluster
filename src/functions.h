@@ -85,6 +85,7 @@ std::vector<int> rank2index(std::vector<std::vector<int> > const& listeRang,std:
  * m!= m m-1 .. 1
  */
 std::vector<int> index2rank(int index,int const& m,std::vector<int> const& tabFactorial);
+std::vector<int> index2rankb(int index,int const& m,std::vector<int> const& tabFactorial);
 std::vector<int> index2rank(int index,int const& m);
 
 
@@ -173,5 +174,14 @@ std::vector<std::vector<int> > simulISR(int const& n,int const& m,std::vector<in
  */
 std::pair<std::vector<std::vector<std::vector<int> > >,std::vector<int> >
 freqMulti(std::vector<std::vector<std::vector<int> > > const& listeRang);
+
+/**
+ * compute probability of x according to multivariate ISR
+ * @param x rank for each dimension for compute probability
+ * @param mu reference rank for each dimension
+ * @param pi dispersion parameter for each dimension
+ * @return p(x;mu,pi)
+ */
+double proba(std::vector<std::vector<int> > const& x, std::vector<std::vector<int> > const& mu, std::vector<double> const& pi);
 
 #endif /* FUNCTIONS_H_ */

@@ -1,5 +1,0 @@
-Rankcluster is licensed under GPL (>=2).
-Eigen code (src/Eigen) is dual licensed under GPL (>=2) and MPL-2.
-See http://www.gnu.org/licenses/license-list.html#MPL-2.0 for more details about the dual-licensing.
-The MPL-2 license is available at http://www.mozilla.org/MPL/2.0/ .
-The various GPL licenses are available at http://www.gnu.org/licenses/#LicenseURLs .

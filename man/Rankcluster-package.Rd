@@ -20,8 +20,8 @@ The heterogeneity of the rank population is modelled by a mixture of ISR, wherea
 \tabular{ll}{
 Package: \tab Rankcluster\cr
 Type: \tab Package\cr
-Version: \tab 0.91.6\cr
-Date: \tab 2013-12-19\cr
+Version: \tab 0.92\cr
+Date: \tab 2014-02-11\cr
 License: \tab GPL (>=2) | file LICENSE\cr
 }
 
@@ -33,6 +33,9 @@ Maintainer: Quentin Grimonprez <quentin.grimonprez@inria.fr>
 }
 
 \examples{
+#see vignette
+#vignette("Rankcluster")
+
 #main function of the package for run the algorithm
 data(big4)
 result=rankclust(big4$data,K=2,m=big4$m,Ql=200,Bl=100,maxTry=2)

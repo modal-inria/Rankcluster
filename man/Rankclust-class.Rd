@@ -1,16 +1,26 @@
+\docType{class}
 \name{Rankclust-class}
 \alias{Rankclust-class}
 \title{Constructor of Rankclust class}
 \description{
-  This class contains results of rankclust function.
+This class contains results of rankclust function.
 }
 \details{
-  \describe{ \item{K}{vector containing the number of
-  clusters.} \item{data}{data used in algorithm.}
-  \item{criterion}{criterion defined in rankclust function
-  to select the best result.} \item{convergence}{if 0, no
-  convergence, no result available in results.}
-  \item{results}{a list of the same length than K,
-  containing Output objects.} }
+\describe{ \item{K}{a vector of the number of clusters.}
+\item{data}{the data used for clustering.}
+\item{criterion}{the model selection criterion used.}
+\item{convergence}{a boolean indicating if none problem of
+empty class has been encountered (for any number of
+clusters).} \item{results}{a list of \link{Output-class},
+containing the results for each number of clusters (one
+element of the list is associated to one number of
+clusters).} }
+
+If res is the result of rankclust(), each slot of results
+can be reached by res[k]@slotname, where k is the number of
+clusters and slotname is the name of the slot we want to
+reach (see \link{Output-class}). For the slots ll, bic,
+icl, res["slotname"] returns a vector of size K containing
+the values of the slot for each number of clusters.
 }
 

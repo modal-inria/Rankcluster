@@ -34,15 +34,40 @@ mixtureSEM<-function(X,g,m,Qsem,Bsem,Ql,Bl,RjSE,RjM,maxTry,run,detail)
 	#Verification des donnees
 	for(i in 1:d)
 	{
-		if(sum(apply(X[,(1+cumsum(c(0,m))[i]):(cumsum(c(0,m))[i+1])],1,checkPartialRank,m[i]))!=n)
-			stop("Data are not correct")
+    check=apply(X[,(1+cumsum(c(0,m))[i]):(cumsum(c(0,m))[i+1])],1,checkTiePartialRank,m[i])
+		if(sum(check)!=n)
+		{
+      indfalse=which(check==0)
+		  stop(cat("Data are not correct.\n","For dimension",i,", ranks at row",indfalse,"are not correct."))
+		}
+			
 	}
 
 	res=.Call("semR",X,m,g,Qsem,Bsem,Ql,Bl,RjSE,RjM,maxTry,run,detail,PACKAGE="Rankcluster")
+	if(res$stock[1]==2)
+	{
+	  res$indexPb=lapply(res$indexPb,unique)
+    for(i in 1:d)
+    {
+      if(length(res$indexPb)!=0)
+      {
+        cat(paste0("For dimension ",i,", rankings at the following index have format problem :\n"))
+        cat(res$indexPb[[i]])
+      }
+    }
+    stop("Problem with your data.\n The ranks have to be given in the ranking notation (see convertRank function), with the following convention :
+- missing positions are replaced by 0
+- tied are replaced by the lowest position they share\n")
+	}
+
+  
 	#récupération des résultats
 	if(res$stock[1]==1)#si convergence
 	{
-
+# 	  print("la")
+#     print(res$referenceRank)
+# 	  print("la")
+#     print(res$initMu)
 		res$referenceRank=tliste3d2mat(res$referenceRank)
 		res$initMu=tliste3d2mat(res$initMu)
 		res$p=liste2d2matgd(res$p)
@@ -57,25 +82,60 @@ mixtureSEM<-function(X,g,m,Qsem,Bsem,Ql,Bl,RjSE,RjM,maxTry,run,detail)
 		res$distMu=liste3d2listematgd(res$distMu)
 		res$distP=liste3d2listematgd(res$distP)
 
+    ###rank conversion from ordering to ranking
+		indM=c(0,cumsum(m))
+    
+		for(i in 1:length(m))
+		{
+		  #res$initMu
+		  res$initMu[,(indM[i]+1):indM[i+1]]=t(apply(res$initMu[,(indM[i]+1):indM[i+1],drop=FALSE],1,convertRank))
+		  
+		  #res$referenceRank
+		  res$referenceRank[,(indM[i]+1):indM[i+1]]=t(apply(res$referenceRank[,(indM[i]+1):indM[i+1],drop=FALSE],1,convertRank))
+		  
+		}
+    
+
 
 		if(res$stock[2]==1)#si il y a des données partielles
 		{
-			#print(res$partialRank)#liste[[dim]][[ind]] vector
-			#print(res$initPartialRank)#liste[[dim]][[ind]] vector
+# 			print(res$partialRank)#liste[[dim]][[ind]] vector
+# 			print(res$initPartialRank)#liste[[dim]][[ind]] vector
 			#print(res$distPartialRank[[1]])#liste 30 iter
 			#print(res$indexPartialData)
-
 			res$partialRank=tliste3d2mat(res$partialRank)##proba a rajouté 
 
 			rownames(res$partialRank)=rep("",nrow(res$partialRank))#enlever les cl1...
 			#colnames(res$partialRank)[1]="Index"
 			#colnames(res$partialRank)[ncol(res$rangPartial)]="Probability"
-
+      #print(res$initPartialRank)
 			res$initPartialRank=tliste3d2mat(res$initPartialRank)
+      #print(res$scorePartial)
+      res$scorePartial=tliste3d2mat(res$scorePartial)
 			#colnames(res$initPartialRank)[1]="Index"
 			rownames(res$initPartialRank)=rep("",nrow(res$initPartialRank))
+      rownames(res$scorePartial)=rep("",nrow(res$scorePartial))
 
+			###rank conversion from ordering to ranking
+			for(i in 1:length(m))
+			{
+			  #res$initPartialRank
+			  res$initPartialRank[,(indM[i]+1):indM[i+1]]=t(apply(res$initPartialRank[,(indM[i]+1):indM[i+1],drop=FALSE],1,convertRank))
+			  
+			  #res$partialRank
+# 			  res$partialRank[,(indM[i]+1):indM[i+1]]=t(apply(res$partialRank[,(indM[i]+1):indM[i+1],drop=FALSE],1,convertRank))
+			  for(j in 1:n)
+			  {
+          ordtemp=order(res$partialRank[j,(indM[i]+1):indM[i+1]])
+          res$partialRank[j,(indM[i]+1):indM[i+1]]=ordtemp
+          res$scorePartial[j,(indM[i]+1):indM[i+1]]=res$scorePartial[j,((indM[i]+1):indM[i+1])][ordtemp]
+          
+			  }
+			}
+      
+      
 			res$distPartialRank=lapply(res$distPartialRank,FUN=function(x){listedistPartiel(x)})
+      
 			result=new(Class="Output",
 				bic=res$stock[4],
 				icl=res$stock[5],
@@ -96,9 +156,10 @@ mixtureSEM<-function(X,g,m,Qsem,Bsem,Ql,Bl,RjSE,RjM,maxTry,run,detail)
 				distancePi=res$distP,
 				distancePartialRank=res$distPartialRank,
 				piInitial=res$initPi,
-   				muInitial=res$initMu,
+   			muInitial=res$initMu,
 				partialRankInitial=res$initPartialRank,
-				proportionInitial=res$initProportion)
+				proportionInitial=res$initProportion,
+        partialRankScore=res$scorePartial)
 		}
 		else
 		{
@@ -121,7 +182,7 @@ mixtureSEM<-function(X,g,m,Qsem,Bsem,Ql,Bl,RjSE,RjM,maxTry,run,detail)
 				distanceProp=res$distProp,
 				distancePi=res$distP,
 				piInitial=res$initPi,
-   				muInitial=res$initMu,
+   			muInitial=res$initMu,
 				proportionInitial=res$initProportion)
 		}
 

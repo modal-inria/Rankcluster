@@ -3,12 +3,18 @@
 \alias{summary}
 \alias{summary,Rankclust-method}
 \title{summary function.}
+\usage{
+\S4method{summary}{Rankclust}(object, ...)
+}
 \arguments{
   \item{object}{output object from
   \code{\link{rankclust}}.}
+
+  \item{...}{additional arguments affecting the summary
+  produced.}
 }
 \description{
-  This function This function gives the summary of output
-  from \code{rankclust}.
+This function This function gives the summary of output
+from \code{rankclust}.
 }
 

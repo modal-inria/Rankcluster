@@ -8,6 +8,7 @@
 #include <iostream>
 #include <algorithm>
 #include <cmath>
+#include <map>
 
 #include "functions.h"
 
@@ -18,7 +19,6 @@ using namespace std;
 int positionRank(vector<int> const& x,int const& i)
 {
     int j(0);
-
     while(x[j]!=i)
         j++;
 
@@ -44,7 +44,7 @@ vector<int> comparaison(vector<int> const& x,vector<int> const& y,vector<int> co
         for (int i(0);i<j;i++)
         {
             //calcul Aj-
-            if (positionRank(x,y[i])<positionRank(x,y[j]))
+            if(positionRank(x,y[i]) < positionRank(x,y[j]))
             {
                 ajmoins.push_back(i);
                 ajmoinsb.push_back(i);
@@ -55,13 +55,14 @@ vector<int> comparaison(vector<int> const& x,vector<int> const& y,vector<int> co
                 ajplusbIndex.push_back(i);
             }
         }
+
         if (ajplusb.size()>0)//si le Aj+ en cours est non vide, on rajoute l'index du min � Aj+
         {
             index=min_element(ajplusb.begin(), ajplusb.end())- ajplusb.begin();
             ajplus.push_back(ajplusbIndex[index]);
 
             //calcul de G+
-            if (positionRank(mu,y[j])<positionRank(mu,y[ajplus[ajplus.size()-1]]))
+            if(positionRank(mu,y[j]) < positionRank(mu,y[ajplus[ajplus.size()-1]]))
             {
                 gplus++;
                 gjplusb++;
@@ -103,7 +104,7 @@ double probaCond(vector<int> const& x,vector<int> const& y,vector<int> const& mu
 //factorial function
 int factorial(int const& nombre)
 {
-	int temp;
+  int temp;
 
 	if(nombre<=1)
         return 1;
@@ -244,6 +245,38 @@ vector<int> index2rank(int index,int const& m)
     }
 }
 
+vector<int> index2rankb(int index,int const& m,vector<int> const& tabFactorial)
+{
+        vector<int> liste(m),r(m,0);
+        int temp(0),temp2(0);
+
+        index--;
+        r[0]=index/tabFactorial[m-2]+1;
+
+        for(int i(0);i<m;i++)
+            liste[i]=i+1;
+
+        //on supprime l'élément égale à r[0]
+        liste.erase(remove_if(liste.begin(), liste.end(), bind2nd(equal_to<int>(), r[0])), liste.end());
+
+        for(int j(1);j<m-1;j++)
+        {
+            temp=index;
+            for(int k(1);k<j+1;k++)
+                temp%=tabFactorial[m-k-1];
+
+            temp2=temp/tabFactorial[m-j-2];
+            r[j]=liste[temp2];
+
+            //replace (liste.begin(), liste.end(), r[j], 0);
+            liste.erase(remove_if(liste.begin(), liste.end(), bind2nd(equal_to<int>(),r[j])), liste.end());
+
+        }
+        r[m-1]=liste[0];
+
+        return r;
+
+}
 
 vector<int> listeSigma(int const& m,vector<int> const& tabFactorial)
 {
@@ -547,5 +580,48 @@ pair<vector<vector<vector<int> > >,vector<int> > freqMulti(vector<vector<vector<
     delete currRang;
 
     return make_pair(donnees,freq);
+}
+
+double proba(vector<vector<int> > const& x, vector<vector<int> > const& mu, vector<double> const& pi)
+{
+  int d = pi.size();
+  vector<double> probaDim(d,0);
+  double finalProba;
+  vector<int> tabFact,listeY,y;
+  vector<int> m(mu.size());
+  map<int,vector<int> > diffDim;
+  
+  for(int dim = 0; dim < d; dim++)
+  {
+    m[dim] = mu[dim].size();
+    diffDim[m[dim]].push_back(dim);  
+  }
+         
+  for(map<int, vector<int> >::iterator it = diffDim.begin(); it!=diffDim.end(); it++)
+  {
+    int m = it->first;
+    tabFact = tab_factorial(m);
+    listeY = listeSigma(m,tabFact);
+    double div = 2. / (double) tabFact[m-1];
+    vector<int> aa=index2rankb(1,m,tabFact);
+
+    for(int i = 0; i < tabFact[m-1]/2; i++)
+    {
+      y = index2rankb(listeY[i],m,tabFact);
+
+      for(int j = 0; j < (int) (it->second).size(); j++)
+        probaDim[(it->second)[j]] += probaCond(x[(it->second)[j]],y,mu[(it->second)[j]],pi[(it->second)[j]]);
+    }
+    
+    for(int j = 0; j < (int) (it->second).size(); j++)
+      probaDim[(it->second)[j]] *= div;
+  }
+
+  finalProba = probaDim[0];
+  for(int dim = 1; dim < d; dim++)
+    finalProba *= probaDim[dim];
+    
+  return finalProba;
+  
 }
 

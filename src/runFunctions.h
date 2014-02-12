@@ -1,7 +1,7 @@
 #ifndef RUNFUNCTIONS_H_
 #define RUNFUNCTIONS_H_
 
-#include <Rcpp.h>
+#include <RcppEigen.h>
 #include <vector>
 #include <set>
 
@@ -10,6 +10,7 @@ std::vector<std::vector<std::vector<int> > > numMat2vvvInt(Rcpp::NumericMatrix X
 RcppExport SEXP freqMultiR(SEXP X,SEXP m);
 RcppExport SEXP simulISRR(SEXP n,SEXP m,SEXP mu,SEXP p);
 RcppExport SEXP loglikelihood(SEXP X,SEXP mu,SEXP p, SEXP proportion,SEXP m, SEXP iterL, SEXP burnL);
+RcppExport SEXP computeProba(SEXP X,SEXP mu,SEXP pi,SEXP m);
 
 #endif /* RUNFUNCTIONS_H_ */
 

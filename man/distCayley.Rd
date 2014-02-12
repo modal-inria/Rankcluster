@@ -2,18 +2,18 @@
 \alias{distCayley}
 \title{Cayley distance between two ranks}
 \usage{
-  distCayley(x, y)
+distCayley(x, y)
 }
 \arguments{
   \item{x,y}{two ranks of size m.}
 }
 \value{
-  the Cayley distance between x and y.
+the Cayley distance between x and y.
 }
 \description{
-  The Cayley distance between two ranks x and y is the
-  minimum number of transpositions required to transform
-  the ranking x into y.
+The Cayley distance between two ranks x and y is the
+minimum number of transpositions required to transform the
+ranking x into y.
 }
 \examples{
 x=1:5
@@ -21,6 +21,6 @@ y=c(2,3,1,4,5)
 distCayley(x,y)
 }
 \author{
-  Julien Jacques
+Julien Jacques
 }
 

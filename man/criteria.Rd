@@ -2,7 +2,7 @@
 \alias{criteria}
 \title{criteria estimation}
 \usage{
-  criteria(data, proportion, pi, mu, m, Ql = 500, Bl = 100)
+criteria(data, proportion, pi, mu, m, Ql = 500, Bl = 100)
 }
 \arguments{
   \item{data}{a matrix in which each row is a rank (partial
@@ -31,14 +31,14 @@
   \item{Bl}{burn-in period of the Gibbs sampler.}
 }
 \value{
-  a list containing: \item{ll}{the estimated
-  log-likelihood.} \item{bic}{the estimated BIC criterion.}
-  \item{icl}{the estimated ICL criterion.}
+a list containing: \item{ll}{the estimated log-likelihood.}
+\item{bic}{the estimated BIC criterion.} \item{icl}{the
+estimated ICL criterion.}
 }
 \description{
-  This function estimates the loglikelihood of a mixture of
-  multidimensional ISR model, as well as the BIC and ICL
-  model selection criteria.
+This function estimates the loglikelihood of a mixture of
+multidimensional ISR model, as well as the BIC and ICL
+model selection criteria.
 }
 \examples{
 data(big4)
@@ -47,6 +47,6 @@ if(res@convergence)
 	crit=criteria(big4$data,res[2]@proportion,res[2]@pi,res[2]@mu,big4$m,Ql=200,Bl=100)
 }
 \author{
-  Quentin Grimonprez
+Quentin Grimonprez
 }
 

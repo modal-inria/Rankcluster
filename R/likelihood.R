@@ -101,7 +101,7 @@ criteria <-function(data,proportion,pi,mu,m,Ql=500,Bl=100)
   #check data
   for(i in 1:length(m))
   {
-    if(sum(apply(data[,(1+cumsum(c(0,m))[i]):(cumsum(c(0,m))[i+1])],1,checkPartialRank,m[i]))!=nrow(data))
+    if(sum(apply(data[,(1+cumsum(c(0,m))[i]):(cumsum(c(0,m))[i+1])],1,checkTiePartialRank,m[i]))!=nrow(data))
       stop("Data are not correct")
   }
 
@@ -110,6 +110,8 @@ criteria <-function(data,proportion,pi,mu,m,Ql=500,Bl=100)
   
   LL=.Call("loglikelihood",data,mu,a,proportion,m,Ql,Bl,PACKAGE="Rankcluster")
   
+  if(LL$ll=="pb")
+    stop("Data are not correct.")
   return(LL)
 }
 

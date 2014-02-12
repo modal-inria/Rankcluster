@@ -1,10 +1,13 @@
-#' This functions estimates a clustering of ranking data, potentially multivariate and partial, based on a mixture of multivariate ISR model [2].
+#' This functions estimates a clustering of ranking data, potentially multivariate, partial and containing tied, based on a mixture of multivariate ISR model [2].
 #' By specifying only one cluster, the function performs a modelling of the ranking data using the multivariate ISR model.
 #' The estimation is performed thanks to a SEM-Gibbs algorithm in the general case.
 #'
 #' @title model-based clustering for multivariate partial ranking
 #' @author Quentin Grimonprez
-#' @param data a matrix in which each row is a ranking (partial or not; for partial ranking, missing elements must be 0). For multivariate rankings, the rankings of each dimension are placed end to end in each row. The data must be in ordering notation (see Details or \link{convertRank} functions).
+#' @param data a matrix in which each row is a ranking (partial or not; for partial ranking, 
+#' missing elements must be 0. Tied are replaced by the lowest position they share). For multivariate rankings, the rankings of each dimension are 
+#' placed end to end in each row. The data must be in ranking notation (see Details or 
+#' \link{convertRank} functions).
 #' @param m a vector composed of the sizes of the rankings of each dimension (default value is the number of column of the matrix data).
 #' @param K an integer or a vector of integer with the number of clusters.
 #' @param criterion criterion "bic" or "icl", criterion to minimize for selecting the number of clusters.
@@ -19,7 +22,7 @@
 #' @param maxTry maximum number of restarts of the SEM-Gibbs algorithm in the case of non convergence (default value=3).
 #' @param run number of runs of the algorithm for each value of K.
 #' @param detail boolean, if TRUE, time and others informations will be print during the process (default value FALSE).
-#' @return An object of class rankclust.
+#' @return An object of class rankclust (See \code{\link{Output-class}} and \code{\link{Rankclust-class}}).
 #'
 #' For example :
 #' res=rankclust(data,K=1:2,m=m)
@@ -36,6 +39,13 @@
 #' 
 #' @details
 #' 
+#' The ranks have to be given to the package in the ranking notation (see \link{convertRank} function), with the following convention :
+#' 
+#' - missing positions are replaced by 0
+#' 
+#' - tied are replaced by the lowest position they share"
+#' 
+#' 
 #'   The ranking representation r=(r_1,...,r_m) contains the
 #' ranks assigned to the objects, and means that the ith
 #' object is in r_ith position.
@@ -51,11 +61,14 @@
 #' result of the judge is o = (3, 1, 2) whereas the ranking
 #' result is r = (2, 3, 1).
 #' 
+#' 
 #' @seealso See \code{\link{Output-class}} and \code{\link{Rankclust-class}} for available output.
 #' 
 #' @useDynLib Rankcluster
 #' @export
-
+#' 
+#' @import Rcpp methods
+#' 
 rankclust<-function(data,m=ncol(data),K=1,criterion="bic",Qsem=100,Bsem=20,RjSE=m*(m-1)/2,RjM=m*(m-1)/2,Ql=500,Bl=100,maxTry=3,run=1,detail=FALSE)
 {
 
@@ -76,7 +89,7 @@ rankclust<-function(data,m=ncol(data),K=1,criterion="bic",Qsem=100,Bsem=20,RjSE=
 		}
 		else
 		{
-			cat("\n for K=",k,"clusters, the algorithm has not converge (a proportion was equal to 0 during the process), please retry\n")
+			cat("\n for K=",k,"clusters, the algorithm has not converged (a proportion was equal to 0 during the process), please retry\n")
 		}	
 	}
 
