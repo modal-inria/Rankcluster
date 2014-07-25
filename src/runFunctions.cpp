@@ -2,6 +2,9 @@
 #include "runFunctions.h"
 #include "runTest.h"
 #include "RankCluster.h"
+#ifdef SUPPORT_OPENMP
+#include <omp.h>
+#endif
 
 using namespace Rcpp ;
 using namespace std ;
@@ -96,21 +99,25 @@ RcppExport SEXP simulISRR(SEXP n,SEXP m,SEXP mu,SEXP p)
 	return data;
 }
 
-RcppExport SEXP loglikelihood(SEXP X,SEXP mu,SEXP p, SEXP proportion,SEXP m, SEXP iterL, SEXP burnL)
+RcppExport SEXP loglikelihood(SEXP X,SEXP mu,SEXP p, SEXP proportion,SEXP m, SEXP iterL, SEXP burnL, SEXP IC, SEXP nb_cpus)
 {
   //conversion
 	NumericMatrix XR(X);
 	int n(XR.nrow()),col(XR.ncol());
 	vector<vector<int> > data(n,vector<int> (col));
-	for(int i(0);i<n;i++)
-		for(int j(0);j<col;j++)
-			data[i][j]=XR[i+j*n];
-
+  for(int i = 0; i < n; i++)
+		for(int j = 0; j < col; j++)
+			data[i][j] = XR[i+j*n];
+      
+  int nbRun = as<int>(IC);
+  int nb = as<int>(nb_cpus);
   NumericVector proportionR(proportion);
 	NumericVector mR(m);
+  
   vector<int> mC=as<vector<int> > (mR);
-	vector<double> prop=as<vector<double> > (proportionR);
+	vector<double> prop=as<vector<double> >(proportionR);
 	vector<vector<double> > pC;
+  
 	pC=convertToVVd(p);
 
 	NumericMatrix muR(mu);
@@ -118,14 +125,14 @@ RcppExport SEXP loglikelihood(SEXP X,SEXP mu,SEXP p, SEXP proportion,SEXP m, SEX
 	muC=numMat2vvvInt(mu,mC);
 
   SEMparameters param;
-	param.nGibbsSE=mC;
-	param.nGibbsM=mC;
-	param.maxIt=1;
-	param.burnAlgo=1;
-	param.nGibbsL=as<int>(iterL);
-	param.burnL=as<int>(burnL);
-	param.maxTry=1;
-	param.detail=false;
+	param.nGibbsSE = mC;
+	param.nGibbsM = mC;
+	param.maxIt = 1;
+	param.burnAlgo = 1;
+	param.nGibbsL = as<int>(iterL);
+	param.burnL = as<int>(burnL);
+	param.maxTry = 1;
+	param.detail = false;
 
   RankCluster estimLog(data,mC,param,prop,pC,muC);
   if(!estimLog.dataOk())
@@ -133,10 +140,36 @@ RcppExport SEXP loglikelihood(SEXP X,SEXP mu,SEXP p, SEXP proportion,SEXP m, SEX
   	return List::create(Named("ll")=wrap("pb"));  
   }
   
-  double L,bic,icl;
-  estimLog.estimateCriterion(L,bic,icl);
+  vector<double> L(nbRun,0), bic(nbRun,0), icl(nbRun,0);
 
-  return List::create(Named("ll")=wrap(L),Named("bic")=wrap(bic),Named("icl")=wrap(icl));
+  
+  #ifdef SUPPORT_OPENMP
+  nb = std::min(nb, omp_get_num_procs());
+  #pragma omp parallel num_threads(nb)
+  {
+    #pragma omp for schedule(dynamic,1)
+    for(int i = 0; i < nbRun; i++)
+    {
+      RankCluster estimLogpar(estimLog);
+      estimLogpar.estimateCriterion(L[i],bic[i],icl[i]);
+    }
+  }
+  #else
+  {
+    for(int i = 0; i < nbRun; i++)
+    {
+      RankCluster estimLogpar(estimLog);
+      estimLogpar.estimateCriterion(L[i],bic[i],icl[i]);    
+    }
+  }
+  #endif
+  
+  
+  
+  return List::create(Named("ll")=wrap(L),
+    Named("bic")=wrap(bic),
+    Named("icl")=wrap(icl));//*/
+
 }
 
 

@@ -165,9 +165,9 @@ mixtureSEM<-function(X,g,m,Qsem,Bsem,Ql,Bl,RjSE,RjM,maxTry,run,detail)
 		{
 			
 			result=new(Class="Output",
-				bic=res$stock[4],
-				icl=res$stock[5],
-				ll=res$stock[3],
+			  bic=res$stock[4],
+			  icl=res$stock[5],
+			  ll=res$stock[3],
 				proportion=res$proportion,
 				pi=res$p,
 				mu=res$referenceRank,

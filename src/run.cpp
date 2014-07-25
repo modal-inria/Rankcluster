@@ -9,14 +9,14 @@ RcppExport SEXP semR(SEXP X,SEXP m,SEXP K,SEXP Qsem,SEXP Bsem,SEXP Ql,SEXP Bl,SE
 	int g=as<int>(K),runC(as<int>(run));
 	vector<int> mC=as<vector<int> >(m);
 	SEMparameters param;
-	param.nGibbsSE=as<vector<int> >(RjSE);
-	param.nGibbsM=as<vector<int> >(RjM);
-	param.maxIt=as<int>(Qsem);
-	param.burnAlgo=as<int>(Bsem);
-	param.nGibbsL=as<int>(Ql);
-	param.burnL=as<int>(Bl);
-	param.maxTry=as<int>(maxTry);
-	param.detail=as<bool>(detail);
+	param.nGibbsSE = as<vector<int> >(RjSE);
+	param.nGibbsM = as<vector<int> >(RjM);
+	param.maxIt = as<int>(Qsem);
+	param.burnAlgo = as<int>(Bsem);
+	param.nGibbsL = as<int>(Ql);
+	param.burnL = as<int>(Bl);
+	param.maxTry = as<int>(maxTry);
+	param.detail = as<bool>(detail);
 
 	NumericMatrix XR(X);
 	int n(XR.nrow()),col(XR.ncol());
@@ -58,13 +58,12 @@ RcppExport SEXP semR(SEXP X,SEXP m,SEXP K,SEXP Qsem,SEXP Bsem,SEXP Ql,SEXP Bl,SE
 
 	if(semgibbs.convergence())
 	{
-		vector<double> stock(5);
+		vector<double> stock(11);
 		stock[0]=1;
 		stock[1]=semgibbs.partial();
 		stock[2]=semgibbs.L();
 		stock[3]=semgibbs.bic();
 		stock[4]=semgibbs.icl();
-
 		int d=mC.size();
 		int n=XR.nrow();
 		vector<vector<vector<int> > > data(d,vector<vector<int> > (n));

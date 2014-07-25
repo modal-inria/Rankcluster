@@ -8,12 +8,12 @@
 ##'   \item{proportion}{a K-vector of proportions.}
 ##'   \item{pi}{a K*p-matrix composed of the scale parameters.}
 ##'   \item{mu}{a matrix with K lines and sum(m) columns in which line k is composed of the location
-##'   parameters of cluster k..}
+##'   parameters of cluster k.}
 ##'   \item{ll}{the estimated log-likelihood.}
 ##'   \item{bic}{the estimated BIC criterion.}
 ##'   \item{icl}{the estimated ICL criterion.}
 ##'   \item{tik}{a n*K-matrix containing the estimation of the conditional probabilities for the observed
-##' ranks to belong to each cluster..}
+##' ranks to belong to each cluster.}
 ##'   \item{partition}{a n-vector containing the partition estimation resulting from the clustering.}
 ##'   \item{entropy}{a n*2-matrix containing for each observation its estimated cluster and its entropy. The entropy
 ##'   output illustrates the confidence in the clustering of each observation (a high entropy means a
@@ -63,8 +63,11 @@ setClass(
     pi="matrix",
     mu="matrix",
     ll="numeric",
+    confidencell="numeric",
     bic="numeric",
+    confidencebic="numeric",
     icl="numeric",
+    confidenceicl="numeric",
     tik="matrix",
     partition="numeric",
 	  entropy="matrix",
@@ -88,8 +91,11 @@ setClass(
     pi=matrix(nrow=0,ncol=0),
     mu=matrix(nrow=0,ncol=0),
     ll=numeric(0),
+    confidencell=numeric(0),
     bic=numeric(0),
+    confidencebic=numeric(0),
     icl=numeric(0),
+    confidenceicl=numeric(0),
     tik=matrix(nrow=0,ncol=0),
     partition=numeric(0),
 	  entropy=matrix(nrow=0,ncol=0),
@@ -174,7 +180,7 @@ setClass(
 setMethod(
   f="[",
   signature="Rankclust",
-  definition=function(x,i,j,drop){
+  definition=function(x,i){
 	if(x@convergence)
 	{
 		if(is.numeric(i))
@@ -358,9 +364,9 @@ setMethod(
 #'
 #' show function.
 #' 
-#' This function shows the elements of an object of class Output.
+#' This function shows the elements of a given object.
 #' 
-#' @param object of class Output.
+#' @param object an object of class Output or Rankclust.
 #' 
 #' @name show
 #' @rdname show-methods
@@ -391,13 +397,7 @@ setMethod(
 )
 
 
-#'
-#' show function.
-#' 
-#' This function shows the output from \code{rankclust}.
-#' 
-#' @param object output object from \code{\link{rankclust}}.
-#' 
+ 
 #' @name show
 #' @rdname show-methods
 #' @docType methods
