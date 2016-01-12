@@ -84,19 +84,19 @@ convertRank <- function(x)
 # checkRank  check if a vector is a rank
 checkRank <- function(x,m=length(x))
 {
-	if(sum(sort(x)==(1:m))==m)
-		return(TRUE)
-	else
-		return(FALSE)	
+  if(sum(sort(x)==(1:m))==m)
+    return(TRUE)
+  else
+    return(FALSE)	
 }
 
 # checkPartialRank check if a vector is a partial rank
 checkPartialRank <- function(x,m=length(x))
 {
-	if((length(x[x<=m])==m)&& (length(x[x>=0])==m) && (length(unique(x[x!=0]))==length(x[x!=0])))
-		return(TRUE)
-	else
-		return(FALSE)
+  if((length(x[x<=m])==m)&& (length(x[x>=0])==m) && (length(unique(x[x!=0]))==length(x[x!=0])))
+    return(TRUE)
+  else
+    return(FALSE)
 }
 
 
@@ -112,14 +112,14 @@ checkTiePartialRank <- function(x,m=length(x))
 # completeRank complete partial that have only one missing element
 completeRank <-function(x)
 {
-	if(length(x[x==0])==1)
-	{	
-		m=length(x)
-		a=1:m
-		a[x[x!=0]]=0
-		x[x==0]=a[a!=0]
-	}
-	return(x)
+  if(length(x[x==0])==1)
+  {	
+    m=length(x)
+    a=1:m
+    a[x[x!=0]]=0
+    x[x==0]=a[a!=0]
+  }
+  return(x)
 }
 
 # check if a number is an integer
@@ -149,35 +149,35 @@ is.wholenumber=function(x, tol = .Machine$double.eps^0.5)
 #' @export
 frequence <-function(X,m=ncol(X))
 {
-	if(missing(X))
-		stop("X is missing")
-	if(!is.numeric(X) || !is.matrix(X))
-		stop("X must be a matrix of positive integer")
-	if(length(X[X>=0])!=length(X))
-		stop("X must be a matrix of positive integer")
-	if(!is.vector(m,mode="numeric"))
-		stop("m must be a (vector of) integer strictly greater than 1")
-	if(length(m)!=length(m[m>1]))
-		stop("m must be a (vector of) integer strictly greater than 1")
-
-	if(length(m)==1)
-	{
-		if(m!=ncol(X))
-		{
-			print(paste0("You put m=",m,", but X has ",ncol(X)," columns(rank of size ",ncol(X)-1," and 1 for the frequence)."))
- 			print(paste0("The algorithm will continue with m=",ncol(X)-1))
-		}
-	}
-
-	res=.Call("freqMultiR",X,m,PACKAGE="Rankcluster")
-	
-	data=matrix(0,ncol=length(res$data[[1]])+1,nrow=length(res$data))
-	for(i in 1:nrow(data))
-		data[i,]=c(res$data[[i]],res$freq[[i]])
-	
-
-	return(data)
-
+  if(missing(X))
+    stop("X is missing")
+  if(!is.numeric(X) || !is.matrix(X))
+    stop("X must be a matrix of positive integer")
+  if(length(X[X>=0])!=length(X))
+    stop("X must be a matrix of positive integer")
+  if(!is.vector(m,mode="numeric"))
+    stop("m must be a (vector of) integer strictly greater than 1")
+  if(length(m)!=length(m[m>1]))
+    stop("m must be a (vector of) integer strictly greater than 1")
+  
+  if(length(m)==1)
+  {
+    if(m!=ncol(X))
+    {
+      print(paste0("You put m=",m,", but X has ",ncol(X)," columns(rank of size ",ncol(X)-1," and 1 for the frequence)."))
+      print(paste0("The algorithm will continue with m=",ncol(X)-1))
+    }
+  }
+  
+  res=.Call("freqMultiR",X,m,PACKAGE="Rankcluster")
+  
+  data=matrix(0,ncol=length(res$data[[1]])+1,nrow=length(res$data))
+  for(i in 1:nrow(data))
+    data[i,]=c(res$data[[i]],res$freq[[i]])
+  
+  
+  return(data)
+  
 }
 
 #' This function simulates univariate rankings data (ordering representation) according to the ISR(pi,mu).
@@ -213,33 +213,33 @@ frequence <-function(X,m=ncol(X))
 #' @export
 simulISR <-function(n,pi,mu)
 {
-	if(missing(n))
-		stop("n is missing")
-	if(missing(mu))
-		stop("mu is missing")
-	if(missing(pi))
-		stop("pi is missing")
-
-	if(!is.numeric(n) || (length(n)>1))
-		stop("n must be a strictly positive integer")
-	if( (n!=round(n)) || (n<=0))
-		stop("n must be a strictly positive integer")
-
-	if(!is.numeric(pi) || (length(pi)>1))
-		stop("pi must be a real between 0 and 1")
-	if( (pi>1) || (pi<0))
-		stop("pi must be a real between 0 and 1")
-
-	if(!is.vector(mu,mode="numeric"))
-		stop("mu must be a complete rank")
-	if(!checkRank(mu))
-		stop("mu must be a complete rank")
-
-
-
-	res=.Call("simulISRR",n,length(mu),mu,pi,PACKAGE="Rankcluster")
-
-	return(res)
+  if(missing(n))
+    stop("n is missing")
+  if(missing(mu))
+    stop("mu is missing")
+  if(missing(pi))
+    stop("pi is missing")
+  
+  if(!is.numeric(n) || (length(n)>1))
+    stop("n must be a strictly positive integer")
+  if( (n!=round(n)) || (n<=0))
+    stop("n must be a strictly positive integer")
+  
+  if(!is.numeric(pi) || (length(pi)>1))
+    stop("pi must be a real between 0 and 1")
+  if( (pi>1) || (pi<0))
+    stop("pi must be a real between 0 and 1")
+  
+  if(!is.vector(mu,mode="numeric"))
+    stop("mu must be a complete rank")
+  if(!checkRank(mu))
+    stop("mu must be a complete rank")
+  
+  
+  
+  res=.Call("simulISRR",n,length(mu),mu,pi,PACKAGE="Rankcluster")
+  
+  return(res)
 }
 
 #' This function takes in input a matrix in which the m first columns are the different observed ranks and the last column contains the observation frequency, and returns a matrix containing all the ranks (ranks with frequency>1 are repeated).
@@ -370,7 +370,7 @@ probability = function(x,mu,pi,m=length(x))
     if(!checkRank(x[,(1+cumsum(c(0,m))[i]):(cumsum(c(0,m))[i+1])],m[i]))
       stop("x is not correct.")
   }
-
+  
   #convert to ordering
   for(i in 1:length(m))
   {

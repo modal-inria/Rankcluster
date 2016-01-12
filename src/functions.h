@@ -9,6 +9,10 @@
 #define FUNCTIONS_H_
 
 #include<vector>
+#include <Rmath.h>
+
+/**r random number generator, code from : http://gallery.rcpp.org/articles/r-function-from-c++/*/
+inline int randWrapper(const int n) { return floor(unif_rand()*n); }
 
 /**
  * search the position of i in x

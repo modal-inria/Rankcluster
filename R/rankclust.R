@@ -68,48 +68,48 @@
 #' 
 rankclust<-function(data,m=ncol(data),K=1,criterion="bic",Qsem=100,Bsem=20,RjSE=m*(m-1)/2,RjM=m*(m-1)/2,Ql=500,Bl=100,maxTry=3,run=1,detail=FALSE)
 {
-
-	.checkArgRankclust(data,m,K,criterion,Qsem,Bsem,RjSE,RjM,Ql,Bl,detail,maxTry,run)
-
-	
-	result=c()
-	
-	G=c()
-	for(k in K)
-	{
-		## first run
-		res=mixtureSEM(data,k,m,Qsem,Bsem,Ql,Bl,RjSE,RjM,maxTry,run,detail)
-		if(res@convergence)
-		{	
-			G=c(G,k)
-			result=c(result,list(res))
-		}
-		else
-		{
-			cat("\n for K=",k,"clusters, the algorithm has not converged (a proportion was equal to 0 during the process), please retry\n")
-		}	
-	}
-
-
-
-	if(length(G)==0)
-	{
-		resultat=new("Rankclust",convergence=FALSE)
-		cat("No convergence for all values of K (a proportion was equal to 0 during the process). Please retry")
-	}
-	else
-	{
-		colnom=c()
-		for(i in 1:length(m))
-			colnom=c(colnom,paste0("dim",i),rep("",m[i]-1))
-
-		colnames(data)=colnom
-		
-		resultat=new("Rankclust",K=G,criterion=criterion,results=result,data=data,convergence=TRUE)
-	}
-	
-	
-	return(resultat)
+  
+  .checkArgRankclust(data,m,K,criterion,Qsem,Bsem,RjSE,RjM,Ql,Bl,detail,maxTry,run)
+  
+  
+  result=c()
+  
+  G=c()
+  for(k in K)
+  {
+    ## first run
+    res=mixtureSEM(data,k,m,Qsem,Bsem,Ql,Bl,RjSE,RjM,maxTry,run,detail)
+    if(res@convergence)
+    {	
+      G=c(G,k)
+      result=c(result,list(res))
+    }
+    else
+    {
+      cat("\n for K=",k,"clusters, the algorithm has not converged (a proportion was equal to 0 during the process), please retry\n")
+    }	
+  }
+  
+  
+  
+  if(length(G)==0)
+  {
+    resultat=new("Rankclust",convergence=FALSE)
+    cat("No convergence for all values of K (a proportion was equal to 0 during the process). Please retry")
+  }
+  else
+  {
+    colnom=c()
+    for(i in 1:length(m))
+      colnom=c(colnom,paste0("dim",i),rep("",m[i]-1))
+    
+    colnames(data)=colnom
+    
+    resultat=new("Rankclust",K=G,criterion=criterion,results=result,data=data,convergence=TRUE)
+  }
+  
+  
+  return(resultat)
 }
 
 
@@ -123,7 +123,7 @@ rankclust<-function(data,m=ncol(data),K=1,criterion="bic",Qsem=100,Bsem=20,RjSE=
     stop("data must be a matrix of positive integer")
   if(length(data[data>=0])!=length(data))
     stop("data must be a matrix of positive integer")
-  	
+  
   
   #m
   if(!is.vector(m,mode="numeric"))
@@ -134,7 +134,7 @@ rankclust<-function(data,m=ncol(data),K=1,criterion="bic",Qsem=100,Bsem=20,RjSE=
     stop("m must be a (vector of) integer strictly greater than 1")
   if(sum(m)!=ncol(data))
     stop("The number of column of data and m don't match.")
-
+  
   
   #K
   if(!is.vector(K,mode="numeric"))

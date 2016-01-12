@@ -1,7 +1,7 @@
 #' @import Rcpp methods
 #' @useDynLib Rankcluster
 #' 
-#' @title Model-based clustering for multivariate partial ranking data
+#' @title Model-Based Clustering for Multivariate Partial Ranking Data
 #' @docType package
 #' @aliases Rankcluster-package, Rankcluster
 #' @name Rankcluster-package
@@ -16,8 +16,8 @@
 #'   \tabular{ll}{
 #' Package: \tab Rankcluster\cr
 #' Type: \tab Package\cr
-#' Version: \tab 0.92.9\cr
-#' Date: \tab 2014-09-25\cr
+#' Version: \tab 0.93.1\cr
+#' Date: \tab 2016-01-04\cr
 #' License: \tab GPL (>=2) \cr
 #' }
 #' 

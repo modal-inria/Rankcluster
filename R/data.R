@@ -1,4 +1,4 @@
-# DOCUMENTATION DOR DATA SET
+# DOCUMENTATION FOR DATA SET
 
 
 #' @title rank data : APA
@@ -54,9 +54,9 @@ NULL
 #' 
 #' In 2009-2010, Liverpool and Arsenal have also the same UEFA coefficient, the ranking is  (1, 2, 2, 4).
 #' 
-#' @source   http://en.wikipedia.org/wiki/Big_Four_%28English_football%29#.22Big_Four.22_dominance_.282003.E2.80.9304_to_2008.E2.80.9309.29
+#' @source   \url{http://en.wikipedia.org/wiki/Premier_League#.22Big_Four.22_dominance_.282000s.29}
 #' 
-#' http://www.uefa.com/memberassociations/uefarankings/club/index.html
+#' \url{http://www.uefa.com/memberassociations/uefarankings/club/index.html}
 #' 
 #' @examples 
 #'  data(big4)
@@ -92,7 +92,7 @@ NULL
 #' 
 #' All the rankings are partial since none country has ranked this 8 countries in its 10 preferences. Missing ranking elements are zeros.
 #' 
-#' @source   http://www.eurovision.tv
+#' @source  \url{http://www.eurovision.tv} 
 #' 
 #' @examples 
 #'  data(eurovision)

@@ -11,38 +11,48 @@
 #' distKendall(x,y,type="ordering")
 #' @export
 
-distKendall<- function(x,y,type="ordering"){
-	if(type=="ordering")
-		dist=distKendall_ordering(x,y)
-	else 
-		dist=distKendall_ranking(x,y)
-
-	return(dist)	
+distKendall<- function(x,y,type="ordering")
+{
+  if(type=="ordering")
+    dist=distKendall_ordering(x,y)
+  else 
+    dist=distKendall_ranking(x,y)
+  
+  return(dist)	
 }
 
-distKendall_ranking<- function(x,y){
-	m = length(x)
-	distKendall_ranking=0
-	for (i in 1:(m-1)){
-	    for (j in (i+1):m){
-		if (((x[i]-x[j])*(y[i]-y[j]))<0) {distKendall_ranking=distKendall_ranking+1}
-	}}
-	return(distKendall_ranking)
+distKendall_ranking<- function(x,y)
+{
+  m = length(x)
+  distKendall_ranking=0
+  for (i in 1:(m-1))
+  {
+    for (j in (i+1):m)
+    {
+      if (((x[i]-x[j])*(y[i]-y[j]))<0)
+      {
+        distKendall_ranking=distKendall_ranking+1
+      }
+    }
+  }
+  return(distKendall_ranking)
 }
 
 
 
-distKendall_ordering<- function(x,y){
-	m = length(x)
-	distKendall_ordering=0
-	x_ordering=x
-	y_ordering=y
-	for (i in 1:m){
-		x_ordering[i]=which(x==i)
-		y_ordering[i]=which(y==i)
-	}
-	distKendall_ordering=distKendall_ranking(x_ordering,y_ordering)
-	return(distKendall_ordering)
+distKendall_ordering<- function(x,y)
+{
+  m = length(x)
+  distKendall_ordering=0
+  x_ordering=x
+  y_ordering=y
+  for (i in 1:m)
+  {
+    x_ordering[i]=which(x==i)
+    y_ordering[i]=which(y==i)
+  }
+  distKendall_ordering=distKendall_ranking(x_ordering,y_ordering)
+  return(distKendall_ordering)
 }
 
 #' The Spearman distance is the square of Euclidean distance between two rank vector.
@@ -56,9 +66,10 @@ distKendall_ordering<- function(x,y){
 #' distSpearman(x,y)
 #' @export
 
-distSpearman<- function(x,y){
-	distSpearman=sum((x-y)^2)
-	return(distSpearman)
+distSpearman<- function(x,y)
+{
+  distSpearman=sum((x-y)^2)
+  return(distSpearman)
 }
 
 # CorrelSpearman calculates the Spearman rank correlation between two ranks.
@@ -71,9 +82,10 @@ distSpearman<- function(x,y){
 # y=c(2,3,1,4,5)
 # CorrelSpearman(x,y)
 # @export
-CorrelSpearman<- function(x,y){
-	CorrelSpearman=sqrt(sum((x-y)^2))
-	return(CorrelSpearman)
+CorrelSpearman<- function(x,y)
+{
+  CorrelSpearman=sqrt(sum((x-y)^2))
+  return(CorrelSpearman)
 }
 
 #' The Cayley distance between two ranks x and y is the minimum number of transpositions required to transform the ranking x into y.
@@ -86,18 +98,21 @@ CorrelSpearman<- function(x,y){
 #' y=c(2,3,1,4,5)
 #' distCayley(x,y)
 #' @export
-distCayley<- function(x,y){
-	m = length(x)
-	distCayley=0
-	for (i in 1:(m-1)){
-		if (! x[i]==y[i]){
-			distCayley=distCayley+1
-			tmp=x[i]
-			x[i]=y[i]
-			x[which(y[i]==x)]=tmp
-		}	    
-	}
-	return(distCayley)
+distCayley<- function(x,y)
+{
+  m = length(x)
+  distCayley=0
+  for (i in 1:(m-1))
+  {
+    if (! x[i]==y[i])
+    {
+      distCayley=distCayley+1
+      tmp=x[i]
+      x[i]=y[i]
+      x[which(y[i]==x)]=tmp
+    }	    
+  }
+  return(distCayley)
 }
 
 
@@ -112,13 +127,16 @@ distCayley<- function(x,y){
 #' y=c(2,3,1,4,5)
 #' distHamming(x,y)
 #' @export
-distHamming<- function(x,y){
-	m = length(x)
-	distHamming=0
-	for (i in 1:m){
-		if (! x[i]==y[i]){
-			distHamming=distHamming+1
-		}	    
-	}
-	return(distHamming)
+distHamming<- function(x,y)
+{
+  m = length(x)
+  distHamming=0
+  for (i in 1:m)
+  {
+    if (! x[i]==y[i])
+    {
+      distHamming=distHamming+1
+    }	    
+  }
+  return(distHamming)
 }
