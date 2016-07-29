@@ -5,7 +5,7 @@
 #' @title model-based clustering for multivariate partial ranking
 #' @author Quentin Grimonprez
 #' @param data a matrix in which each row is a ranking (partial or not; for partial ranking, 
-#' missing elements must be 0. Tied are replaced by the lowest position they share). For multivariate rankings, the rankings of each dimension are 
+#' missing elements must be 0 or NA. Tied are replaced by the lowest position they share). For multivariate rankings, the rankings of each dimension are 
 #' placed end to end in each row. The data must be in ranking notation (see Details or 
 #' \link{convertRank} functions).
 #' @param m a vector composed of the sizes of the rankings of each dimension (default value is the number of column of the matrix data).
@@ -66,46 +66,54 @@
 #' 
 #' @export
 #' 
-rankclust<-function(data,m=ncol(data),K=1,criterion="bic",Qsem=100,Bsem=20,RjSE=m*(m-1)/2,RjM=m*(m-1)/2,Ql=500,Bl=100,maxTry=3,run=1,detail=FALSE)
+rankclust <- function(data, m = ncol(data), K = 1, criterion = "bic", Qsem = 100, Bsem = 20, RjSE = m*(m-1)/2, RjM = m*(m-1)/2, Ql = 500, Bl = 100, 
+                    maxTry = 3, run = 1, detail = FALSE)
 {
   
-  .checkArgRankclust(data,m,K,criterion,Qsem,Bsem,RjSE,RjM,Ql,Bl,detail,maxTry,run)
+  .checkArgRankclust(data, m, K, criterion, Qsem, Bsem, RjSE, RjM, Ql, Bl, detail, maxTry, run)
   
+  # change NA in data 
+  data[is.na(data)] = 0
   
-  result=c()
+  # output container
+  result = c()
+  # number of clusters for which the algorithm converges
+  G = c()
   
-  G=c()
+  # loop over the different number of cluster
   for(k in K)
   {
+    if(detail)
+      cat("K=", k, "\n")
     ## first run
-    res=mixtureSEM(data,k,m,Qsem,Bsem,Ql,Bl,RjSE,RjM,maxTry,run,detail)
+    res = mixtureSEM(data, k, m, Qsem, Bsem, Ql, Bl, RjSE, RjM, maxTry, run, detail)
     if(res@convergence)
     {	
-      G=c(G,k)
-      result=c(result,list(res))
+      G = c(G, k)
+      result = c(result, list(res))
     }
     else
     {
       cat("\n for K=",k,"clusters, the algorithm has not converged (a proportion was equal to 0 during the process), please retry\n")
     }	
-  }
+  }# end for K number of cluster
   
   
   
   if(length(G)==0)
   {
-    resultat=new("Rankclust",convergence=FALSE)
+    resultat = new("Rankclust", convergence = FALSE)
     cat("No convergence for all values of K (a proportion was equal to 0 during the process). Please retry")
   }
   else
   {
-    colnom=c()
+    colnom = c()
     for(i in 1:length(m))
-      colnom=c(colnom,paste0("dim",i),rep("",m[i]-1))
+      colnom = c(colnom, paste0("dim",i), rep("", m[i]-1))
     
-    colnames(data)=colnom
+    colnames(data) = colnom
     
-    resultat=new("Rankclust",K=G,criterion=criterion,results=result,data=data,convergence=TRUE)
+    resultat = new("Rankclust", K = G, criterion = criterion, results = result, data = data, convergence = TRUE)
   }
   
   
@@ -113,7 +121,7 @@ rankclust<-function(data,m=ncol(data),K=1,criterion="bic",Qsem=100,Bsem=20,RjSE=
 }
 
 
-.checkArgRankclust=function(data,m,K,criterion,Qsem,Bsem,RjSE,RjM,Ql,Bl,detail,maxTry,run)
+.checkArgRankclust=function(data, m, K, criterion, Qsem, Bsem, RjSE, RjM, Ql, Bl, detail, maxTry, run)
 {
   ##################check the arguments
   #data

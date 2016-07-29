@@ -10,7 +10,7 @@ rankclust(data, m = ncol(data), K = 1, criterion = "bic", Qsem = 100,
 }
 \arguments{
 \item{data}{a matrix in which each row is a ranking (partial or not; for partial ranking, 
-missing elements must be 0. Tied are replaced by the lowest position they share). For multivariate rankings, the rankings of each dimension are 
+missing elements must be 0 or NA. Tied are replaced by the lowest position they share). For multivariate rankings, the rankings of each dimension are 
 placed end to end in each row. The data must be in ranking notation (see Details or 
 \link{convertRank} functions).}
 

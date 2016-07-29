@@ -24,67 +24,63 @@
  
  //constructor
  RankCluster::RankCluster(std::vector<std::vector<int> > const& X,int g, vector<int> const& m, SEMparameters const& param)
- : m_(m),n_(X.size()),d_(m.size()),g_(g),
- data_(d_,vector<PartialRank> (n_)),
- z_(n_),
- mu_(d_,vector<vector<int> > (g_)),
- p_(d_,vector<double>(g_)),
- proportion_(g),
- parameter_(param),
- partial_(false),
- dataOk_(true),
- indexPb_(m.size())
+                          : m_(m),n_(X.size()),d_(m.size()),g_(g),
+                            data_(d_,vector<PartialRank> (n_)),
+                            z_(n_),
+                            mu_(d_,vector<vector<int> > (g_)),
+                            p_(d_,vector<double>(g_)),
+                            proportion_(g),
+                            parameter_(param),
+                            partial_(false),
+                            dataOk_(true),
+                            indexPb_(m.size())
  {
    //  try
    //  {
-   //convert data
+   // convert data in the good notation and create information about missing and partial
    conversion2data(X);
    //  }
    //  catch(string const& chaine)
    //    {dataOk_=false;}
-   
    
  }
  
  //constructor
  RankCluster::RankCluster(vector<vector<int> > const& X, vector<int> const& m, SEMparameters const& param,
- vector<double> const& proportion, vector<vector<double> > const& p, vector<vector<vector<int> > > const& mu)
- : m_(m),n_(X.size()),d_(m.size()),g_(proportion.size()),
- data_(d_,vector<PartialRank> (n_)),
- z_(n_),
- mu_(mu),
- p_(p),
- proportion_(proportion),
- parameter_(param),
- partial_(false),
- dataOk_(true),
- indexPb_(m.size())
+                          vector<double> const& proportion, vector<vector<double> > const& p, vector<vector<vector<int> > > const& mu)
+                          : m_(m), n_(X.size()), d_(m.size()), g_(proportion.size()),
+                            data_(d_,vector<PartialRank> (n_)),
+                            z_(n_), mu_(mu), p_(p),
+                            proportion_(proportion),
+                            parameter_(param),
+                            partial_(false),
+                            dataOk_(true),
+                            indexPb_(m.size())
  {
-   //  try
-   //  {
-   //convert data
-   conversion2data(X);
-   //  }
-   //  catch(string const& chaine)
-   //    {dataOk_=false;}
-   
+  //  try
+  //  {
+  // convert data in the good notation and create information about missing and partial
+  conversion2data(X);
+  //  }
+  //  catch(string const& chaine)
+  //    {dataOk_=false;}
  }
  
  //copy constructor
  RankCluster::RankCluster(RankCluster& rankClusterObject)
- : m_(rankClusterObject.m())
- , n_(rankClusterObject.n())
- , d_(rankClusterObject.d())
- , g_(rankClusterObject.g())
- , data_(rankClusterObject.data())
- , mu_(rankClusterObject.mu())
- , p_(rankClusterObject.p())
- , proportion_(rankClusterObject.proportion())
- , parameter_(rankClusterObject.parameter())
- , partial_(rankClusterObject.partial())
- , dataOk_(rankClusterObject.dataOk())
+                          : m_(rankClusterObject.m()),
+                            n_(rankClusterObject.n()),
+                            d_(rankClusterObject.d()),
+                            g_(rankClusterObject.g()),
+                            data_(rankClusterObject.data()),
+                            mu_(rankClusterObject.mu()),
+                            p_(rankClusterObject.p()),
+                            proportion_(rankClusterObject.proportion()),
+                            parameter_(rankClusterObject.parameter()),
+                            partial_(rankClusterObject.partial()),
+                            dataOk_(rankClusterObject.dataOk())
  {
-   
+   //nothing to do
  }
  
  
@@ -98,12 +94,12 @@
  {
    //initialization
    int indiceElement = 0;
-   data_[dim][j].isNotFull=false;
+   data_[dim][j].isNotFull = false;
    
    //multi dim rank temporary
    vector<vector<int> > temp(m_[dim]+1);
    
-   for(int i= indM[dim]; i < indM[dim+1]; i++)
+   for(int i = indM[dim]; i < indM[dim+1]; i++)
    {
      temp[X[j][i]].push_back(indiceElement+1);
      indiceElement++;
@@ -136,9 +132,11 @@
          partial_ = true;
          skip = temp[i].size() - 1;
          data_[dim][j].missingData.push_back(temp[i]);
+         
          vector<int> missingIndex(temp[i].size());
-         for(int ii = 0; ii < (int) temp[i].size(); ii++)
-         missingIndex[ii] = i + ii - 1;
+         
+        for(int ii = 0; ii < (int) temp[i].size(); ii++)
+          missingIndex[ii] = i + ii - 1;
          
          data_[dim][j].missingIndex.push_back(missingIndex);
        }
@@ -146,9 +144,9 @@
        {
          //normal case
          if(temp[i].size()==1)
-         data_[dim][j].rank[i-1] = temp[i][0];
+          data_[dim][j].rank[i-1] = temp[i][0];
          else//temp[i].size=0//partial case
-         partialIndex.push_back(i-1);
+          partialIndex.push_back(i-1);
        }
      }
    }
@@ -180,8 +178,8 @@
    
    //resize data
    for(int i = 0; i < d_; i++)
-   for(int j = 0; j < n_; j++)
-   data_[i][j].rank.resize(m_[i]);
+    for(int j = 0; j < n_; j++)
+      data_[i][j].rank.resize(m_[i]);
    
    //begin the read of the data row by row
    for(int j = 0; j < n_; j++)
@@ -233,7 +231,7 @@
        //initialization of mu_ with alea rank of size m_
        mu_[k][i].resize(m_[k]);
        for(int j = 0; j < m_[k]; j++)
-       mu_[k][i][j]=j+1;
+        mu_[k][i][j]=j+1;
        random_shuffle(mu_[k][i].begin(),mu_[k][i].end(),randWrapper);
      }
    }
@@ -251,7 +249,7 @@
    {
      vector<int> rankTemp(m_[dim]);
      for(int i = 0; i < m_[dim]; i++)
-     rankTemp[i]=i+1;
+      rankTemp[i]=i+1;
      for(int ind = 0; ind < n_; ind++)
      {
        //initialization of y
@@ -440,8 +438,8 @@
            {
              //nouveau x à tester, ancien x auquel on inverse 2 éléments partiels
              x2 = x;
-             x2[data_[indexDim][ind].missingIndex[ii][i]] = x[data_[indexDim][ind].missingIndex[ii][i]+1];
-             x2[data_[indexDim][ind].missingIndex[ii][i]+1] = x[data_[indexDim][ind].missingIndex[ii][i]];
+             x2[data_[indexDim][ind].missingIndex[ii][i]] = x[data_[indexDim][ind].missingIndex[ii][i+1]];
+             x2[data_[indexDim][ind].missingIndex[ii][i+1]] = x[data_[indexDim][ind].missingIndex[ii][i]];
              
              p2 = probaCond(x2,data_[indexDim][ind].y,mu_[indexDim][z_[ind]],p_[indexDim][z_[ind]]);
              

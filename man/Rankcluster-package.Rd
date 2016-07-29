@@ -5,7 +5,7 @@
 \alias{Rankcluster}
 \alias{Rankcluster-package}
 \alias{Rankcluster-package,}
-\title{Model-based clustering for multivariate partial ranking data}
+\title{Model-Based Clustering for Multivariate Partial Ranking Data}
 \description{
 This package proposes a model-based clustering algorithm for ranking data. 
 Multivariate rankings as well as partial rankings are taken into account.
@@ -17,8 +17,8 @@ The heterogeneity of the rank population is modelled by a mixture of ISR, wherea
 \tabular{ll}{
 Package: \tab Rankcluster\cr
 Type: \tab Package\cr
-Version: \tab 0.93.1\cr
-Date: \tab 2016-01-04\cr
+Version: \tab 0.94\cr
+Date: \tab 2016-07-21\cr
 License: \tab GPL (>=2) \cr
 }
 
