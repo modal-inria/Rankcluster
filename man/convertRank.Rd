@@ -25,10 +25,9 @@ The ordering representation o=(o_1,...,o_m) means that object o_i is in the ith 
 Let us consider the following example to illustrate both notations: a judge, which has to rank three holidays destinations according to its preferences, O1 = Countryside, O2 =Mountain and O3 = Sea, ranks first Sea, second Countryside, and last Mountain. The ordering result of the judge is o = (3, 1, 2) whereas the ranking result is r = (2, 3, 1).
 }
 \examples{
-x=c(2,3,1,4,5)
+x <- c(2, 3, 1, 4, 5)
 convertRank(x)
 }
 \author{
 Julien Jacques
 }
-

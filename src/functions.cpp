@@ -138,13 +138,13 @@ int rank2index(vector<int> const& rang,vector<int> const& tabFactorial)
   for(int i(0);i<m;i++)
     liste[i]=i+1;
   
-  liste.erase(remove_if(liste.begin(), liste.end(), bind2nd(equal_to<int>(), rang[0])), liste.end());
+  liste.erase(remove(liste.begin(), liste.end(), rang[0]), liste.end()); 
   
   for(int j(1);j<m-1;j++)
   {
     it=search_n(liste.begin(),liste.end(),1,rang[j]);
     index+=(int(it-liste.begin())*tabFactorial[m-j-2]);
-    liste.erase(remove_if(liste.begin(),liste.end(),bind2nd(equal_to<int>(), rang[j])), liste.end());
+    liste.erase(remove(liste.begin(), liste.end(), rang[j]), liste.end()); 
   }
   
   return index+1;
@@ -182,7 +182,7 @@ vector<int> index2rank(int index,int const& m,vector<int> const& tabFactorial)
     liste[i]=i+1;
     
     //on supprime l'élément égale à r[0]
-    liste.erase(remove_if(liste.begin(), liste.end(), bind2nd(equal_to<int>(), r[0])), liste.end());
+    liste.erase(remove(liste.begin(), liste.end(), r[0]), liste.end());
     
     for(int j(1);j<m-1;j++)
     {
@@ -194,8 +194,7 @@ vector<int> index2rank(int index,int const& m,vector<int> const& tabFactorial)
       r[j]=liste[temp2];
       
       //replace (liste.begin(), liste.end(), r[j], 0);
-      liste.erase(remove_if(liste.begin(), liste.end(), bind2nd(equal_to<int>(),r[j])), liste.end());
-      
+      liste.erase(remove(liste.begin(), liste.end(), r[j]), liste.end());
     }
     r[m-1]=liste[0];
     
@@ -225,7 +224,7 @@ vector<int> index2rank(int index,int const& m)
       liste[i]=i+1;
     
     //on supprime l'élément égale à r[0]
-    liste.erase(remove_if(liste.begin(), liste.end(), bind2nd(equal_to<int>(), r[0])), liste.end());
+    liste.erase(remove(liste.begin(), liste.end(), r[0]), liste.end());
     
     for(int j(1); j < m-1; j++)
     {
@@ -237,7 +236,7 @@ vector<int> index2rank(int index,int const& m)
       r[j]=liste[temp2];
       
       //replace (liste.begin(), liste.end(), r[j], 0);
-      liste.erase(remove_if(liste.begin(), liste.end(), bind2nd(equal_to<int>(),r[j])), liste.end());
+      liste.erase(remove(liste.begin(), liste.end(), r[j]), liste.end());
       
     }
     r[m-1]=liste[0];
@@ -258,7 +257,7 @@ vector<int> index2rankb(int index,int const& m,vector<int> const& tabFactorial)
     liste[i]=i+1;
   
   //on supprime l'élément égale à r[0]
-  liste.erase(remove_if(liste.begin(), liste.end(), bind2nd(equal_to<int>(), r[0])), liste.end());
+  liste.erase(remove(liste.begin(), liste.end(), r[0]), liste.end());
   
   for(int j(1);j<m-1;j++)
   {
@@ -270,7 +269,7 @@ vector<int> index2rankb(int index,int const& m,vector<int> const& tabFactorial)
     r[j]=liste[temp2];
     
     //replace (liste.begin(), liste.end(), r[j], 0);
-    liste.erase(remove_if(liste.begin(), liste.end(), bind2nd(equal_to<int>(),r[j])), liste.end());
+    liste.erase(remove(liste.begin(), liste.end(), r[j]), liste.end());
     
   }
   r[m-1]=liste[0];

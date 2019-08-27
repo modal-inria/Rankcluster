@@ -17,11 +17,10 @@ The Hamming distance between two ranks x and y is the number of difference betwe
 For example, the Hamming's distance between x=(1,4,2,5,3) and y=(1,3,4,5,2) is 3 because, only 1 and 5 have the same place in both ranks.
 }
 \examples{
-x=1:5
-y=c(2,3,1,4,5)
-distHamming(x,y)
+x <- 1:5
+y <- c(2, 3, 1, 4, 5)
+distHamming(x, y)
 }
 \author{
 Julien Jacques
 }
-

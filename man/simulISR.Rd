@@ -38,12 +38,11 @@ result is r = (2, 3, 1).
 You can see the \link{convertRank} function to convert the simualted ranking drom ordering to ranking representation.
 }
 \examples{
-x=simulISR(30,0.8,1:4)
-}
-\author{
-Julien Jacques
+x <- simulISR(30, 0.8, 1:4)
 }
 \references{
 [1] C.Biernacki and J.Jacques (2013), A generative model for rank data based on sorting algorithm, Computational Statistics and Data Analysis, 58, 162-176.
 }
-
+\author{
+Julien Jacques
+}

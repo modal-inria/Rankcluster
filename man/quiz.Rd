@@ -42,8 +42,7 @@ A=Inglourious Basterds, B=Pulp Fiction, C=Reservoir Dogs, D=Jackie Brown.}
 }
 }
 \examples{
- data(quiz)
+data(quiz)
  
 }
 \keyword{datasets}
-

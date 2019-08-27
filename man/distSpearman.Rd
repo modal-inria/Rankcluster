@@ -16,11 +16,10 @@ an integer, the Spearman distance between x and y.
 The Spearman distance is the square of Euclidean distance between two rank vector.
 }
 \examples{
-x=1:5
-y=c(2,3,1,4,5)
+x <- 1:5
+y <- c(2, 3, 1, 4, 5)
 distSpearman(x,y)
 }
 \author{
 Julien Jacques
 }
-

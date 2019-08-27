@@ -24,4 +24,3 @@ k is the number of clusters and slotname is the name of the slot we want to reac
 For the slots ll, bic, icl, res["slotname"] returns a vector of size K containing the values of the
 slot for each number of clusters.
 }
-

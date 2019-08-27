@@ -25,7 +25,7 @@ convertInter=function(x)
 #' @param x a rank (vector) datum either in its ranking or ordering representation.
 #' @return a rank (vector) in its ordering representation if its ranking representation has been given in input of convertRank, and vice-versa.
 #' @examples
-#' x=c(2,3,1,4,5)
+#' x <- c(2, 3, 1, 4, 5)
 #' convertRank(x)
 #' @export
 convertRank <- function(x)
@@ -82,7 +82,7 @@ convertRank <- function(x)
 # }
 
 # checkRank  check if a vector is a rank
-checkRank <- function(x,m=length(x))
+checkRank <- function(x, m = length(x))
 {
   if(sum(sort(x)==(1:m))==m)
     return(TRUE)
@@ -91,7 +91,7 @@ checkRank <- function(x,m=length(x))
 }
 
 # checkPartialRank check if a vector is a partial rank
-checkPartialRank <- function(x,m=length(x))
+checkPartialRank <- function(x, m = length(x))
 {
   if((length(x[x<=m])==m)&& (length(x[x>=0])==m) && (length(unique(x[x!=0]))==length(x[x!=0])))
     return(TRUE)
@@ -101,7 +101,7 @@ checkPartialRank <- function(x,m=length(x))
 
 
 # checkPartialRank check if a vector is a partial rank
-checkTiePartialRank <- function(x,m=length(x))
+checkTiePartialRank <- function(x, m = length(x))
 {
   if((length(x[x<=m])==m) && (length(x[x>=0])==m) )
     return(TRUE)
@@ -110,7 +110,7 @@ checkTiePartialRank <- function(x,m=length(x))
 }
 
 # completeRank complete partial that have only one missing element
-completeRank <-function(x)
+completeRank <- function(x)
 {
   if(length(x[x==0])==1)
   {	
@@ -128,7 +128,7 @@ completeRank <-function(x)
 #
 # @ return TRUE if the number is an integer, FALSE else
 #
-is.wholenumber=function(x, tol = .Machine$double.eps^0.5)  
+is.wholenumber <- function(x, tol = .Machine$double.eps^0.5)  
 {
   #if(!is.double(x))
   #  return(FALSE)
@@ -143,11 +143,11 @@ is.wholenumber=function(x, tol = .Machine$double.eps^0.5)
 #' @param m a vector with the size of ranks of each dimension.
 #' @return A matrix containing each different observed ranks with its observation frequencies in the last column.
 #' @examples
-#' X=matrix(1:4,ncol=4,nrow=5,byrow=TRUE)
-#' Y=frequence(X)
+#' X <- matrix(1:4, ncol = 4, nrow = 5, byrow = TRUE)
+#' Y <- frequence(X)
 #' Y
 #' @export
-frequence <-function(X,m=ncol(X))
+frequence <- function(X, m = ncol(X))
 {
   if(missing(X))
     stop("X is missing")
@@ -209,9 +209,9 @@ frequence <-function(X,m=ncol(X))
 #' @references 
 #' [1] C.Biernacki and J.Jacques (2013), A generative model for rank data based on sorting algorithm, Computational Statistics and Data Analysis, 58, 162-176.
 #' @examples
-#' x=simulISR(30,0.8,1:4)
+#' x <- simulISR(30, 0.8, 1:4)
 #' @export
-simulISR <-function(n,pi,mu)
+simulISR <- function(n, pi, mu)
 {
   if(missing(n))
     stop("n is missing")
@@ -248,10 +248,10 @@ simulISR <-function(n,pi,mu)
 #' @return a matrix containing all the rankings.
 #' @examples
 #' data(quiz)
-#' Y=unfrequence(quiz$frequency)
+#' Y <- unfrequence(quiz$frequency)
 #' Y
 #' @export
-unfrequence=function(data)
+unfrequence <- function(data)
 {
   X=matrix(ncol=ncol(data)-1,nrow=sum(data[,ncol(data)]))
   colnames(X)=colnames(data)[-ncol(data)]
@@ -302,19 +302,19 @@ unfrequence=function(data)
 #' 
 #' 
 #' @examples
-#' m=c(4,5)
-#' x=mu=matrix(nrow=1,ncol=9)
-#' x[1:4] = c(1,4,2,3)
-#' x[5:9] = c(3,5,2,4,1)
+#' m <- c(4, 5)
+#' x = mu <- matrix(nrow = 1, ncol = 9)
+#' x[1:4] = c(1, 4, 2, 3)
+#' x[5:9] = c(3, 5, 2, 4, 1)
 #' mu[1:4] = 1:4
-#' mu[5:9] = c(3,5,4,2,1)
-#' pi=c(0.75,0.82)
+#' mu[5:9] = c(3, 5, 4, 2, 1)
+#' pi <- c(0.75, 0.82)
 #' 
-#' prob=probability(x,mu,pi,m)
+#' prob <- probability(x, mu, pi, m)
 #' prob
 #' @export
 #' 
-probability = function(x,mu,pi,m=length(x))
+probability <- function(x, mu, pi, m = length(x))
 {
   ### check parameters
   if(missing(x))

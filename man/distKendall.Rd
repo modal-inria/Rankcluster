@@ -18,14 +18,13 @@ an integer, the Kendall distance between x and y.
 The Kendall distance between two ranks is the number of pairs that are in different order in the two ranks.
 }
 \examples{
-x=1:5
-y=c(2,3,1,4,5)
-distKendall(x,y,type="ordering")
-}
-\author{
-Julien Jacques
+x <- 1:5
+y <- c(2, 3, 1, 4, 5)
+distKendall(x, y, type = "ordering")
 }
 \references{
 A New Measure of Rank Correlation, M. G. Kendall
 }
-
+\author{
+Julien Jacques
+}

@@ -27,8 +27,7 @@ In 2000-2001, Arsenal and Chelsea had the same UEFA coefficient and then are tie
 In 2009-2010, Liverpool and Arsenal have also the same UEFA coefficient, the ranking is  (1, 2, 2, 4).
 }
 \examples{
- data(big4)
+data(big4)
  
 }
 \keyword{datasets}
-

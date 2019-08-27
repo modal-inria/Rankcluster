@@ -13,13 +13,6 @@
 #' 
 #' @details
 #' 
-#'   \tabular{ll}{
-#' Package: \tab Rankcluster\cr
-#' Type: \tab Package\cr
-#' Version: \tab 0.94\cr
-#' Date: \tab 2016-07-21\cr
-#' License: \tab GPL (>=2) \cr
-#' }
 #' 
 #' The main function is \link{rankclust}. 
 #' 
@@ -30,12 +23,12 @@
 #' @author Maintainer: Quentin Grimonprez <quentin.grimonprez@@inria.fr>
 #' 
 #' @examples 
-#' #see vignette
-#' #vignette("Rankcluster")
+#' # see vignette
+#' # vignette("Rankcluster")
 #' 
-#' #main function of the package for run the algorithm
+#' # main function of the package for run the algorithm
 #' data(big4)
-#' result=rankclust(big4$data,K=2,m=big4$m,Ql=200,Bl=100,maxTry=2)
+#' result = rankclust(big4$data, K = 2, m = big4$m, Ql = 200, Bl = 100, maxTry = 2)
 #'  
 #' @keywords package
 NULL

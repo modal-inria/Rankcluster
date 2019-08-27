@@ -17,4 +17,3 @@
 \description{
 This function shows the elements of a given object.
 }
-

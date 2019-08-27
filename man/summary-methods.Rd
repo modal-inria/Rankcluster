@@ -16,4 +16,3 @@
 \description{
 This function This function gives the summary of output from \code{rankclust}.
 }
-

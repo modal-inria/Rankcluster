@@ -6,12 +6,12 @@
 #' @return an integer, the Kendall distance between x and y.
 #' @references A New Measure of Rank Correlation, M. G. Kendall
 #' @examples
-#' x=1:5
-#' y=c(2,3,1,4,5)
-#' distKendall(x,y,type="ordering")
+#' x <- 1:5
+#' y <- c(2, 3, 1, 4, 5)
+#' distKendall(x, y, type = "ordering")
 #' @export
 
-distKendall<- function(x,y,type="ordering")
+distKendall<- function(x, y, type = "ordering")
 {
   if(type=="ordering")
     dist=distKendall_ordering(x,y)
@@ -21,7 +21,7 @@ distKendall<- function(x,y,type="ordering")
   return(dist)	
 }
 
-distKendall_ranking<- function(x,y)
+distKendall_ranking<- function(x, y)
 {
   m = length(x)
   distKendall_ranking=0
@@ -40,7 +40,7 @@ distKendall_ranking<- function(x,y)
 
 
 
-distKendall_ordering<- function(x,y)
+distKendall_ordering<- function(x, y)
 {
   m = length(x)
   distKendall_ordering=0
@@ -61,12 +61,12 @@ distKendall_ordering<- function(x,y)
 #' @param x,y two ranks of size m. 
 #' @return an integer, the Spearman distance between x and y.
 #' @examples
-#' x=1:5
-#' y=c(2,3,1,4,5)
+#' x <- 1:5
+#' y <- c(2, 3, 1, 4, 5)
 #' distSpearman(x,y)
 #' @export
 
-distSpearman<- function(x,y)
+distSpearman<- function(x, y)
 {
   distSpearman=sum((x-y)^2)
   return(distSpearman)
@@ -80,9 +80,9 @@ distSpearman<- function(x,y)
 # @examples
 # x=1:5
 # y=c(2,3,1,4,5)
-# CorrelSpearman(x,y)
+# CorrelSpearman(x, y)
 # @export
-CorrelSpearman<- function(x,y)
+CorrelSpearman<- function(x, y)
 {
   CorrelSpearman=sqrt(sum((x-y)^2))
   return(CorrelSpearman)
@@ -94,11 +94,11 @@ CorrelSpearman<- function(x,y)
 #' @param x,y two ranks of size m.
 #' @return the Cayley distance between x and y.
 #' @examples
-#' x=1:5
-#' y=c(2,3,1,4,5)
-#' distCayley(x,y)
+#' x <- 1:5
+#' y <- c(2, 3, 1, 4, 5)
+#' distCayley(x, y)
 #' @export
-distCayley<- function(x,y)
+distCayley<- function(x, y)
 {
   m = length(x)
   distCayley=0
@@ -123,11 +123,11 @@ distCayley<- function(x,y)
 #' @param x,y two ranks of size m. 
 #' @return an integer, the Hamming distance between x and y.
 #' @examples
-#' x=1:5
-#' y=c(2,3,1,4,5)
-#' distHamming(x,y)
+#' x <- 1:5
+#' y <- c(2, 3, 1, 4, 5)
+#' distHamming(x, y)
 #' @export
-distHamming<- function(x,y)
+distHamming<- function(x, y)
 {
   m = length(x)
   distHamming=0

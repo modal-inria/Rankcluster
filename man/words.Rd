@@ -27,4 +27,3 @@ Examination Board. A sample of 98 college students were asked to rank five words
  
 }
 \keyword{datasets}
-

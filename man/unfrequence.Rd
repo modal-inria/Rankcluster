@@ -17,7 +17,6 @@ This function takes in input a matrix in which the m first columns are the diffe
 }
 \examples{
 data(quiz)
-Y=unfrequence(quiz$frequency)
+Y <- unfrequence(quiz$frequency)
 Y
 }
-

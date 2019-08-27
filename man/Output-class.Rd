@@ -56,4 +56,3 @@ partial ranking.}
   \item{partialRankInitial}{a matrix containing the initialization of the partial rankings in the algorithm.}
 }
 }
-

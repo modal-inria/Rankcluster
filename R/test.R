@@ -9,15 +9,16 @@
 #' @references 
 #' http://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence
 #' @examples
-#' proportion1=c(0.4,0.6)
-#' pi1=matrix(c(0.8,0.75),nrow=2)
-#' mu1=matrix(c(1,2,3,4,4,2,1,3),nrow=2,byrow=TRUE)
-#' proportion2=c(0.43,0.57)
-#' pi2=matrix(c(0.82,0.7),nrow=2)
-#' mu2=matrix(c(1,2,3,4,4,2,1,3),nrow=2,byrow=TRUE)
-#' dK=kullback(proportion1,pi1,mu1,proportion2,pi2,mu2,4)
+#' proportion1 <- c(0.4, 0.6)
+#' pi1 <- matrix(c(0.8, 0.75), nrow = 2)
+#' mu1 <- matrix(c(1, 2, 3, 4, 4, 2, 1, 3), nrow = 2, byrow = TRUE)
+#' proportion2 <- c(0.43, 0.57)
+#' pi2 <- matrix(c(0.82, 0.7), nrow = 2)
+#' mu2 <- matrix(c(1, 2, 3, 4, 4, 2, 1, 3), nrow = 2, byrow = TRUE)
+#' dK <- kullback(proportion1, pi1, mu1, proportion2, pi2, mu2, 4)
+#' 
 #' @export
-kullback <-function(proportion1,pi1,mu1,proportion2,pi2,mu2,m)
+kullback <- function(proportion1, pi1, mu1, proportion2, pi2, mu2, m)
 {
   if(missing(proportion1))
     stop("proportion1 is missing")
@@ -129,15 +130,15 @@ kullback <-function(proportion1,pi1,mu1,proportion2,pi2,mu2,m)
 #' @param nBoot number of bootstrap iterations used to estimate the khi2 adequation test p-value.
 #' @return a real, the p-value of the khi2 adequation test. 
 #' @examples
-#' proportion=c(0.4,0.6)
-#' pi=c(0.8,0.75)
-#' mu=matrix(c(1,2,3,4,4,2,1,3),nrow=2,byrow=TRUE)
-#' #simulate a data set with declared parameters.
-#' data=rbind(simulISR(proportion[1]*100,pi[1],mu[1,]),
-#' simulISR(proportion[2]*100,pi[2],mu[2,]))
-#' pval=khi2(data,proportion,mu,pi)
+#' proportion  <- c(0.4, 0.6)
+#' pi <- c(0.8, 0.75)
+#' mu <- matrix(c(1, 2, 3, 4, 4, 2, 1, 3), nrow = 2, byrow = TRUE)
+#' # simulate a data set with declared parameters.
+#' data <- rbind(simulISR(proportion[1] * 100, pi[1], mu[1,]),
+#' simulISR(proportion[2] * 100, pi[2], mu[2,]))
+#' pval <- khi2(data, proportion, mu, pi)
 #' @export
-khi2 <-function(data,proportion,mu,pi,nBoot=1000)
+khi2 <-function(data, proportion, mu, pi, nBoot = 1000)
 {
   if(missing(proportion))
     stop("proportion is missing")
