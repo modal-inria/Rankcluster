@@ -5,7 +5,7 @@
 \alias{[,Rankclust-method}
 \title{Getter method for rankclust output}
 \usage{
-\S4method{[}{Rankclust,ANY,ANY,ANY}(x, i)
+\S4method{[}{Rankclust}(x, i)
 }
 \arguments{
 \item{x}{object from which to extract element(s) or in which to replace element(s).}

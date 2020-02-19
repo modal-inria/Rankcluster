@@ -1,6 +1,6 @@
 # Rankcluster
 
-[![Travis build status](https://travis-ci.org/modal-inria/Rankcluster.svg?branch=master)](https://travis-ci.org/modal-inria/Rankcluster) [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/modal-inria/Rankcluster?branch=master&svg=true)](https://ci.appveyor.com/project/modal-inria/Rankcluster)
+[![Travis build status](https://travis-ci.com/modal-inria/Rankcluster.svg?branch=master)](https://travis-ci.com/modal-inria/Rankcluster) [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/modal-inria/Rankcluster?branch=master&svg=true)](https://ci.appveyor.com/project/modal-inria/Rankcluster)
 
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/Rankcluster)](https://cran.r-project.org/package=Rankcluster) [![Total Downloads](http://cranlogs.r-pkg.org/badges/grand-total/Rankcluster?color=blue)](http://cranlogs.r-pkg.org/badges/grand-total/Rankcluster) [![Downloads](https://cranlogs.r-pkg.org/badges/Rankcluster)](https://cran.rstudio.com/web/packages/Rankcluster/index.html)
 
@@ -16,9 +16,15 @@ The heterogeneity of the rank population is modelled by a mixture of ISR, wherea
 
 ## Installation
 
+From github:
 ```
 library(devtools)
-install_github("CorReg/CorReg", build_vignettes = TRUE)
+install_github("modal-inria/Rankcluster", build_vignettes = TRUE)
+```
+
+From CRAN:
+```
+install.packages("Rankcluster", repos = "https://cran.rstudio.com")
 ```
 
 ## Vignette
