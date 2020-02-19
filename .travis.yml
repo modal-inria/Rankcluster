@@ -5,14 +5,21 @@ cran: http://cran.rstudio.com
 
 os:
   - linux
-
+  - osx
+  
 r:
   - oldrel
   - release
   - devel
 
+matrix:
+  exclude:
+  - r: devel
+    os: osx
+   
 before_install:
-  - tlmgr install elsarticle cancel
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then tlmgr install elsarticle cancel; sudo apt install ghostscript; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then sudo tlmgr install elsarticle cancel multirow; brew install ghostscript; fi
    
 script:
   - R CMD build .
