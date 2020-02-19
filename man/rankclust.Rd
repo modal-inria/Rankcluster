@@ -4,9 +4,21 @@
 \alias{rankclust}
 \title{model-based clustering for multivariate partial ranking}
 \usage{
-rankclust(data, m = ncol(data), K = 1, criterion = "bic",
-  Qsem = 100, Bsem = 20, RjSE = m * (m - 1)/2, RjM = m * (m - 1)/2,
-  Ql = 500, Bl = 100, maxTry = 3, run = 1, detail = FALSE)
+rankclust(
+  data,
+  m = ncol(data),
+  K = 1,
+  criterion = "bic",
+  Qsem = 100,
+  Bsem = 20,
+  RjSE = m * (m - 1)/2,
+  RjM = m * (m - 1)/2,
+  Ql = 500,
+  Bl = 100,
+  maxTry = 3,
+  run = 1,
+  detail = FALSE
+)
 }
 \arguments{
 \item{data}{a matrix in which each row is a ranking (partial or not; for partial ranking, 
