@@ -17,6 +17,9 @@ matrix:
   - r: devel
     os: osx
    
+before_install:
+  - tlmgr install elsarticle
+   
 script:
   - R CMD build .
   - R CMD check *.tar.gz --as-cran
