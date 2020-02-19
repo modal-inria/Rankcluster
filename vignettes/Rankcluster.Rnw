@@ -135,6 +135,7 @@ model-based clustering, multivariate rankings, partial rankings, \textbf{R}, Ran
 
 \end{frontmatter}
 
+\textbf{This preprint is from 2014 and was performed with Rankcluster v0.91.6.}
 
 \section{Introduction}
 
