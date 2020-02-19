@@ -5,20 +5,14 @@ cran: http://cran.rstudio.com
 
 os:
   - linux
-  - osx
-  
+
 r:
   - oldrel
   - release
   - devel
 
-matrix:
-  exclude:
-  - r: devel
-    os: osx
-   
 before_install:
-  - sudo tlmgr install elsarticle cancel
+  - tlmgr install elsarticle cancel
    
 script:
   - R CMD build .
