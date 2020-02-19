@@ -18,7 +18,7 @@ matrix:
     os: osx
    
 before_install:
-  - tlmgr install elsarticle cancel
+  - sudo tlmgr install elsarticle cancel
    
 script:
   - R CMD build .
