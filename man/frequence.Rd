@@ -15,12 +15,17 @@ frequence(X, m = ncol(X))
 A matrix containing each different observed ranks with its observation frequencies in the last column.
 }
 \description{
-This function takes in input a matrix containing all the observed ranks (a rank can be repeated) and returns a matrix containing all the different observed ranks with their observation frequencies (in the last column).
+This function takes in input a matrix containing all the observed ranks (a rank can be repeated) and returns a matrix containing all 
+the different observed ranks with their observation frequencies (in the last column).
 }
 \examples{
 X <- matrix(1:4, ncol = 4, nrow = 5, byrow = TRUE)
 Y <- frequence(X)
 Y
+
+}
+\seealso{
+\link{unfrequence}
 }
 \author{
 Quentin Grimonprez

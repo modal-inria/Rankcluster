@@ -2,7 +2,7 @@
 % Please edit documentation in R/rankclust.R
 \name{rankclust}
 \alias{rankclust}
-\title{model-based clustering for multivariate partial ranking}
+\title{Model-based clustering for multivariate partial ranking}
 \usage{
 rankclust(
   data,
@@ -21,9 +21,9 @@ rankclust(
 )
 }
 \arguments{
-\item{data}{a matrix in which each row is a ranking (partial or not; for partial ranking, 
-missing elements must be 0 or NA. Tied are replaced by the lowest position they share). For multivariate rankings, the rankings of each dimension are 
-placed end to end in each row. The data must be in ranking notation (see Details or 
+\item{data}{a matrix in which each row is a ranking (partial or not; for partial ranking,
+missing elements must be 0 or NA. Tied are replaced by the lowest position they share). For multivariate rankings, the rankings of each dimension are
+placed end to end in each row. The data must be in ranking notation (see Details or
 \link{convertRank} functions).}
 
 \item{m}{a vector composed of the sizes of the rankings of each dimension (default value is the number of column of the matrix data).}
@@ -36,12 +36,12 @@ placed end to end in each row. The data must be in ranking notation (see Details
 
 \item{Bsem}{burn-in period for SEM algorithm (default value=10).}
 
-\item{RjSE}{a vector containing, for each dimension, the number of iterations of the Gibbs sampler 
+\item{RjSE}{a vector containing, for each dimension, the number of iterations of the Gibbs sampler
 used both in the SE step for partial rankings and for the presentation orders generation (default value=mj(mj-1)/2).}
 
 \item{RjM}{a vector containing, for each dimension, the number of iterations of the Gibbs sampler used in the  M step (default value=mj(mj-1)/2)}
 
-\item{Ql}{number of iterations of the Gibbs sampler 
+\item{Ql}{number of iterations of the Gibbs sampler
 for estimation of log-likelihood (default value=100).}
 
 \item{Bl}{burn-in period for estimation of log-likelihood (default value=50).}
@@ -62,7 +62,7 @@ By specifying only one cluster, the function performs a modelling of the ranking
 The estimation is performed thanks to a SEM-Gibbs algorithm in the general case.
 }
 \details{
-The ranks have to be given to the package in the ranking notation (see \link{convertRank} function), with the following convention :
+The ranks have to be given to the package in the ranking notation (see \link{convertRank} function), with the following convention:
 
 - missing positions are replaced by 0
 

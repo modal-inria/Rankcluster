@@ -21,10 +21,18 @@ The Kendall distance between two ranks is the number of pairs that are in differ
 x <- 1:5
 y <- c(2, 3, 1, 4, 5)
 distKendall(x, y, type = "ordering")
+
 }
 \references{
 A New Measure of Rank Correlation, M. G. Kendall
 }
+\seealso{
+Other distance: 
+\code{\link{distCayley}()},
+\code{\link{distHamming}()},
+\code{\link{distSpearman}()}
+}
 \author{
 Julien Jacques
 }
+\concept{distance}

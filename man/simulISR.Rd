@@ -2,7 +2,7 @@
 % Please edit documentation in R/RankFunctions.R
 \name{simulISR}
 \alias{simulISR}
-\title{simulate a sample of ISR(pi,mu)}
+\title{Simulate a sample of ISR(pi,mu)}
 \usage{
 simulISR(n, pi, mu)
 }
@@ -39,6 +39,7 @@ You can see the \link{convertRank} function to convert the simualted ranking dro
 }
 \examples{
 x <- simulISR(30, 0.8, 1:4)
+
 }
 \references{
 [1] C.Biernacki and J.Jacques (2013), A generative model for rank data based on sorting algorithm, Computational Statistics and Data Analysis, 58, 162-176.

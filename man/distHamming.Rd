@@ -20,7 +20,15 @@ For example, the Hamming's distance between x=(1,4,2,5,3) and y=(1,3,4,5,2) is 3
 x <- 1:5
 y <- c(2, 3, 1, 4, 5)
 distHamming(x, y)
+
+}
+\seealso{
+Other distance: 
+\code{\link{distCayley}()},
+\code{\link{distKendall}()},
+\code{\link{distSpearman}()}
 }
 \author{
 Julien Jacques
 }
+\concept{distance}

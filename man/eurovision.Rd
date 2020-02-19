@@ -3,20 +3,20 @@
 \docType{data}
 \name{eurovision}
 \alias{eurovision}
-\title{Multidimensionnal partial rank data : eurovision}
+\title{Multidimensionnal partial rank data: eurovision}
 \format{A list containing:
 \describe{
   \item{data}{ A matrix of size 34*48. Each row corresponds to the ranking representation of a multidimensionnal ranking.
                Columns 1 to 8 correspond to the 2007 contest, columns 9 to 18 to the 2008 contest, etc...
-               
+
                The ranking representation r=(r_1,...,r_m) contains the  ranks assigned to the objects, and means that the ith object is in r_ith position.
-               
+
                For example, if the ranking representation of a rank is (4,3,1,2,5), it means that judge ranks the first object in 4th position, second object in 3rd position, ...
-               
+
   }
-  
+
   \item{frequency}{A matrix of size 34*49 containing the differents multidimensionnal rankings. The 48 first columns are the same as in data, and the last column contains the frequency (1 for all ranks).}
-  
+
   \item{m}{ a vector with the sizes of ranks for each dimension.}
 }}
 \source{
@@ -33,6 +33,15 @@ All the rankings are partial since none country has ranked this 8 countries in i
 }
 \examples{
 data(eurovision)
- 
+
 }
+\seealso{
+Other datasets: 
+\code{\link{APA}},
+\code{\link{big4}},
+\code{\link{quiz}},
+\code{\link{sports}},
+\code{\link{words}}
+}
+\concept{datasets}
 \keyword{datasets}

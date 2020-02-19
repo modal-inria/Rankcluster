@@ -18,8 +18,16 @@ The Spearman distance is the square of Euclidean distance between two rank vecto
 \examples{
 x <- 1:5
 y <- c(2, 3, 1, 4, 5)
-distSpearman(x,y)
+distSpearman(x, y)
+
+}
+\seealso{
+Other distance: 
+\code{\link{distCayley}()},
+\code{\link{distHamming}()},
+\code{\link{distKendall}()}
 }
 \author{
 Julien Jacques
 }
+\concept{distance}

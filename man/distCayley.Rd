@@ -19,7 +19,15 @@ The Cayley distance between two ranks x and y is the minimum number of transposi
 x <- 1:5
 y <- c(2, 3, 1, 4, 5)
 distCayley(x, y)
+
+}
+\seealso{
+Other distance: 
+\code{\link{distHamming}()},
+\code{\link{distKendall}()},
+\code{\link{distSpearman}()}
 }
 \author{
 Julien Jacques
 }
+\concept{distance}

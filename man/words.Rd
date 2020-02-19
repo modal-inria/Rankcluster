@@ -3,13 +3,13 @@
 \docType{data}
 \name{words}
 \alias{words}
-\title{rank data : words}
-\format{A list containing :
+\title{Rank data: words}
+\format{A list containing:
 \describe{
   \item{data}{A matrix of size 98*5 containing the 98 answers. Each row corresponding to one ranking (ranking representation).
-              
+
               The ranking representation r=(r_1,...,r_m) contains the  ranks assigned to the objects, and means that the ith object is in r_ith position.
-              
+
               For example, if the ranking representation of a rank is (4,3,1,2,5), it means that judge ranks the first object in 4th position, second object in 3rd position, ...}
  \item{frequency}{matrix of size 15*6. Each row corresponds to one of the 15 different observed rankings, and the last column contains the observation frequency.}
   \item{m}{the size of the rankings (m=5).}
@@ -23,7 +23,16 @@ Examination Board. A sample of 98 college students were asked to rank five words
   A = Thought, B = Play, C = Theory, D = Dream and E = Attention.
 }
 \examples{
- data(sports)
- 
+data(sports)
+
 }
+\seealso{
+Other datasets: 
+\code{\link{APA}},
+\code{\link{big4}},
+\code{\link{eurovision}},
+\code{\link{quiz}},
+\code{\link{sports}}
+}
+\concept{datasets}
 \keyword{datasets}

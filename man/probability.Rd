@@ -7,10 +7,10 @@
 probability(x, mu, pi, m = length(x))
 }
 \arguments{
-\item{x}{a vector or a matrix of 1 row containing the rankings in ranking notation (see Details or \link{convertRank} function). The rankings of each dimension are 
+\item{x}{a vector or a matrix of 1 row containing the rankings in ranking notation (see Details or \link{convertRank} function). The rankings of each dimension are
 placed end to end. x must contain only full ranking (no partial or tied).}
 
-\item{mu}{a vector of length sum(m) or a matrix of size 1*sum(m), containing the modal ranks in ranking notation (see Details or \link{convertRank} function). The rankings of each dimension are 
+\item{mu}{a vector of length sum(m) or a matrix of size 1*sum(m), containing the modal ranks in ranking notation (see Details or \link{convertRank} function). The rankings of each dimension are
 placed end to end. mu must contain only full ranking (no partial or tied).}
 
 \item{pi}{a vector of size p, where p is the number of dimension, containing the probabilities of a good comparaison of the model (dispersion parameters).}
@@ -24,7 +24,7 @@ the probability of x according to a multivariate ISR o parameter mu and pi.
 This function computes the probability of x according to a multivariate ISR o parameter mu and pi.
 }
 \details{
-The ranks have to be given to the package in the ranking notation (see \link{convertRank} function), with the following convention :
+The ranks have to be given to the package in the ranking notation (see \link{convertRank} function), with the following convention:
 
 - missing positions are replaced by 0
 
@@ -57,6 +57,7 @@ pi <- c(0.75, 0.82)
 
 prob <- probability(x, mu, pi, m)
 prob
+
 }
 \author{
 Quentin Grimonprez

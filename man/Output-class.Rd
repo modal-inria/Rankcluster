@@ -8,51 +8,75 @@
 This class contains a result of a run. Let K be the total number of cluster,
  p the number of dimension m the p-vector containing the size of each dimension.
 }
-\details{
+\section{Slots}{
+
 \describe{
-  \item{proportion}{a K-vector of proportions.}
-  \item{pi}{a K*p-matrix composed of the scale parameters.}
-  \item{mu}{a matrix with K lines and sum(m) columns in which line k is composed of the location
-  parameters of cluster k.}
-  \item{ll}{the estimated log-likelihood.}
-  \item{bic}{the estimated BIC criterion.}
-  \item{icl}{the estimated ICL criterion.}
-  \item{tik}{a n*K-matrix containing the estimation of the conditional probabilities for the observed
+\item{\code{proportion}}{a K-vector of proportions.}
+
+\item{\code{pi}}{a K*p-matrix composed of the scale parameters.}
+
+\item{\code{mu}}{a matrix with K lines and sum(m) columns in which line k is composed of the location
+parameters of cluster k.}
+
+\item{\code{ll}}{the estimated log-likelihood.}
+
+\item{\code{bic}}{the estimated BIC criterion.}
+
+\item{\code{icl}}{the estimated ICL criterion.}
+
+\item{\code{tik}}{a n*K-matrix containing the estimation of the conditional probabilities for the observed
 ranks to belong to each cluster.}
-  \item{partition}{a n-vector containing the partition estimation resulting from the clustering.}
-  \item{entropy}{a n*2-matrix containing for each observation its estimated cluster and its entropy. The entropy
-  output illustrates the confidence in the clustering of each observation (a high entropy means a
-     low confidence in the clustering)..}
-  \item{probability}{a n*2-matrix similar to the entropy output, containing for each observation
+
+\item{\code{partition}}{a n-vector containing the partition estimation resulting from the clustering.}
+
+\item{\code{entropy}}{a n*2-matrix containing for each observation its estimated cluster and its entropy. The entropy
+output illustrates the confidence in the clustering of each observation (a high entropy means a
+   low confidence in the clustering)..}
+
+\item{\code{probability}}{a n*2-matrix similar to the entropy output, containing for each observation
 its estimated cluster and its probability p(xi; mk, pk) given its
 cluster. This probability is estimated using the last simulation of the presentation orders used
 for the likelihood approximation. The probability output exhibits the best representative of
 each cluster.}
-  \item{convergence}{a boolean indicating if none problem of empty class has been encountered.}
-  \item{partial}{a boolean indicating the presence of partial rankings or ties.}
-  \item{partialRank}{a matrix containing the full rankings, estimated using the within cluster ISR parameters
+
+\item{\code{convergence}}{a boolean indicating if none problem of empty class has been encountered.}
+
+\item{\code{partial}}{a boolean indicating the presence of partial rankings or ties.}
+
+\item{\code{partialRank}}{a matrix containing the full rankings, estimated using the within cluster ISR parameters
 when the ranking is partial. When ranking is full, partialRank simply contains the
 observed ranking. Available only in presence of at least one partial ranking.}
-  \item{distanceProp}{Distances (MSE) between the final estimation and the current
-value at each iteration of the SEM-Gibbs algorithm (except the burning phase) for proportions. A list of Qsem-Bsem elements,
-each element being a K*p-matrix. }
-  \item{distancePi}{Distances (MSE) between the final estimation and the current
-value at each iteration of the SEM-Gibbs algorithm (except the burning phase) for scale parameters. A list of Qsem-Bsem elements,
+
+\item{\code{partialRankScore}}{confidence score in estimated partial rank}
+
+\item{\code{distanceProp}}{Distances (MSE) between the final estimation and the current
+value at each iteration of the SEM-Gibbs algorithm (except the burn-in phase) for proportions. A list of Qsem-Bsem elements,
 each element being a K*p-matrix.}
-  \item{distanceMu}{Distances (Kendall distance) between the final estimation and the current
-value at each iteration of the SEM-Gibbs algorithm (except the burning phase) for proportions. A list of Qsem-Bsem elements,
+
+\item{\code{distancePi}}{Distances (MSE) between the final estimation and the current
+value at each iteration of the SEM-Gibbs algorithm (except the burn-in phase) for scale parameters. A list of Qsem-Bsem elements,
 each element being a K*p-matrix.}
-  \item{distanceZ}{a vector of size Qsem-Bsem containing the rand index between the final
+
+\item{\code{distanceMu}}{Distances (Kendall distance) between the final estimation and the current
+value at each iteration of the SEM-Gibbs algorithm (except the burn-in phase) for proportions. A list of Qsem-Bsem elements,
+each element being a K*p-matrix.}
+
+\item{\code{distanceZ}}{a vector of size Qsem-Bsem containing the rand index between the final
 estimated partition and the current value at each iteration of the SEM-Gibbs algorithm (except
-the burning phase). Let precise that the rand index is not affected by label switching.}
-  \item{distancePartialRank}{Kendall distance between the final estimation of the partial rankings
+the burn-in phase). Let precise that the rand index is not affected by label switching.}
+
+\item{\code{distancePartialRank}}{Kendall distance between the final estimation of the partial rankings
 (missing positions in such rankings are estimated) and the current value at each iteration of the
-SEM-Gibbs algorithm (except the burning phase). distancePartialRank is a list of Qsem-Bsem
+SEM-Gibbs algorithm (except the burn-in phase). distancePartialRank is a list of Qsem-Bsem
 elements, each element being a matrix of size n*p. Available only in presence of at least one
 partial ranking.}
-  \item{proportionInitial}{a vector containing the initialization of proportions in the algorithm.}
-  \item{piInitial}{a matrix containing the initialization of the probabilities of good paired comparison in the algorithm.}
-  \item{muInitial}{a matrix containing the initialization of modal rankings in the algorithm.}
-  \item{partialRankInitial}{a matrix containing the initialization of the partial rankings in the algorithm.}
-}
-}
+
+\item{\code{proportionInitial}}{a vector containing the initialization of proportions in the algorithm.}
+
+\item{\code{piInitial}}{a matrix containing the initialization of the probabilities of good paired comparison in the algorithm.}
+
+\item{\code{muInitial}}{a matrix containing the initialization of modal rankings in the algorithm.}
+
+\item{\code{partialRankInitial}}{a matrix containing the initialization of the partial rankings in the algorithm.}
+}}
+

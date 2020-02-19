@@ -13,10 +13,15 @@ unfrequence(data)
 a matrix containing all the rankings.
 }
 \description{
-This function takes in input a matrix in which the m first columns are the different observed ranks and the last column contains the observation frequency, and returns a matrix containing all the ranks (ranks with frequency>1 are repeated).
+This function takes in input a matrix in which the m first columns are the different observed ranks and the last column contains the observation frequency, 
+and returns a matrix containing all the ranks (ranks with frequency>1 are repeated).
 }
 \examples{
 data(quiz)
 Y <- unfrequence(quiz$frequency)
 Y
+
+}
+\seealso{
+\link{frequence}
 }

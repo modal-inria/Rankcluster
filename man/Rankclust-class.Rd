@@ -5,22 +5,27 @@
 \alias{Rankclust-class}
 \title{Constructor of Rankclust class}
 \description{
-This class contains results of rankclust function.
+This class contains results of \link{rankclust} function.
 }
 \details{
-\describe{
-  \item{K}{a vector of the number of clusters.}
-  \item{data}{the data used for clustering.}
-  \item{criterion}{the model selection criterion used.}
-  \item{convergence}{a boolean indicating if none problem of empty class has been encountered (for
-any number of clusters).}
-  \item{results}{a list of \link{Output-class}, containing the results for each number of clusters (one
-element of the list is associated to one number of clusters).}
-}
-
-
-If res is the result of rankclust(), each slot of results can be reached by res[k]@slotname, where
-k is the number of clusters and slotname is the name of the slot we want to reach (see \link{Output-class}).
-For the slots ll, bic, icl, res["slotname"] returns a vector of size K containing the values of the
+If \code{res} is the result of \link{rankclust} function, each slot of results can be reached by \code{res[k]@slotname}, where
+\code{k} is the number of clusters and \code{slotname} is the name of the slot we want to reach (see \link{Output-class}).
+For the slots, \code{ll}, \code{bic}, \code{icl}, \code{res["slotname"]} returns a vector of size \code{k} containing the values of the
 slot for each number of clusters.
 }
+\section{Slots}{
+
+\describe{
+\item{\code{K}}{a vector of the number of clusters.}
+
+\item{\code{data}}{the data used for clustering.}
+
+\item{\code{criterion}}{the model selection criterion used.}
+
+\item{\code{convergence}}{a boolean indicating if none problem of empty class has been encountered (for
+any number of clusters).}
+
+\item{\code{results}}{a list of \link{Output-class}, containing the results for each number of clusters (one
+element of the list is associated to one number of clusters).}
+}}
+
