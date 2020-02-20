@@ -125,21 +125,10 @@ rankclust <- function(data, m = ncol(data), K = 1, criterion = "bic", Qsem = 100
 {
   ################## check the arguments
   # data
-  if (missing(data))
-    stop("data is missing")
-  if (!is.numeric(data) || !is.matrix(data))
-    stop("data must be a matrix of positive integer")
-  if (length(data[data >= 0]) != length(data))
-    stop("data must be a matrix of positive integer")
-
+  checkData(data)
 
   # m
-  if (!is.vector(m, mode = "numeric"))
-    stop("m must be a (vector of) integer strictly greater than 1")
-  if (length(m) != length(m[m > 1]))
-    stop("m must be a (vector of) integer strictly greater than 1")
-  if (!min(m == round(m)))
-    stop("m must be a (vector of) integer strictly greater than 1")
+  checkM(m)
   if (sum(m) != ncol(data))
     stop("The number of column of data and m don't match.")
 

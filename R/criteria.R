@@ -29,100 +29,7 @@
 #' @export
 criteria <- function(data, proportion, pi, mu, m, Ql = 500, Bl = 100, IC = 1, nb_cpus = 1)
 {
-  if (missing(proportion))
-    stop("proportion is missing")
-  if (missing(mu))
-    stop("mu is missing")
-  if (missing(pi))
-    stop("pi is missing")
-  if (missing(m))
-    stop("m is missing")
-
-  # data
-  if (missing(data))
-    stop("data is missing")
-  if (!is.numeric(data) || !is.matrix(data))
-    stop("data must be a matrix of positive integer")
-  if (length(data[data >= 0]) != length(data))
-    stop("data must be a matrix of positive integer")
-
-  # proportion
-  if (!is.vector(proportion, mode = "numeric"))
-    stop("proportion must be a vector of positive real whose sum equal 1")
-  if (min(proportion) < 0)
-    stop("proportion must be a vector of positive real whose sum equal 1")
-  if (abs(1 - sum(proportion)) > 1e-10)
-    stop("proportion must be a vector of positive real whose sum equal 1")
-
-  # m
-  if (!is.vector(m, mode = "numeric"))
-    stop("m must be a (vector of) integer strictly greater than 1")
-  if (length(m) != length(m[m > 1]))
-    stop("m must be a (vector of) integer strictly greater than 1")
-  if (!min(m == round(m)))
-    stop("m must be a (vector of) integer strictly greater than 1")
-  if ((length(m) != ncol(pi)))
-    stop("The number of column of p and m don't match.")
-  if (sum(m) != ncol(mu))
-    stop("The number of column of mu and sum(m) don't match.")
-
-  # p
-  if (!is.numeric(pi) || !is.matrix(pi))
-    stop("pi must be a matrix of probabilities")
-  if ((min(pi) < 0) && (max(pi) > 1))
-    stop("pi must be a matrix of probabilities")
-  if ((nrow(pi) != length(proportion)) || (nrow(pi) != nrow(mu)))
-    stop("The number of rows of pi doesn't match with the others parameters.")
-
-  # Ql
-  if (!is.numeric(Ql) || (length(Ql) > 1))
-    stop("Ql must be a strictly positive integer")
-  if ((Ql != round(Ql)) || (Ql <= 0))
-    stop("Ql must be a strictly positive integer")
-
-  # IC
-  if (!is.numeric(IC) || (length(IC) > 1))
-    stop("IC must be a strictly positive integer")
-  if ((IC != round(IC)) || (IC <= 0))
-    stop("IC must be a strictly positive integer")
-
-  # nb_cpus
-  if (!is.numeric(nb_cpus) || (length(nb_cpus) > 1))
-    stop("nb_cpus must be a strictly positive integer")
-  if ((nb_cpus != round(nb_cpus)) || (nb_cpus <= 0))
-    stop("nb_cpus must be a strictly positive integer")
-
-  # Bl
-  if (!is.numeric(Bl) || (length(Bl) > 1))
-    stop("Bl must be a strictly positive integer lower than Ql")
-  if ((Bl != round(Bl)) || (Bl <= 0) || (Bl >= Ql))
-    stop("Bl must be a strictly positive integer lower than Ql")
-
-  # mu
-  if (!is.numeric(mu) || !is.matrix(mu))
-    stop("mu must be a matrix of positive integer")
-  if (min(mu) < 1)
-    stop("mu must be a matrix of positive integer")
-  if (nrow(mu) != length(proportion))
-    stop("The number of rows of mu and the length of proportion don't match.")
-  if (nrow(mu) != nrow(pi))
-    stop("The number of rows of mu and pi doesn't match.")
-
-
-  # check if mu contains ranks
-  for (i in 1:length(m))
-  {
-    if (sum(apply(mu[, (1 + cumsum(c(0, m))[i]):(cumsum(c(0, m))[i + 1]), drop = FALSE], 1, checkRank, m[i])) != nrow(mu))
-      stop("mu is not correct")
-  }
-
-  # check data
-  for (i in 1:length(m))
-  {
-    if (sum(apply(data[, (1 + cumsum(c(0, m))[i]):(cumsum(c(0, m))[i + 1])], 1, checkTiePartialRank, m[i])) != nrow(data))
-      stop("Data are not correct")
-  }
-
+  checkCriteria(data, proportion, pi, mu, m, Ql, Bl, IC, nb_cpus)
 
   a = t(pi)
 
@@ -131,4 +38,64 @@ criteria <- function(data, proportion, pi, mu, m, Ql = 500, Bl = 100, IC = 1, nb
   if (LL$ll[1] == "pb")
     stop("Data are not correct.")
   return(LL)
+}
+
+checkCriteria <- function(data, proportion, pi, mu, m, Ql, Bl, IC, nb_cpus)
+{
+  # data
+  checkData(data)
+  
+  #proportion
+  checkProportion(proportion, paramName = "proportion", eps = 1e-10)
+  
+  # m
+  checkM(m)
+  checkM2(m, pi, mu, piName = "pi", muName = "mu")
+
+  # p
+  checkPi(pi, paramName = "pi")
+  if ((nrow(pi) != length(proportion)) || (nrow(pi) != nrow(mu)))
+    stop("The number of rows of pi doesn't match with the others parameters.")
+  
+  # Ql
+  if (!is.numeric(Ql) || (length(Ql) > 1))
+    stop("Ql must be a strictly positive integer")
+  if ((Ql != round(Ql)) || (Ql <= 0))
+    stop("Ql must be a strictly positive integer")
+  
+  # IC
+  if (!is.numeric(IC) || (length(IC) > 1))
+    stop("IC must be a strictly positive integer")
+  if ((IC != round(IC)) || (IC <= 0))
+    stop("IC must be a strictly positive integer")
+  
+  # nb_cpus
+  if (!is.numeric(nb_cpus) || (length(nb_cpus) > 1))
+    stop("nb_cpus must be a strictly positive integer")
+  if ((nb_cpus != round(nb_cpus)) || (nb_cpus <= 0))
+    stop("nb_cpus must be a strictly positive integer")
+  
+  # Bl
+  if (!is.numeric(Bl) || (length(Bl) > 1))
+    stop("Bl must be a strictly positive integer lower than Ql")
+  if ((Bl != round(Bl)) || (Bl <= 0) || (Bl >= Ql))
+    stop("Bl must be a strictly positive integer lower than Ql")
+  
+  # mu
+  checkMu(mu, proportion, pi, muName = "mu", proportionName = "proportion", piName = "pi")
+  
+  
+  # check if mu contains ranks
+  for (i in 1:length(m))
+  {
+    if (sum(apply(mu[, (1 + cumsum(c(0, m))[i]):(cumsum(c(0, m))[i + 1]), drop = FALSE], 1, checkRank, m[i])) != nrow(mu))
+      stop("mu is not correct")
+  }
+  
+  # check data
+  for (i in 1:length(m))
+  {
+    if (sum(apply(data[, (1 + cumsum(c(0, m))[i]):(cumsum(c(0, m))[i + 1])], 1, checkTiePartialRank, m[i])) != nrow(data))
+      stop("Data are not correct")
+  }
 }

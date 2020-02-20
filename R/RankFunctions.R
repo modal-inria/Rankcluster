@@ -349,6 +349,24 @@ unfrequence <- function(data)
 #'
 probability <- function(x, mu, pi, m = length(x))
 {
+  checkProbability(x, mu, pi, m)
+
+  # convert to ordering
+  for (i in 1:length(m))
+  {
+    mu[1, (1 + cumsum(c(0, m))[i]):(cumsum(c(0, m))[i + 1])] = convertRank(mu[1, (1 + cumsum(c(0, m))[i]):(cumsum(c(0, m))[i + 1])])
+    x[1, (1 + cumsum(c(0, m))[i]):(cumsum(c(0, m))[i + 1])] = convertRank(x[1, (1 + cumsum(c(0, m))[i]):(cumsum(c(0, m))[i + 1])])
+  }
+
+
+  prob = .Call("computeProba", x, mu, pi, m, PACKAGE = "Rankcluster")
+
+  return(prob)
+}
+
+
+checkProbability <- function(x, mu, pi, m)
+{
   ### check parameters
   if (missing(x))
     stop("x is missing.")
@@ -356,7 +374,7 @@ probability <- function(x, mu, pi, m = length(x))
     stop("mu is missing.")
   if (missing(pi))
     stop("pi is missing.")
-
+  
   # x
   if (!(is.vector(x) || is.matrix(x)))
     stop("x must be either a matrix or a vector.")
@@ -364,7 +382,7 @@ probability <- function(x, mu, pi, m = length(x))
     x = t(as.matrix(x))
   if (!is.numeric(x))
     stop("x must be either a matrix or a vector of integer.")
-
+  
   # mu
   if (!(is.vector(mu) || is.matrix(mu)))
     stop("mu must be either a matrix or a vector.")
@@ -372,7 +390,7 @@ probability <- function(x, mu, pi, m = length(x))
     mu = t(as.matrix(mu))
   if (!is.numeric(mu))
     stop("mu must be either a matrix or a vector of integer.")
-
+  
   # pi
   if (!is.numeric(pi))
     stop("pi must be a vector of probabilities.")
@@ -380,7 +398,7 @@ probability <- function(x, mu, pi, m = length(x))
     stop("pi must be a vector of probabilities.")
   if ((min(pi) < 0) || max(pi) > 1)
     stop("pi must be a vector of probabilities.")
-
+  
   # m
   if (!is.numeric(m))
     stop("m must be a vector of integer.")
@@ -394,7 +412,7 @@ probability <- function(x, mu, pi, m = length(x))
     stop("sum(m) and the length of mu do not match.")
   if (length(m) != length(pi))
     stop("the length of pi and m do not match.")
-
+  
   # check if mu contains ranks
   for (i in 1:length(m))
   {
@@ -403,16 +421,4 @@ probability <- function(x, mu, pi, m = length(x))
     if (!checkRank(x[, (1 + cumsum(c(0, m))[i]):(cumsum(c(0, m))[i + 1])], m[i]))
       stop("x is not correct.")
   }
-
-  # convert to ordering
-  for (i in 1:length(m))
-  {
-    mu[1, (1 + cumsum(c(0, m))[i]):(cumsum(c(0, m))[i + 1])] = convertRank(mu[1, (1 + cumsum(c(0, m))[i]):(cumsum(c(0, m))[i + 1])])
-    x[1, (1 + cumsum(c(0, m))[i]):(cumsum(c(0, m))[i + 1])] = convertRank(x[1, (1 + cumsum(c(0, m))[i]):(cumsum(c(0, m))[i + 1])])
-  }
-
-
-  prob = .Call("computeProba", x, mu, pi, m, PACKAGE = "Rankcluster")
-
-  return(prob)
 }

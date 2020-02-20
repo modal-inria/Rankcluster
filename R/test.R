@@ -26,87 +26,46 @@
 #' @export
 kullback <- function(proportion1, pi1, mu1, proportion2, pi2, mu2, m)
 {
-  if (missing(proportion1))
-    stop("proportion1 is missing")
+  checkKullback(proportion1, pi1, mu1, proportion2, pi2, mu2, m)
+
+  a = t(pi1)
+  b = t(pi2)
+  dKL = .Call("kullback", m, mu1, mu2, a, b, proportion1, proportion2, PACKAGE = "Rankcluster")
+
+  return(dKL)
+}
+
+
+checkKullback <- function(proportion1, pi1, mu1, proportion2, pi2, mu2, m)
+{
   if (missing(mu1))
     stop("mu1 is missing")
-  if (missing(pi1))
-    stop("pi1 is missing")
-  if (missing(proportion2))
-    stop("proportion2 is missing")
   if (missing(mu2))
     stop("mu2 is missing")
-  if (missing(pi2))
-    stop("pi2 is missing")
-
-  eps = 1e-10
-  # proportion1
-  if (!is.vector(proportion1, mode = "numeric"))
-    stop("proportion1 must be a vector of positive real whose sum equal 1")
-  if (min(proportion1) < 0)
-    stop("proportion1 must be a vector of positive real whose sum equal 1")
-  if (abs(1 - sum(proportion1)) > eps)
-    stop("proportion1 must be a vector of positive real whose sum equal 1")
-
-  # proportion2
-  if (!is.vector(proportion2, mode = "numeric"))
-    stop("proportion2 must be a vector of positive real whose sum equal 1")
-  if (min(proportion2) < 0)
-    stop("proportion2 must be a vector of positive real whose sum equal 1")
-  if (abs(1 - sum(proportion2)) > eps)
-    stop("proportion2 must be a vector of positive real whose sum equal 1")
+  
+  checkProportion(proportion1, paramName = "proportion1", eps = 1e-10)
+  checkProportion(proportion2, paramName = "proportion2", eps = 1e-10)
   if (length(proportion1) != length(proportion2))
     stop("proportion1 and proportion2 must have the same length.")
-
+  
   # m
-  if (!is.vector(m, mode = "numeric"))
-    stop("m must be a (vector of) integer strictly greater than 1")
-  if (length(m) != length(m[m > 1]))
-    stop("m must be a (vector of) integer strictly greater than 1")
-  if (!min(m == round(m)))
-    stop("m must be a (vector of) integer strictly greater than 1")
-  if ((length(m) != ncol(pi1)) || (length(m) != ncol(pi2)))
-    stop("The number of column of pi1 or pi2 and m don't match.")
-  if ((sum(m) != ncol(mu1)) || (sum(m) != ncol(mu2)))
-    stop("The number of column of mu1 or mu2 and sum(m) don't match.")
+  checkM(m)
+  checkM2(m, pi1, mu1, piName = "pi1", muName = "mu1")
+  checkM2(m, pi2, mu2, piName = "pi2", muName = "mu2")
 
-  # pi1
-  if (!is.numeric(pi1) || !is.matrix(pi1))
-    stop("pi1 must be a matrix of probabilities")
-  if ((min(pi1) < 0) && (max(pi1) > 1))
-    stop("pi1 must be a matrix of probabilities")
-
-  # pi2
-  if (!is.numeric(pi2) || !is.matrix(pi2))
-    stop("pi2 must be a matrix of probabilities")
-  if ((min(pi2) < 0) && (max(pi2) > 1))
-    stop("pi2 must be a matrix of probabilities")
+  # pi
+  checkPi(pi1, paramName = "pi1")
+  checkPi(pi2, paramName = "pi2")
   if (length(pi1) != length(pi2))
     stop("pi1 and pi2 must have the same size.")
   if ((nrow(pi1) != length(proportion1)) || (nrow(pi1) != nrow(mu1)))
     stop("The number of rows of pi1 doesn't match with the others parameters.")
   if ((nrow(pi2) != length(proportion2)) || (nrow(pi2) != nrow(mu2)))
     stop("The number of rows of pi2 doesn't match with the others parameters.")
-
-  # mu1
-  if (!is.numeric(mu1) || !is.matrix(mu1))
-    stop("mu1 must be a matrix of positive integer")
-  if (min(mu1) < 1)
-    stop("mu1 must be a matrix of positive integer")
-  if (nrow(mu1) != length(proportion1))
-    stop("The number of rows of mu1 and the length of proportion1 don't match.")
-  if (nrow(mu1) != nrow(pi1))
-    stop("The number of rows of mu1 and pi1 doesn't match.")
-
-  # mu2
-  if (!is.numeric(mu2) || !is.matrix(mu2))
-    stop("mu2 must be a matrix of positive integer")
-  if (min(mu2) < 1)
-    stop("mu2 must be a matrix of positive integer")
-  if (nrow(mu2) != length(proportion2))
-    stop("The number of rows of mu2 and the length of proportion2 don't match.")
-  if (nrow(mu2) != nrow(pi2))
-    stop("The number of rows of mu2 ans pi2 doesn't match.")
+  
+  # mu1 mu2
+  checkMu(mu1, proportion1, pi1, muName = "mu1", proportionName = "proportion1", piName = "pi1")
+  checkMu(mu2, proportion2, pi2, muName = "mu2", proportionName = "proportion2", piName = "pi2")
 
   # check if mu contains ranks
   for (i in 1:length(m))
@@ -116,14 +75,7 @@ kullback <- function(proportion1, pi1, mu1, proportion2, pi2, mu2, m)
     if (sum(apply(mu2[, (1 + cumsum(c(0, m))[i]):(cumsum(c(0, m))[i + 1])], 1, checkRank, m[i])) != nrow(mu2))
       stop("mu2 is not correct")
   }
-
-  a = t(pi1)
-  b = t(pi2)
-  dKL = .Call("kullback", m, mu1, mu2, a, b, proportion1, proportion2, PACKAGE = "Rankcluster")
-
-  return(dKL)
 }
-
 
 #' @title Khi2 test
 #'
@@ -151,30 +103,31 @@ kullback <- function(proportion1, pi1, mu1, proportion2, pi2, mu2, m)
 #' @export
 khi2 <- function(data, proportion, mu, pi, nBoot = 1000)
 {
-  if (missing(proportion))
-    stop("proportion is missing")
+
+  checkKhi2(data, proportion, mu, pi, nBoot)
+  
+  pval = .Call("adkhi2partial", data, pi, proportion, mu, nBoot, PACKAGE = "Rankcluster")
+
+  return(pval)
+}
+
+
+checkKhi2 <- function(data, proportion, mu, pi, nBoot = 1000)
+{
   if (missing(mu))
     stop("mu is missing")
   if (missing(pi))
     stop("pi is missing")
-  if (missing(data))
-    stop("data is missing")
-
-  eps = 1e-10
+  
   # proportion
-  if (!is.vector(proportion, mode = "numeric"))
-    stop("proportion must be a vector of positive real whose sum equal 1")
-  if (min(proportion) < 0)
-    stop("proportion must be a vector of positive real whose sum equal 1")
-  if (abs(1 - sum(proportion)) > eps)
-    stop("proportion must be a vector of positive real whose sum equal 1")
-
+  checkProportion(proportion, paramName = "proportion", eps = 1e-10)
+  
   # pi
   if (!is.vector(pi, mode = "numeric"))
     stop("pi must be a vector of probabilities")
   if ((min(pi) < 0) && (max(pi) > 1))
     stop("pi must be a vector of probabilities")
-
+  
   # mu
   if (!is.numeric(mu) || !is.matrix(mu))
     stop("mu must be a matrix of positive integer")
@@ -184,19 +137,13 @@ khi2 <- function(data, proportion, mu, pi, nBoot = 1000)
     stop("The number of rows of mu and the length of proportion don't match.")
   if (nrow(mu) != length(pi))
     stop("The number of rows of mu and the length of pi don't match.")
-
+  
   # data
-  if (missing(data))
-    stop("data is missing")
-  if (!is.numeric(data) || !is.matrix(data))
-    stop("X must be a matrix of positive integer")
-  if (length(data[data >= 0]) != length(data))
-    stop("data must be a matrix of positive integer")
-
+  checkData(data)
   if (ncol(data) != ncol(mu))
     stop("mu and data must have the same number of columns.")
-
-
+  
+  
   # nBoot
   if (!is.numeric(nBoot))
     stop("nBoot must be a positive integer.")
@@ -204,14 +151,11 @@ khi2 <- function(data, proportion, mu, pi, nBoot = 1000)
     stop("nBoot must be a positive integer.")
   if ((nBoot < 0) || (nBoot != round(nBoot)))
     stop("nBoot must be a positive integer.")
-
+  
   # check if mu and data are rank
   if (sum(apply(data, 1, checkPartialRank)) != nrow(data))
     stop("Data are not correct")
   if (sum(apply(mu, 1, checkPartialRank)) != nrow(mu))
     stop("mu is not correct")
-
-  pval = .Call("adkhi2partial", data, pi, proportion, mu, nBoot, PACKAGE = "Rankcluster")
-
-  return(pval)
+  
 }
