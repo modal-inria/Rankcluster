@@ -13,9 +13,9 @@
 #' The heterogeneity of the rank population is modelled by a mixture of ISR, whereas conditional independence assumption is considered for multivariate rankings.
 #'
 #' @details
-#'
-#'
 #' The main function is \link{rankclust}.
+#' See vignettes for detailled examples: \code{RShowDoc("dataFormat", package = "Rankcluster")} and \code{RShowDoc("Rankcluster", package = "Rankcluster")}
+#' 
 #'
 #' @references   [1] C.Biernacki and J.Jacques (2013), A generative model for rank data based on sorting algorithm, Computational Statistics and Data Analysis, 58, 162-176.
 #'
@@ -24,8 +24,9 @@
 #' @author Maintainer: Quentin Grimonprez <quentin.grimonprez@@inria.fr>
 #'
 #' @examples
-#' # see vignette
-#' # vignette("Rankcluster")
+#' # see vignettes
+#' # RShowDoc("dataFormat", package = "Rankcluster")
+#' # RShowDoc("Rankcluster", package = "Rankcluster")
 #'
 #' # main function of the package for run the algorithm
 #' data(big4)

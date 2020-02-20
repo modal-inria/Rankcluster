@@ -103,6 +103,7 @@
 \renewcommand{\uwave}[1]{#1}
 
 \begin{document}
+\SweaveOpts{concordance=TRUE}
 
 \begin{frontmatter}
 
@@ -120,6 +121,7 @@
 
 \address{$^{1}$Laboratoire Paul Painlev\'e, UMR CNRS 8524, University Lille I, Lille, France}
 \address{$^{2}$MODAL team, Inria Lille-Nord Europe}
+
 
 
 \begin{abstract}

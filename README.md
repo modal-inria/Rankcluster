@@ -33,6 +33,7 @@ Once the package is installed, a vignette showing an example is available using 
 
 ```
 RShowDoc("Rankcluster", package = "Rankcluster")
+RShowDoc("dataFormat", package = "Rankcluster")
 ```
 
 ## Credits
