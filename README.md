@@ -27,9 +27,9 @@ From CRAN:
 install.packages("Rankcluster", repos = "https://cran.rstudio.com")
 ```
 
-## Vignette
+## Vignettes
 
-Once the package is installed, a vignette showing an example is available using the R command:
+Once the package is installed, a vignette showing an example and one describing the data format are available using the R commands:
 
 ```
 RShowDoc("Rankcluster", package = "Rankcluster")
