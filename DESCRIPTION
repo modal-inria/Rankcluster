@@ -1,8 +1,8 @@
 Package: Rankcluster
 Type: Package
 Title: Model-Based Clustering for Multivariate Partial Ranking Data
-Version: 0.94.1
-Date: 2019-08-26
+Version: 0.94.2
+Date: 2020-02-20
 Authors@R: c(person("Quentin", "Grimonprez", role = c("aut", "cre"), email = "quentin.grimonprez@inria.fr"),
               person("Julien", "Jacques", role = "aut"),
               person("Christophe", "Biernacki", role = "aut"))
