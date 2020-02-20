@@ -1,0 +1,13 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+src/*.o
+src/*.so
+src/*.dll
+src/*.a
+*.bbl
+*.log
+*.spl
+*.synctex.gz
+*.tex
