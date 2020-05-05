@@ -32,5 +32,13 @@
 #' data(big4)
 #' result <- rankclust(big4$data, K = 2, m = big4$m, Ql = 200, Bl = 100, maxTry = 2)
 #' 
+#' if(result@@convergence)
+#' { 
+#'   summary(result)
+#' 
+#'   partition <- result[2]@@partition
+#'   tik <- result[2]@@tik
+#' }
+#' 
 #' @keywords package
 NULL

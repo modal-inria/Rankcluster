@@ -27,14 +27,6 @@
 #' @return An object of class rankclust (See \code{\link{Output-class}} and \code{\link{Rankclust-class}}).
 #' If the output object is named \code{res}. You can access the result by res[number of groups]@@slotName where \code{slotName} is an element of the class Output.
 #'
-#' @references
-#' [1] C.Biernacki and J.Jacques (2013), A generative model for rank data based on sorting algorithm, Computational Statistics and Data Analysis, 58, 162-176.
-#'
-#' [2] J.Jacques and C.Biernacki (2012), Model-based clustering for multivariate partial ranking data, Inria Research Report n 8113.
-#'
-#' @examples
-#' data(big4)
-#' result = rankclust(big4$data, K = 2, m = big4$m, Ql = 200, Bl = 100, maxTry = 2)
 #' 
 #' @details
 #' The ranks have to be given to the package in the ranking notation (see \link{convertRank} function), with the following convention:
@@ -59,6 +51,24 @@
 #' result of the judge is o = (3, 1, 2) whereas the ranking
 #' result is r = (2, 3, 1).
 #'
+#'
+#'
+#' @references
+#' [1] C.Biernacki and J.Jacques (2013), A generative model for rank data based on sorting algorithm, Computational Statistics and Data Analysis, 58, 162-176.
+#'
+#' [2] J.Jacques and C.Biernacki (2012), Model-based clustering for multivariate partial ranking data, Inria Research Report n 8113.
+#'
+#' @examples
+#' data(big4)
+#' result <- rankclust(big4$data, K = 2, m = big4$m, Ql = 200, Bl = 100, maxTry = 2)
+#' 
+#' if(result@@convergence)
+#' { 
+#'   summary(result)
+#' 
+#'   partition <- result[2]@@partition
+#'   tik <- result[2]@@tik
+#' }
 #'
 #' @author Quentin Grimonprez
 #'

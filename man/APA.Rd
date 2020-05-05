@@ -4,7 +4,8 @@
 \name{APA}
 \alias{APA}
 \title{Rank data: APA}
-\format{A list containing:
+\format{
+A list containing:
 \describe{
   \item{data}{ matrix of size 5738x5 containing the 5738 observed full ranks in ranking representation.
                The ranking representation r=(r_1,...,r_m) contains the  ranks assigned to the objects, and means that the ith object is in r_ith position.
@@ -16,7 +17,8 @@
                    contains the frequency of observation.}
 
   \item{m}{ vector with the size of the ranks (5 here).}
-}}
+}
+}
 \source{
 "Group representations in probability and statistics", P. Diaconis, 1988.
 }

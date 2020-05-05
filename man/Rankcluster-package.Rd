@@ -24,6 +24,14 @@ See vignettes for detailled examples: \code{RShowDoc("dataFormat", package = "Ra
 data(big4)
 result <- rankclust(big4$data, K = 2, m = big4$m, Ql = 200, Bl = 100, maxTry = 2)
 
+if(result@convergence)
+{ 
+  summary(result)
+
+  partition <- result[2]@partition
+  tik <- result[2]@tik
+}
+
 }
 \references{
 [1] C.Biernacki and J.Jacques (2013), A generative model for rank data based on sorting algorithm, Computational Statistics and Data Analysis, 58, 162-176.

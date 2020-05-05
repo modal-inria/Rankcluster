@@ -4,7 +4,8 @@
 \name{eurovision}
 \alias{eurovision}
 \title{Multidimensionnal partial rank data: eurovision}
-\format{A list containing:
+\format{
+A list containing:
 \describe{
   \item{data}{ A matrix of size 34*48. Each row corresponds to the ranking representation of a multidimensionnal ranking.
                Columns 1 to 8 correspond to the 2007 contest, columns 9 to 18 to the 2008 contest, etc...
@@ -18,7 +19,8 @@
   \item{frequency}{A matrix of size 34*49 containing the differents multidimensionnal rankings. The 48 first columns are the same as in data, and the last column contains the frequency (1 for all ranks).}
 
   \item{m}{ a vector with the sizes of ranks for each dimension.}
-}}
+}
+}
 \source{
 https://eurovision.tv
 }

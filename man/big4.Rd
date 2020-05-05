@@ -4,7 +4,8 @@
 \name{big4}
 \alias{big4}
 \title{Rank data: big4}
-\format{A list containing:
+\format{
+A list containing:
 \describe{
   \item{data}{A matrix of size 21*8 containing the 21 Premier League seasons. Each row corresponding to one ranking (ranking representation).
 
@@ -13,7 +14,8 @@
               For example, if the ranking representation of a rank is (4,3,1,2,5), it means that judge ranks the first object in 4th position, second object in 3rd position, ...}
   \item{frequency}{matrix of size 21*9. Each row corresponds to one of the 21 different observed rankings, and the last column contains the observation frequency.}
   \item{m}{the size of the rankings (m=c(4,4) ).}
-}}
+}
+}
 \source{
 \url{http://en.wikipedia.org/wiki/Premier_League#.22Big_Four.22_dominance_.282000s.29}
 

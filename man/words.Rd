@@ -4,7 +4,8 @@
 \name{words}
 \alias{words}
 \title{Rank data: words}
-\format{A list containing:
+\format{
+A list containing:
 \describe{
   \item{data}{A matrix of size 98*5 containing the 98 answers. Each row corresponding to one ranking (ranking representation).
 
@@ -13,7 +14,8 @@
               For example, if the ranking representation of a rank is (4,3,1,2,5), it means that judge ranks the first object in 4th position, second object in 3rd position, ...}
  \item{frequency}{matrix of size 15*6. Each row corresponds to one of the 15 different observed rankings, and the last column contains the observation frequency.}
   \item{m}{the size of the rankings (m=5).}
-}}
+}
+}
 \source{
 M.A. Fligner and J.S. Verducci. "Distance based ranking models". J. Roy. Statist. Soc. Ser. B, 48(3):359-369, 1986.
 }

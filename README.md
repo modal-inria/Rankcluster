@@ -17,13 +17,13 @@ The heterogeneity of the rank population is modelled by a mixture of ISR, wherea
 ## Installation
 
 From github:
-```
+``` r
 library(devtools)
 install_github("modal-inria/Rankcluster", build_vignettes = TRUE)
 ```
 
 From CRAN:
-```
+``` r
 install.packages("Rankcluster", repos = "https://cran.rstudio.com")
 ```
 
@@ -31,7 +31,7 @@ install.packages("Rankcluster", repos = "https://cran.rstudio.com")
 
 Once the package is installed, a vignette showing an example and one describing the data format are available using the R commands:
 
-```
+``` r
 RShowDoc("Rankcluster", package = "Rankcluster")
 RShowDoc("dataFormat", package = "Rankcluster")
 ```

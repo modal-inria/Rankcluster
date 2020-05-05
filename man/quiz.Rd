@@ -4,7 +4,8 @@
 \name{quiz}
 \alias{quiz}
 \title{Multidimensionnal rank data: quiz}
-\format{A list containing:
+\format{
+A list containing:
 \describe{
   \item{data}{a matrix of size 70*16. The student's answers are in row and the 16 columns correspond to the 4 rankings (for the 4 quizzes) of size 4 (ranking representation).
 
@@ -15,7 +16,8 @@ For example, if the ranking representation of a rank is (4,3,1,2,5), it means th
 rankings (ranking representation). Each row contains 4 ranks of size 4 and a last column for the frequency.}
 \item{m}{a vector with the sizes of the ranks for each dimension.}
 
-}}
+}
+}
 \source{
 Julien Jacques
 }
