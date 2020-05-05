@@ -234,9 +234,7 @@ setMethod(
 #'
 #' @param object output object from \code{\link{rankclust}}.
 #' @param ... Not used.
-#'
-#' @rdname summary-methods
-#' @aliases summary,Rankclust-method
+#' @export
 setMethod(
   f = "summary",
   signature = "Rankclust",
