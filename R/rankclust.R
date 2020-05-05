@@ -103,7 +103,7 @@ rankclust <- function(data, m = ncol(data), K = 1, criterion = "bic", Qsem = 100
   if (length(G) == 0)
   {
     resultat = new("Rankclust", convergence = FALSE)
-    cat("No convergence for all values of K (a proportion was equal to 0 during the process). Please retry")
+    cat("No convergence for all values of K (a proportion was equal to 0 during the process). Please retry\n")
   }
   else
   {
