@@ -1,7 +1,7 @@
 language: r
 cache: packages
 cran: http://cran.rstudio.com
-dist: bionic
+dist: focal
 warnings_are_errors: true
 
 os:
@@ -17,8 +17,16 @@ jobs:
   exclude:
   - r: devel
     os: osx
-   
+    
+addons:
+  homebrew:
+    packages:
+    - ghostscript
+  apt:
+    packages:
+    - ghostscript
+    
 before_install:
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then tlmgr install elsarticle cancel; sudo apt install ghostscript; fi
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then sudo tlmgr install elsarticle cancel multirow; brew install ghostscript; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then tlmgr install elsarticle cancel; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then sudo tlmgr install elsarticle cancel multirow; fi
    
