@@ -17,9 +17,9 @@ A list containing:
 }
 }
 \source{
-\url{http://en.wikipedia.org/wiki/Premier_League#.22Big_Four.22_dominance_.282000s.29}
+\url{https://en.wikipedia.org/wiki/Premier_League}
 
-\url{http://www.uefa.com/memberassociations/uefarankings/club/index.html}
+\url{https://www.uefa.com/memberassociations/uefarankings/club/}
 }
 \description{
 This dataset is composed of the rankings (in ranking notation) of the "Big Four" English football teams (A: Manchester, B: Liverpool, C: Arsenal, D: Chelsea) to the English Championship (Premier League) and according to the UEFA coefficients (statistics used in Europe for ranking and seeding teams in international competitions), from 1993 to 2013.

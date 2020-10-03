@@ -57,9 +57,9 @@ NULL
 #'
 #' In 2009-2010, Liverpool and Arsenal have also the same UEFA coefficient, the ranking is  (1, 2, 2, 4).
 #'
-#' @source   \url{http://en.wikipedia.org/wiki/Premier_League#.22Big_Four.22_dominance_.282000s.29}
+#' @source   \url{https://en.wikipedia.org/wiki/Premier_League}
 #'
-#' \url{http://www.uefa.com/memberassociations/uefarankings/club/index.html}
+#' \url{https://www.uefa.com/memberassociations/uefarankings/club/}
 #'
 #' @examples
 #' data(big4)
