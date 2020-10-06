@@ -21,7 +21,7 @@ BugReports: https://github.com/modal-inria/Rankcluster/issues/
 Depends: R (>= 2.10)
 Imports: Rcpp, methods
 LinkingTo: Rcpp, RcppEigen
-Suggests: knitr, markdown
+Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
 Encoding: UTF-8
 RoxygenNote: 7.1.1
