@@ -158,16 +158,18 @@ setClass(
 
 #' @title Getter method for rankclust output
 #'
-#' @description This is overloading of square braces to extract values of various
+#' @description Extract values of various
 #' slots of the output from the function \code{\link{rankclust}}.
 #'
 #' @param x object from which to extract element(s) or in which to replace element(s).
-#' @param i the number of cluster of the element we want to extract.
-#'
+#' @param i the number of cluster of the element we want to extract or "bic", "icl", "ll"
+#' @param j,drop not used 
+#' 
+#' @export
 setMethod(
   f = "[",
-  signature = "Rankclust",
-  definition = function(x, i) {
+  signature = signature(x = "Rankclust"),
+  definition = function(x, i, j, drop) {
     if (x@convergence)
     {
       if (is.numeric(i))

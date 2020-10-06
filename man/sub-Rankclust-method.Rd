@@ -4,14 +4,16 @@
 \alias{[,Rankclust-method}
 \title{Getter method for rankclust output}
 \usage{
-\S4method{[}{Rankclust}(x, i)
+\S4method{[}{Rankclust}(x, i, j, drop)
 }
 \arguments{
 \item{x}{object from which to extract element(s) or in which to replace element(s).}
 
-\item{i}{the number of cluster of the element we want to extract.}
+\item{i}{the number of cluster of the element we want to extract or "bic", "icl", "ll"}
+
+\item{j, drop}{not used}
 }
 \description{
-This is overloading of square braces to extract values of various
+Extract values of various
 slots of the output from the function \code{\link{rankclust}}.
 }
