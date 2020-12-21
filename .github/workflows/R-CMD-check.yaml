@@ -44,7 +44,7 @@ jobs:
       - uses: r-lib/actions/setup-tinytex@v1
       
       - name: Install TeX package
-        run: tlmgr install elsarticle cancel multirow
+        run: tlmgr install elsarticle cancel multirow amsthm
         
       - name: Query dependencies
         run: |
