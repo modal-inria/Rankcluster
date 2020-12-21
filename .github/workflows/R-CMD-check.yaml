@@ -44,7 +44,7 @@ jobs:
       - uses: r-lib/actions/setup-tinytex@v1
       
       - name: Install TeX package
-        run: tlmgr install elsarticle cancel multirow amsmath amscls ulem babel-english ae
+        run: tlmgr install elsarticle cancel multirow amsmath amscls ulem babel-english ae grfext
         
       - name: Query dependencies
         run: |
@@ -78,7 +78,7 @@ jobs:
       - name: Check
         env:
           _R_CHECK_CRAN_INCOMING_REMOTE_: false
-        run: rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "warning", check_dir = "check")
+        run: rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), build_args = "--compact-vignettes=\"gs+qpdf\"", error_on = "warning", check_dir = "check")
         shell: Rscript {0}
 
       - name: Upload check results
