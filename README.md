@@ -1,6 +1,6 @@
 # Rankcluster
 
-[![Travis build status](https://travis-ci.com/modal-inria/Rankcluster.svg?branch=master)](https://travis-ci.com/modal-inria/Rankcluster) [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/modal-inria/Rankcluster?branch=master&svg=true)](https://ci.appveyor.com/project/modal-inria/Rankcluster)
+[![R-CMD-check](https://github.com/modal-inria/Rankcluster/workflows/R-CMD-check/badge.svg)](https://github.com/modal-inria/Rankcluster/actions)
 
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/Rankcluster)](https://cran.r-project.org/package=Rankcluster) [![Total Downloads](http://cranlogs.r-pkg.org/badges/grand-total/Rankcluster?color=blue)](http://cranlogs.r-pkg.org/badges/grand-total/Rankcluster) [![Downloads](https://cranlogs.r-pkg.org/badges/Rankcluster)](https://cran.rstudio.com/web/packages/Rankcluster/index.html)
 
