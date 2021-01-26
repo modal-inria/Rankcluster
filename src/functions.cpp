@@ -15,6 +15,12 @@
 
 using namespace std;
 
+// generate an integer between 0 and n -1
+int randWrapper(const int n) 
+{
+    return floor(unif_rand() * n); 
+}
+
 // retourne le rang de l'objet i dans la liste x (ordering representation) equivalent rank.gamma//----FAIRE CAS i PAS DEDANS?
 int positionRank(vector<int> const &x, int const &i)
 {
@@ -448,8 +454,7 @@ vector<vector<int>> simulISR(int const &n, int const &m, vector<int> const &mu, 
     {
         //simulation d'un rang aléatoire: permutation du vecteur 1 2..m
         s = rgTemp;
-        random_shuffle(s.begin(), s.end(), randWrapper);
-
+        Rshuffle(s.begin(), s.end());
         simul[i][0] = s[0];
         for (int j(1); j < m; j++)
         {

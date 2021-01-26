@@ -228,7 +228,7 @@ void RankCluster::initialization()
             mu_[k][i].resize(m_[k]);
             for (int j = 0; j < m_[k]; j++)
                 mu_[k][i][j] = j + 1;
-            random_shuffle(mu_[k][i].begin(), mu_[k][i].end(), randWrapper);
+            Rshuffle(mu_[k][i].begin(), mu_[k][i].end());
         }
     }
 
@@ -248,7 +248,7 @@ void RankCluster::initialization()
         for (int ind = 0; ind < n_; ind++)
         {
             //initialization of y
-            random_shuffle(rankTemp.begin(), rankTemp.end(), randWrapper);
+            Rshuffle(rankTemp.begin(), rankTemp.end());
             data_[dim][ind].y = rankTemp;
 
             if (data_[dim][ind].isNotFull)
@@ -257,7 +257,7 @@ void RankCluster::initialization()
                 {
                     //initialization of Partial Rank
                     vector<int> rankTemp2(data_[dim][ind].missingIndex[ii]);
-                    random_shuffle(rankTemp2.begin(), rankTemp2.end(), randWrapper);
+                    Rshuffle(rankTemp2.begin(), rankTemp2.end());
 
                     for (int iii = 0; iii < (int)data_[dim][ind].missingData[ii].size(); iii++)
                         data_[dim][ind].rank[rankTemp2[iii]] = data_[dim][ind].missingData[ii][iii];
@@ -320,7 +320,7 @@ void RankCluster::gibbsY(int indexDim)
 
         //initialization of p1 and y1
         y = yTemp;
-        random_shuffle(y.begin(), y.end(), randWrapper); //simulation of alea rank
+        Rshuffle(y.begin(), y.end()); //simulation of alea rank
         y1 = y;
         p1 = probaCond(data_[indexDim][ind].rank, y1, mu_[indexDim][z_[ind]], p_[indexDim][z_[ind]]);
 
@@ -901,7 +901,7 @@ double RankCluster::computeLikelihood(vector<vector<vector<int>>> const &mu, vec
                 for (int jjj = 0; jjj < m_[j]; jjj++)
                     scoreCount[j][jj][jjj] = 0;
 
-            random_shuffle(y[j].begin(), y[j].end(), randWrapper); //permutation de 1 2 3 ..m
+            Rshuffle(y[j].begin(), y[j].end()); //permutation de 1 2 3 ..m
             x[j] = data_[j][ind].rank;
         }
 
@@ -1329,7 +1329,7 @@ void RankCluster::estimateCriterion(double &L, double &bic, double &icl)
         for (int ind(0); ind < n_; ind++)
         {
             //initialization of y
-            random_shuffle(rankTemp.begin(), rankTemp.end(), randWrapper);
+            Rshuffle(rankTemp.begin(), rankTemp.end());
             data_[dim][ind].y = rankTemp;
 
             if (data_[dim][ind].isNotFull)
@@ -1338,7 +1338,7 @@ void RankCluster::estimateCriterion(double &L, double &bic, double &icl)
                 {
                     //initialization of Partial Rank
                     vector<int> rankTemp2(data_[dim][ind].missingIndex[i]);
-                    random_shuffle(rankTemp2.begin(), rankTemp2.end(), randWrapper);
+                    Rshuffle(rankTemp2.begin(), rankTemp2.end());
 
                     for (int ii = 0; ii < (int)data_[dim][ind].missingData[i].size(); ii++)
                         data_[dim][ind].rank[rankTemp2[ii]] = data_[dim][ind].missingData[i][ii];
@@ -1387,7 +1387,7 @@ void RankCluster::estimateCriterion(double &L, double &bic, double &icl)
         y = yTemp;
         for (int j(0); j < d_; j++)
         {
-            random_shuffle(y[j].begin(), y[j].end(), randWrapper); //permutation de 1 2 3 ..m
+            Rshuffle(y[j].begin(), y[j].end()); //permutation de 1 2 3 ..m
             x[j] = data_[j][ind].rank;
         }
 

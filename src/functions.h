@@ -9,10 +9,23 @@
 #define FUNCTIONS_H_
 
 #include <vector>
+#include <utility>
 #include <Rmath.h>
 
-/**r random number generator, code from : http://gallery.rcpp.org/articles/r-function-from-c++/*/
-inline int randWrapper(const int n) { return floor(unif_rand() * n); }
+/**r random number generator, code from : http://gallery.rcpp.org/articles/r-function-from-c++/
+ * generate an integer between 0 and n - 1
+ */
+int randWrapper(const int n);
+
+/** equivalent of std::shuffle with an R generator
+ */
+template <class RandomAccessIterator>
+void Rshuffle(RandomAccessIterator first, RandomAccessIterator last)
+{
+  for (auto i = (last-first) - 1;  i > 0; --i) {
+    std::swap (first[i], first[randWrapper(i + 1)]);
+  }
+}
 
 /**
  * search the position of i in x
