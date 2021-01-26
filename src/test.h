@@ -10,10 +10,10 @@
 
 struct Rank
 {
-	std::vector<int> rank;
-	bool isPartial;
-	std::vector<int> missingIndex;
-	std::set<int> missingNumber;
+    std::vector<int> rank;
+    bool isPartial;
+    std::vector<int> missingIndex;
+    std::set<int> missingNumber;
 };
 
 /**
@@ -25,7 +25,7 @@ struct Rank
  * @param p dispersion parameter: probability of a godd comparaison
  * @param prop proportion of the mixture
  */
-void simulMixtureISR(std::vector<std::vector<int> > &simul,int const& n,int const& m,std::vector<std::vector<int> > const& mu,std::vector<double> const& p,std::vector<double> const& prop);
+void simulMixtureISR(std::vector<std::vector<int>> &simul, int const &n, int const &m, std::vector<std::vector<int>> const &mu, std::vector<double> const &p, std::vector<double> const &prop);
 
 /**
  * khi2 adequation test
@@ -36,7 +36,7 @@ void simulMixtureISR(std::vector<std::vector<int> > &simul,int const& n,int cons
  * @param nBoot number of iteration for estimation
  * @return estimated pvalue of khi2 adequation test
  */
-double khi2(std::vector<std::vector<int> > const& data,std::vector<double> const& p,std::vector<double> const& prop,std::vector<std::vector<int> > const& mu,int const& nBoot);
+double khi2(std::vector<std::vector<int>> const &data, std::vector<double> const &p, std::vector<double> const &prop, std::vector<std::vector<int>> const &mu, int const &nBoot);
 
 /**
  * khi2 adequation test for partial rank
@@ -47,8 +47,7 @@ double khi2(std::vector<std::vector<int> > const& data,std::vector<double> const
  * @param nBoot number of iteration for estimation
  * @return estimated pvalue of khi2 adequation test
  */
-double khi2partial(std::vector<Rank > &data,std::vector<double> const& p,std::vector<double> const& prop,std::vector<std::vector<int> > const& mu,int const& nBoot);
-
+double khi2partial(std::vector<Rank> &data, std::vector<double> const &p, std::vector<double> const &prop, std::vector<std::vector<int>> const &mu, int const &nBoot);
 
 /**
  * Updating the kullback leibler divergence
@@ -60,8 +59,8 @@ double khi2partial(std::vector<Rank > &data,std::vector<double> const& p,std::ve
  * @param proportion1 proportion of the mixture of the first set of parameters
  * @param proportion2 proportion of the mixture of the second set of parameters
  */
-void updateD(double &divKL,std::vector<int> &index, std::vector<std::vector<std::vector<double> > > const& p1,std::vector<std::vector<std::vector<double> > >  const& p2,int const& d,int const& g,
-		std::vector<double> const& proportion1,std::vector<double> const& proportion2);
+void updateD(double &divKL, std::vector<int> &index, std::vector<std::vector<std::vector<double>>> const &p1, std::vector<std::vector<std::vector<double>>> const &p2, int const &d, int const &g,
+             std::vector<double> const &proportion1, std::vector<double> const &proportion2);
 /**
  * Recursive function for updating the index for compute probabilities in kullback 
  * @param index current index
@@ -69,7 +68,7 @@ void updateD(double &divKL,std::vector<int> &index, std::vector<std::vector<std:
  * @param factm factorial of the size of rank for each dimension
  * @param stop if true stop the recursivity
  */
-void updateIndex(std::vector<int> &index,int i,std::vector<int> const& factm,bool &stop);
+void updateIndex(std::vector<int> &index, int i, std::vector<int> const &factm, bool &stop);
 
 /**
  * Compute probabilities of each rank for each set of parameters
@@ -84,8 +83,8 @@ void updateIndex(std::vector<int> &index,int i,std::vector<int> const& factm,boo
  * @param d dimension
  * @param g number of cluster
  */
-void computePQ(std::vector<std::vector<std::vector<double> > > &p, std::vector<std::vector<std::vector<double> > > &q,std::vector<std::vector<std::vector<int> > > const& mu1,
-		std::vector<std::vector<std::vector<int> > > const& mu2,std::vector<std::vector<double> > const& p1,std::vector<std::vector<double> > const& p2,std::vector<int> const& m,int d, int g);
+void computePQ(std::vector<std::vector<std::vector<double>>> &p, std::vector<std::vector<std::vector<double>>> &q, std::vector<std::vector<std::vector<int>>> const &mu1,
+               std::vector<std::vector<std::vector<int>>> const &mu2, std::vector<std::vector<double>> const &p1, std::vector<std::vector<double>> const &p2, std::vector<int> const &m, int d, int g);
 
 /**
  * Compute the kullback leibler divergence between the first and the second set of parameters
@@ -98,9 +97,7 @@ void computePQ(std::vector<std::vector<std::vector<double> > > &p, std::vector<s
  * @param proportion2 proportion of the mixture of the second set of parameters
  * @return kullback leibler divergence
  */
-double divKL(std::vector<int> const& m,std::vector<std::vector<std::vector<int> > > const& mu1,std::vector<std::vector<std::vector<int> > > const& mu2,
-		std::vector<std::vector<double> > const& p1, std::vector<std::vector<double> >  const& p2,std::vector<double> const& proportion1,std::vector<double> const& proportion2);
-
+double divKL(std::vector<int> const &m, std::vector<std::vector<std::vector<int>>> const &mu1, std::vector<std::vector<std::vector<int>>> const &mu2,
+             std::vector<std::vector<double>> const &p1, std::vector<std::vector<double>> const &p2, std::vector<double> const &proportion1, std::vector<double> const &proportion2);
 
 #endif /* TEST_H_ */
-

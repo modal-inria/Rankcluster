@@ -17,18 +17,17 @@ extern SEXP semR(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEX
 extern SEXP simulISRR(SEXP, SEXP, SEXP, SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
-  {"adkhi2partial", (DL_FUNC) &adkhi2partial,  5},
-  {"computeProba",  (DL_FUNC) &computeProba,   4},
-  {"freqMultiR",    (DL_FUNC) &freqMultiR,     2},
-  {"kullback",      (DL_FUNC) &kullback,       7},
-  {"loglikelihood", (DL_FUNC) &loglikelihood,  9},
-  {"semR",          (DL_FUNC) &semR,          12},
-  {"simulISRR",     (DL_FUNC) &simulISRR,      4},
-  {NULL, NULL, 0}
-};
+    {"adkhi2partial", (DL_FUNC)&adkhi2partial, 5},
+    {"computeProba", (DL_FUNC)&computeProba, 4},
+    {"freqMultiR", (DL_FUNC)&freqMultiR, 2},
+    {"kullback", (DL_FUNC)&kullback, 7},
+    {"loglikelihood", (DL_FUNC)&loglikelihood, 9},
+    {"semR", (DL_FUNC)&semR, 12},
+    {"simulISRR", (DL_FUNC)&simulISRR, 4},
+    {NULL, NULL, 0}};
 
 void R_init_Rankcluster(DllInfo *dll)
 {
-  R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
-  R_useDynamicSymbols(dll, FALSE);
+    R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+    R_useDynamicSymbols(dll, FALSE);
 }
