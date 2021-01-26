@@ -155,7 +155,8 @@ setClass(
 
 )
 
-
+#' @name [,Rankclust-method
+#' 
 #' @title Getter method for rankclust output
 #'
 #' @description Extract values of various
