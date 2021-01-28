@@ -4,7 +4,7 @@
 #' 
 #' @param data a matrix in which each row is a rank (partial or not; for partial rank, missing elements of a rank are put to 0 ).
 #' @param proportion a vector (which sums to 1) containing the K mixture proportions.
-#' @param pi a matrix of size K*p, where K is the number of clusters and p the number of dimension, containing the probabilities of a good comparaison of the model (dispersion parameters).
+#' @param pi a matrix of size K*p, where K is the number of clusters and p the number of dimension, containing the probabilities of a good comparison of the model (dispersion parameters).
 #' @param mu a matrix of size K*sum(m), containing the modal ranks. Each row contains the modal rank for a cluster. In the case of multivariate ranks, the reference rank for each dimension are set successively on the same row.
 #' @param m a vector containing the size of ranks for each dimension.
 #' @param Ql number of iterations of the Gibbs sampler used for the estimation of the log-likelihood.

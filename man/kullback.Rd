@@ -9,7 +9,7 @@ kullback(proportion1, pi1, mu1, proportion2, pi2, mu2, m)
 \arguments{
 \item{proportion1, proportion2}{vectors (which sums to 1) containing the K mixture proportions.}
 
-\item{pi1, pi2}{matrices of size K*p, where K is the number of clusters and p the number of dimension, containing the probabilities of a good comparaison of the model (dispersion parameters).}
+\item{pi1, pi2}{matrices of size K*p, where K is the number of clusters and p the number of dimension, containing the probabilities of a good comparison of the model (dispersion parameters).}
 
 \item{mu1, mu2}{matrices of size K*sum(m), containing the modal ranks. Each row contains the modal rank for a cluster. In the case of multivariate ranks, the reference rank for each dimension are set successively on the same row.}
 

@@ -3,7 +3,7 @@
 #' @description This function computes the Kullback-Leibler divergence between two mixtures of multidimensional ISR distributions.
 #' 
 #' @param proportion1,proportion2 vectors (which sums to 1) containing the K mixture proportions.
-#' @param pi1,pi2 matrices of size K*p, where K is the number of clusters and p the number of dimension, containing the probabilities of a good comparaison of the model (dispersion parameters).
+#' @param pi1,pi2 matrices of size K*p, where K is the number of clusters and p the number of dimension, containing the probabilities of a good comparison of the model (dispersion parameters).
 #' @param mu1,mu2 matrices of size K*sum(m), containing the modal ranks. Each row contains the modal rank for a cluster. In the case of multivariate ranks, the reference rank for each dimension are set successively on the same row.
 #' @param m a vector containing the size of ranks for each dimension.
 #' 
@@ -79,15 +79,15 @@ checkKullback <- function(proportion1, pi1, mu1, proportion2, pi2, mu2, m)
 
 #' @title Khi2 test
 #'
-#' @description This function computes the p-value of the khi2 adequation test (only for univariate data).
+#' @description This function computes the p-value of the khi2 goodness-of-fit test (only for univariate data).
 #' 
 #' @param data a matrix in which each row is a rank of size m.
 #' @param proportion a vector (which sums to 1) containing the K mixture proportion.
-#' @param pi a vector of size K, where K is the number of clusters, containing the probabilities of a good paired comparaison of the model (dispersion parameters).
+#' @param pi a vector of size K, where K is the number of clusters, containing the probabilities of a good paired comparison of the model (dispersion parameters).
 #' @param mu a matrix of size K*m, where m is the size of a rank, containing the modal rankings of the model (position parameters).
-#' @param nBoot number of bootstrap iterations used to estimate the khi2 adequation test p-value.
+#' @param nBoot number of bootstrap iterations used to estimate the p-value.
 #' 
-#' @return a real, the p-value of the khi2 adequation test.
+#' @return a real, the p-value of the test.
 #' 
 #' @examples
 #' proportion <- c(0.4, 0.6)

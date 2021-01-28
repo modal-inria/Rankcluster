@@ -82,10 +82,10 @@ struct OutParameters
 class RankCluster
 {
 public:
-    ///defaut constructor
+    // defaut constructor
     RankCluster();
     /**
-    * @param X data one row= a multi dimensionnal rank
+    * @param X data one row= a multivariate rank
     * @param g number of clusters
     * @param m size of rank of each dimension
     * @param param parameters of SEM algorithm
@@ -148,11 +148,11 @@ public:
 
 protected:
     /**convert X in vector<vector<PartialRank>>
-        * @param X raw data one row= a multi dimensionnal rank
+        * @param X raw data one row= a multi dimensional rank
         */
     void conversion2data(std::vector<std::vector<int>> const &X);
     /** read rank. used in conversion2data
-        * @param X raw data one row= a multi dimensionnal rank
+        * @param X raw data one row= a multi dimensinnal rank
         * @param dim actual dimension
         * @param j actual index of the sample
         * @param indM transformation of m_
@@ -163,7 +163,7 @@ protected:
     void initialization();
     /** SE step */
     void SEstep();
-    /**unidimensionnal gibbs sampler for y estimation
+    /**unidimensional gibbs sampler for y estimation
     * @param indexDim index of the dimension (<d_)
     */
     void gibbsY(int indexDim);

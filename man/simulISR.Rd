@@ -35,7 +35,7 @@ second Countryside, and last Mountain. The ordering
 result of the judge is o = (3, 1, 2) whereas the ranking
 result is r = (2, 3, 1).
 
-You can see the \link{convertRank} function to convert the simualted ranking drom ordering to ranking representation.
+You can see the \link{convertRank} function to convert the simulated ranking from ordering to ranking representation.
 }
 \examples{
 x <- simulISR(30, 0.8, 1:4)

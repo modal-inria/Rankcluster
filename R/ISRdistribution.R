@@ -23,7 +23,7 @@
 #' result of the judge is o = (3, 1, 2) whereas the ranking
 #' result is r = (2, 3, 1).
 #'
-#' You can see the \link{convertRank} function to convert the simualted ranking drom ordering to ranking representation.
+#' You can see the \link{convertRank} function to convert the simulated ranking from ordering to ranking representation.
 #'
 #' @references
 #' [1] C.Biernacki and J.Jacques (2013), A generative model for rank data based on sorting algorithm, Computational Statistics and Data Analysis, 58, 162-176.

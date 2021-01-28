@@ -11,7 +11,7 @@ criteria(data, proportion, pi, mu, m, Ql = 500, Bl = 100, IC = 1, nb_cpus = 1)
 
 \item{proportion}{a vector (which sums to 1) containing the K mixture proportions.}
 
-\item{pi}{a matrix of size K*p, where K is the number of clusters and p the number of dimension, containing the probabilities of a good comparaison of the model (dispersion parameters).}
+\item{pi}{a matrix of size K*p, where K is the number of clusters and p the number of dimension, containing the probabilities of a good comparison of the model (dispersion parameters).}
 
 \item{mu}{a matrix of size K*sum(m), containing the modal ranks. Each row contains the modal rank for a cluster. In the case of multivariate ranks, the reference rank for each dimension are set successively on the same row.}
 

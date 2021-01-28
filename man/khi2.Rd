@@ -13,15 +13,15 @@ khi2(data, proportion, mu, pi, nBoot = 1000)
 
 \item{mu}{a matrix of size K*m, where m is the size of a rank, containing the modal rankings of the model (position parameters).}
 
-\item{pi}{a vector of size K, where K is the number of clusters, containing the probabilities of a good paired comparaison of the model (dispersion parameters).}
+\item{pi}{a vector of size K, where K is the number of clusters, containing the probabilities of a good paired comparison of the model (dispersion parameters).}
 
-\item{nBoot}{number of bootstrap iterations used to estimate the khi2 adequation test p-value.}
+\item{nBoot}{number of bootstrap iterations used to estimate the p-value.}
 }
 \value{
-a real, the p-value of the khi2 adequation test.
+a real, the p-value of the test.
 }
 \description{
-This function computes the p-value of the khi2 adequation test (only for univariate data).
+This function computes the p-value of the khi2 goodness-of-fit test (only for univariate data).
 }
 \examples{
 proportion <- c(0.4, 0.6)

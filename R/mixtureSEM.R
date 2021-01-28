@@ -7,7 +7,7 @@
 # @param m a vector with the size of ranks for each dimension
 # @param maxIt the maximum number of iteration of the algorithm
 
-# @param Qsem the total number of iterations for the SEM algorithm (defaut value=40)
+# @param Qsem the total number of iterations for the SEM algorithm (default value=40)
 # @param Bsem burn-in period for SEM algorithm (default value=10)
 # @param RjSE a vector containing the number of iteration for each dimension of the Gibbs algorithm in the SE step for generate partial ranks and orders of presentation(only for SEM algorithm, default value=m(m-1)/2)
 # @param RjM a vector containing the number of iterations for each dimension for the Gibbs Sampler in the M step(only for SEM algorithm, default value=m(m-1)/2)
@@ -15,7 +15,7 @@
 # @param Bl burn-in period for estimation of log-likelihood (only for SEM algorithm, default value=50)
 # @param detail boolean, if TRUE, time and others informations will be print during the process (default value FALSE)
 
-# @return an object containing the refererence rank mu, the probability pi of a correct comparaison, proportion, conditionnal probability of belonging to each cluster (tik), the loglikelihood, the partition, the BIC and the ICL
+# @return an object containing the reference rank mu, the probability pi of a correct comparison, proportion, conditional probability of belonging to each cluster (tik), the loglikelihood, the partition, the BIC and the ICL
 # @references "Model-based clustering for multivariate partial ranking data", J. Jacques, C. Biernacki
 # @examples
 # data(APA)#m=5

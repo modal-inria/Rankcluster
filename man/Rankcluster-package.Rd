@@ -13,7 +13,7 @@ The heterogeneity of the rank population is modelled by a mixture of ISR, wherea
 }
 \details{
 The main function is \link{rankclust}.
-See vignettes for detailled examples: \code{RShowDoc("dataFormat", package = "Rankcluster")} and \code{RShowDoc("Rankcluster", package = "Rankcluster")}
+See vignettes for detailed examples: \code{RShowDoc("dataFormat", package = "Rankcluster")} and \code{RShowDoc("Rankcluster", package = "Rankcluster")}
 }
 \examples{
 # see vignettes

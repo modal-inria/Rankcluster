@@ -14,7 +14,7 @@
 #'
 #' @details
 #' The main function is \link{rankclust}.
-#' See vignettes for detailled examples: \code{RShowDoc("dataFormat", package = "Rankcluster")} and \code{RShowDoc("Rankcluster", package = "Rankcluster")}
+#' See vignettes for detailed examples: \code{RShowDoc("dataFormat", package = "Rankcluster")} and \code{RShowDoc("Rankcluster", package = "Rankcluster")}
 #' 
 #'
 #' @references   [1] C.Biernacki and J.Jacques (2013), A generative model for rank data based on sorting algorithm, Computational Statistics and Data Analysis, 58, 162-176.

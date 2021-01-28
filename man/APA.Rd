@@ -26,7 +26,7 @@ A list containing:
 This dataset contains the 5738 full rankings resulting from the American Psychological Association (APA) presidential election of 1980.
 For this election, members of APA had to rank five candidates in order of preference.
 
-For information, a total of 15449 votes have been registred for this election, but only the 5738 full rankings are reported in the APA dataset. Candidates A and C were research psychologists, candidates D and E were clinical psychologists and candidate B was a community psychologist.
+For information, a total of 15449 votes have been registered for this election, but only the 5738 full rankings are reported in the APA dataset. Candidates A and C were research psychologists, candidates D and E were clinical psychologists and candidate B was a community psychologist.
 }
 \examples{
 data(APA)
