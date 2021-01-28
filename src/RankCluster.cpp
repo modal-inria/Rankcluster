@@ -305,7 +305,7 @@ void RankCluster::SEstep()
 
 void RankCluster::gibbsY(int indexDim)
 {
-    double p1(0), p2(0), alea(0);
+    double logPcurrent(0), logPcandidate(0);
     set<int>::iterator itset;
 
     //rank 1 2..m
@@ -316,13 +316,13 @@ void RankCluster::gibbsY(int indexDim)
     for (int ind = 0; ind < n_; ind++)
     {
         //Gibbs sampling
-        vector<int> y(m_[indexDim]), y2(m_[indexDim]), y1(m_[indexDim]);
+        vector<int> y(m_[indexDim]), yCandidate(m_[indexDim]), yCurrent(m_[indexDim]);
 
         //initialization of p1 and y1
         y = yTemp;
         Rshuffle(y.begin(), y.end()); //simulation of alea rank
-        y1 = y;
-        p1 = probaCond(data_[indexDim][ind].rank, y1, mu_[indexDim][z_[ind]], p_[indexDim][z_[ind]]);
+        yCurrent = y;
+        logPcurrent = lnProbaCond(data_[indexDim][ind].rank, yCurrent, mu_[indexDim][z_[ind]], p_[indexDim][z_[ind]]);
 
         //start of iteration
         for (int iter(0); iter < parameter_.nGibbsSE[indexDim]; iter++)
@@ -330,23 +330,22 @@ void RankCluster::gibbsY(int indexDim)
             for (int k(0); k < m_[indexDim] - 1; k++)
             {
                 //new y to test (old y with inversion of 2 adjacents elements)
-                y2 = y;
-                y2[k] = y[k + 1];
-                y2[k + 1] = y[k];
+                yCandidate = y;
+                yCandidate[k] = y[k + 1];
+                yCandidate[k + 1] = y[k];
 
                 //compute the probability of accept the changement of y
-                p2 = probaCond(data_[indexDim][ind].rank, y2, mu_[indexDim][z_[ind]], p_[indexDim][z_[ind]]);
+                logPcandidate = lnProbaCond(data_[indexDim][ind].rank, yCandidate, mu_[indexDim][z_[ind]], p_[indexDim][z_[ind]]);
 
-                alea = (double)runif(0, (p1 + p2));
-
-                if (alea < p2) //changement acceptation
+                bool changeAccepted = acceptChange(logPcurrent, logPcandidate);
+                if  (changeAccepted)//changement acceptation
                 {
-                    y = y2;
-                    p1 = p2;
-                    y1 = y;
+                    y = yCandidate;
+                    logPcurrent = logPcandidate;
+                    yCurrent = y;
                 }
                 else
-                    y = y1;
+                    y = yCurrent;
             }
         }
         data_[indexDim][ind].y = y;
@@ -402,19 +401,19 @@ void RankCluster::zSimulation()
 
 void RankCluster::gibbsX(int indexDim)
 {
-    double p1(0), p2(0), alea(0);
+    double logPcurrent(0), logPcandidate(0);
 
     for (int ind = 0; ind < n_; ind++)
     {
         if (data_[indexDim][ind].isNotFull)
         {
             //Algorithme de Gibbs
-            vector<int> x(m_[indexDim]), x2(m_[indexDim]), x1(m_[indexDim]);
+            vector<int> x(m_[indexDim]), xCurrent(m_[indexDim]), xCandidate(m_[indexDim]);
 
             //initialisation de mu et p pour Gibbs
             x = data_[indexDim][ind].rank;
-            x1 = x;
-            p1 = probaCond(x1, data_[indexDim][ind].y, mu_[indexDim][z_[ind]], p_[indexDim][z_[ind]]);
+            xCurrent = x;
+            logPcurrent = lnProbaCond(xCurrent, data_[indexDim][ind].y, mu_[indexDim][z_[ind]], p_[indexDim][z_[ind]]);
 
             for (int iter = 0; iter < parameter_.nGibbsSE[indexDim]; iter++)
             {
@@ -423,22 +422,21 @@ void RankCluster::gibbsX(int indexDim)
                     for (int i = 0; i < (int)data_[indexDim][ind].missingIndex[ii].size() - 1; i++)
                     {
                         //nouveau x à tester, ancien x auquel on inverse 2 éléments partiels
-                        x2 = x;
-                        x2[data_[indexDim][ind].missingIndex[ii][i]] = x[data_[indexDim][ind].missingIndex[ii][i + 1]];
-                        x2[data_[indexDim][ind].missingIndex[ii][i + 1]] = x[data_[indexDim][ind].missingIndex[ii][i]];
+                        xCandidate = x;
+                        xCandidate[data_[indexDim][ind].missingIndex[ii][i]] = x[data_[indexDim][ind].missingIndex[ii][i + 1]];
+                        xCandidate[data_[indexDim][ind].missingIndex[ii][i + 1]] = x[data_[indexDim][ind].missingIndex[ii][i]];
 
-                        p2 = probaCond(x2, data_[indexDim][ind].y, mu_[indexDim][z_[ind]], p_[indexDim][z_[ind]]);
+                        logPcandidate = lnProbaCond(xCandidate, data_[indexDim][ind].y, mu_[indexDim][z_[ind]], p_[indexDim][z_[ind]]);
 
-                        alea = (double)runif(0., p1 + p2);
-
-                        if (alea < p2) //acceptation du changement
+                        bool changeAccepted = acceptChange(logPcurrent, logPcandidate);
+                        if  (changeAccepted)//changement acceptation
                         {
-                            x = x2;
-                            p1 = p2;
-                            x1 = x;
+                            x = xCandidate;
+                            logPcurrent = logPcandidate;
+                            xCurrent = x;
                         }
                         else
-                            x = x1;
+                            x = xCurrent;
                     }
                 }
             }
@@ -460,10 +458,10 @@ void RankCluster::Mstep()
         }
         proportion_[k] /= (double)n_;
         if (proportion_[k] == 0)
-            throw string("NON CONVERGENCE DE L'ALGORITHME : a proportion is equal to 0");
+            throw string("Algorithm did not converge: a proportion is equal to 0");
     }
 
-    //simulation of mu for ezach dim and cluster
+    //simulation of mu for each dim and cluster
     for (int dim(0); dim < d_; dim++)
     {
         for (int numCl(0); numCl < g_; numCl++)
@@ -473,7 +471,7 @@ void RankCluster::Mstep()
 
 void RankCluster::simuM(int indexDim, int indCl)
 {
-    long double p1(0), p2(0), alea(0), lnp1(0), lnp2(0), lnp1Plusp2(0);
+    double logPcurrent(0), logPcandidate(0);
     double s1(0), lim(-numeric_limits<double>::max());
     vector<int> tabFact(m_[indexDim]), comp(2);
 
@@ -494,20 +492,19 @@ void RankCluster::simuM(int indexDim, int indCl)
     map<int, vector<double>>::iterator itmapmu;
 
     //Algorithme de Gibbs
-    vector<int> mu(m_[indexDim]), mu2(m_[indexDim]), mu1(m_[indexDim]);
+    vector<int> mu(m_[indexDim]), muCurrent(m_[indexDim]), muCandidate(m_[indexDim]);
 
     //initialization of mu  and p
     mu = mu_[indexDim][indCl];
-    mu1 = mu;
-    lnp1 = 0;
+    muCurrent = mu;
+    logPcurrent = 0;
 
     //initial proba
     for (int ind(0); ind < n_; ind++)
     {
         if (z_[ind] == indCl)
         {
-            p1 = probaCond(data_[indexDim][ind].rank, data_[indexDim][ind].y, mu1, p_[indexDim][indCl]);
-            lnp1 += log(p1);
+            logPcurrent += lnProbaCond(data_[indexDim][ind].rank, data_[indexDim][ind].y, muCurrent, p_[indexDim][indCl]);
         }
     }
 
@@ -517,57 +514,57 @@ void RankCluster::simuM(int indexDim, int indCl)
         for (int k(0); k < m_[indexDim] - 1; k++)
         {
             //new mu to test
-            mu2 = mu;
-            mu2[k] = mu[k + 1];
-            mu2[k + 1] = mu[k];
+            muCandidate = mu;
+            muCandidate[k] = mu[k + 1];
+            muCandidate[k + 1] = mu[k];
 
-            lnp2 = 0;
+            logPcandidate = 0;
 
             //new proba
             for (int ind(0); ind < n_; ind++)
             {
                 if (z_[ind] == indCl)
                 {
-                    p2 = probaCond(data_[indexDim][ind].rank, data_[indexDim][ind].y, mu2, p_[indexDim][indCl]);
-                    lnp2 += log(p2);
+                    logPcandidate += lnProbaCond(data_[indexDim][ind].rank, data_[indexDim][ind].y, muCandidate, p_[indexDim][indCl]);
                 }
             }
 
-            //p1+p2
-            //ln(p1+p2)~ln(
-            long double diffln;
-            if (lnp1 > lnp2)
+            // //p1+p2
+            // //ln(p1+p2)~ln(
+            // long double diffln;
+            // if (lnp1 > lnp2)
+            // {
+            //     diffln = lnp2 - lnp1;
+            //     lnp1Plusp2 = lnp1;
+            // }
+            // else
+            // {
+            //     diffln = lnp1 - lnp2;
+            //     lnp1Plusp2 = lnp2;
+            // }
+
+            // //taylor development of order for estiamting lnp1Plusp2
+            // for (int ordre(1); ordre < 6; ordre++)
+            // {
+            //     //* (long double) std::pow((int) -1,(int) ordre-1)
+            //     int sign = 1;
+            //     if (ordre % 2 == 1)
+            //         sign = -1;
+            //     lnp1Plusp2 += (long double)sign / ordre * exp(diffln * ordre);
+            // }
+
+            // alea = (long double)runif(0., 1.);
+
+            // acceptation of change or not
+            bool changeAccepted = acceptChange(logPcurrent, logPcandidate);
+            if  (changeAccepted)//changement acceptation
             {
-                diffln = lnp2 - lnp1;
-                lnp1Plusp2 = lnp1;
+                mu = muCandidate;
+                logPcurrent = logPcandidate;
+                muCurrent = mu;
             }
             else
-            {
-                diffln = lnp1 - lnp2;
-                lnp1Plusp2 = lnp2;
-            }
-
-            //taylor development of order for estiamting lnp1Plusp2
-            for (int ordre(1); ordre < 6; ordre++)
-            {
-                //* (long double) std::pow((int) -1,(int) ordre-1)
-                int sign = 1;
-                if (ordre % 2 == 1)
-                    sign = -1;
-                lnp1Plusp2 += (long double)sign / ordre * exp(diffln * ordre);
-            }
-
-            alea = (long double)runif(0., 1.);
-
-            // acceptaion of change or not
-            if (alea < exp(lnp2 - lnp1Plusp2)) //accept the changement
-            {
-                mu = mu2;
-                lnp1 = lnp2;
-                mu1 = mu;
-            }
-            else
-                mu = mu1;
+                mu = muCurrent;
 
         } //fin parcours mu
         MU[iter] = mu;
