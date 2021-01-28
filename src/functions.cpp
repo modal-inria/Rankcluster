@@ -628,3 +628,23 @@ double proba(vector<vector<int>> const &x, vector<vector<int>> const &mu, vector
 
     return finalProba;
 }
+
+bool acceptChange(double const logP1, double const logP2)
+{
+    double logP1PlusP2;
+    if (logP1 > logP2)
+    {
+        logP1PlusP2 = logP1 + log(exp(logP2 - logP1) + 1);
+    }
+    else
+    {
+        logP1PlusP2 = logP2 + log(exp(logP1 - logP2) + 1);
+    }
+
+    double proba1 = exp(logP1 - logP1PlusP2);
+    double proba2 = exp(logP2 - logP1PlusP2);
+
+    double alea = runif(0., proba1 + proba2);
+
+    return (alea < proba2);
+}

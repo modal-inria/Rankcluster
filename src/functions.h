@@ -200,4 +200,16 @@ freqMulti(std::vector<std::vector<std::vector<int>>> const &listeRang);
  */
 double proba(std::vector<std::vector<int>> const &x, std::vector<std::vector<int>> const &mu, std::vector<double> const &pi);
 
+
+/**
+ * accept or not a change in a gibbs sampler
+ * 
+ * Sample x~U(0, 1), accept the change if x < p2/(p1 + p2)
+ * 
+ * @param logP1 log-probability of the current element
+ * @param logP2 log-probability of the candidate
+ * @return true if the change is accepted
+ */
+bool acceptChange(double const logP1, double const logP2);
+
 #endif /* FUNCTIONS_H_ */
