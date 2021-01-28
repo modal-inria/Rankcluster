@@ -106,6 +106,13 @@ double probaCond(vector<int> const &x, vector<int> const &y, vector<int> const &
     return pow(p, comp[1]) * pow(1 - p, comp[0] - comp[1]);
 }
 
+double lnProbaCond(vector<int> const &x, vector<int> const &y, vector<int> const &mu, double const &p)
+{
+    vector<int> comp(2);
+    comp = comparaison(x, y, mu);
+    return comp[1] * log(p) + (comp[0] - comp[1]) * log(1. - p);
+}
+
 //factorial function
 int factorial(int const &nombre)
 {

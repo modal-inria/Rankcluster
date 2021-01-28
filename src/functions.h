@@ -57,6 +57,7 @@ std::vector<int> comparaison(std::vector<int> const &x, std::vector<int> const &
  * @return p(x|y;mu,p)
  */
 double probaCond(std::vector<int> const &x, std::vector<int> const &y, std::vector<int> const &mu, double const &p);
+double lnProbaCond(std::vector<int> const &x, std::vector<int> const &y, std::vector<int> const &mu, double const &p);
 
 /**
  * factorial function (recursive)
