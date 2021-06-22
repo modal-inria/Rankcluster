@@ -1,3 +1,16 @@
+# check if a number is an integer
+# @param x number
+# @param tol tolerance
+#
+# @ return TRUE if the number is an integer, FALSE else
+#
+is.wholenumber <- function(x, tol = .Machine$double.eps^0.5)
+{
+  # if(!is.double(x))
+  #  return(FALSE)
+  
+  abs(x - round(x)) < tol
+}
 
 
 checkProportion <- function(proportion, paramName = "proportion", eps = 1e-10)
