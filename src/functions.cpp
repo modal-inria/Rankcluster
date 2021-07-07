@@ -479,7 +479,6 @@ vector<vector<int>> simulISR(int const &n, int const &m, vector<int> const &mu, 
                 simul[i][l] = s[j];
         }
     }
-
     return simul;
 }
 
