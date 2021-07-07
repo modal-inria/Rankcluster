@@ -84,11 +84,11 @@ distKendall_ordering <- function(x, y)
 
 distSpearman <- function(x, y)
 {
-  distSpearman = sum((x - y)^2)
+  distSpearman <- sum((x - y)^2)
   return(distSpearman)
 }
 
-# CorrelSpearman calculates the Spearman rank correlation between two ranks.
+# It calculates the Spearman rank correlation between two ranks.
 # @title Spearman rank correlation coefficient
 # @author Julien Jacques
 # @param x,y two ranks of size m.
@@ -98,10 +98,10 @@ distSpearman <- function(x, y)
 # y=c(2,3,1,4,5)
 # CorrelSpearman(x, y)
 # @export
-CorrelSpearman <- function(x, y)
+correlSpearman <- function(x, y)
 {
-  CorrelSpearman = sqrt(sum((x - y)^2))
-  return(CorrelSpearman)
+  correlSpearman <- sqrt(sum((x - y)^2))
+  return(correlSpearman)
 }
 
 #' @title Cayley distance between two ranks
@@ -125,14 +125,14 @@ CorrelSpearman <- function(x, y)
 #' @export
 distCayley <- function(x, y)
 {
-  m = length(x)
-  distCayley = 0
+  m <- length(x)
+  distCayley <- 0
   for (i in 1:(m - 1))
   {
     if (!x[i] == y[i])
     {
       distCayley = distCayley + 1
-      tmp = x[i]
+      tmp <- x[i]
       x[i] = y[i]
       x[which(y[i] == x)] = tmp
     }
@@ -161,14 +161,7 @@ distCayley <- function(x, y)
 #' @export
 distHamming <- function(x, y)
 {
-  m = length(x)
-  distHamming = 0
-  for (i in 1:m)
-  {
-    if (!x[i] == y[i])
-    {
-      distHamming = distHamming + 1
-    }
-  }
+  distHamming <- sum(x != y)
+
   return(distHamming)
 }
