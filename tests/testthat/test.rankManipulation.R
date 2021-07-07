@@ -54,21 +54,23 @@ test_that("checkRank detects if the vector is a rank", {
 })
 
 
-test_that("checkPartialRank detects if the vector is a rank", {
+test_that("checkPartialRank detects if the vector with 0 or NA is a rank", {
   expect_true(checkPartialRank(1:4))
   expect_false(checkPartialRank(1:4, 5))
   expect_true(checkPartialRank(c(2, 4, 1, 3)))
   expect_true(checkPartialRank(c(4, 0, 1, 3)))
   expect_false(checkPartialRank(c(5, 2, 1, 3)))
   expect_false(checkPartialRank(c(4, 1, 1, 3)))
+  expect_true(checkPartialRank(c(4, 1, NA, 3)))
 })
 
 
-test_that("checkTiePartialRank detects if the vector is a rank", {
+test_that("checkTiePartialRank detects if the vector with 0, NA or ties is a rank", {
   expect_true(checkTiePartialRank(1:4))
   expect_false(checkTiePartialRank(1:4, 5))
   expect_true(checkTiePartialRank(c(2, 4, 1, 3)))
   expect_true(checkTiePartialRank(c(4, 0, 1, 3)))
+  expect_true(checkTiePartialRank(c(4, NA, 1, 3)))
   expect_false(checkTiePartialRank(c(5, 2, 1, 3)))
   expect_true(checkTiePartialRank(c(4, 1, 1, 3)))
 })
