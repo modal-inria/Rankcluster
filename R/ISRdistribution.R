@@ -68,16 +68,16 @@ simulISR <- function(n, pi, mu)
 
 #' @title Probability computation
 #'
-#' @description This function computes the probability of x according to a multivariate ISR o parameter mu and pi.
+#' @description It computes the probability of a (multivariate) rank x according to a ISR(mu, pi).
 #'
-#' @param x a vector or a matrix of 1 row containing the rankings in ranking notation (see Details or \link{convertRank} function). The rankings of each dimension are
-#' placed end to end. x must contain only full ranking (no partial or tied).
-#' @param pi a vector of size p, where p is the number of dimension, containing the probabilities of a good comparaison of the model (dispersion parameters).
-#' @param mu a vector of length sum(m) or a matrix of size 1*sum(m), containing the modal ranks in ranking notation (see Details or \link{convertRank} function). The rankings of each dimension are
-#' placed end to end. mu must contain only full ranking (no partial or tied).
+#' @param x a vector or a matrix containing the rankings in ranking notation (see Details or \link{convertRank} function). 
+#' The rankings of each dimension are placed end to end. \code{x} must contain only full ranking (no partial or tied).
+#' @param pi a vector of size \code{p=length(m)}, where \code{p} is the number of dimension, containing the probabilities of a good comparison of the model (dispersion parameters).
+#' @param mu a vector of length \code{sum(m)} containing the modal ranks in ranking notation (see Details or \link{convertRank} function). 
+#' The rankings of each dimension are placed end to end. \code{mu} must contain only full ranking (no partial or tied).
 #' @param m a vector containing the size of ranks for each dimension.
 #' 
-#' @return the probability of x according to a multivariate ISR o parameter mu and pi.
+#' @return the probability of \code{x} according to a ISR(mu, pi).
 #'
 #' @details
 #'  The ranks have to be given to the package in the ranking notation (see \link{convertRank} function), with the following convention:
@@ -119,20 +119,29 @@ simulISR <- function(n, pi, mu)
 #' 
 #' @export
 #'
-probability <- function(x, mu, pi, m = length(x))
+probability <- function(x, mu, pi, m = length(mu))
 {
+  x <- matrix(x, ncol = sum(m))
+  mu <- matrix(mu, ncol = sum(m))
+  
   checkProbability(x, mu, pi, m)
   
   # convert to ordering
   for (i in 1:length(m))
   {
     mu[1, (1 + cumsum(c(0, m))[i]):(cumsum(c(0, m))[i + 1])] = convertRank(mu[1, (1 + cumsum(c(0, m))[i]):(cumsum(c(0, m))[i + 1])])
-    x[1, (1 + cumsum(c(0, m))[i]):(cumsum(c(0, m))[i + 1])] = convertRank(x[1, (1 + cumsum(c(0, m))[i]):(cumsum(c(0, m))[i + 1])])
+    for (j in 1:nrow(x))
+    {
+      x[j, (1 + cumsum(c(0, m))[i]):(cumsum(c(0, m))[i + 1])] = convertRank(x[j, (1 + cumsum(c(0, m))[i]):(cumsum(c(0, m))[i + 1])])
+    }
+    
   }
   
-  prob <- .Call("computeProba", x, mu, pi, m, PACKAGE = "Rankcluster")
+  proba <- rep(NA, nrow(x))
+  for (j in seq_along(proba))
+    proba[j] <- .Call("computeProba", x[j, , drop = FALSE], mu, pi, m, PACKAGE = "Rankcluster")
   
-  return(prob)
+  return(proba)
 }
 
 
@@ -150,7 +159,7 @@ checkProbability <- function(x, mu, pi, m)
   if (!(is.vector(x) || is.matrix(x)))
     stop("x must be either a matrix or a vector.")
   if (is.vector(x))
-    x = t(as.matrix(x))
+    x <- t(as.matrix(x))
   if (!is.numeric(x))
     stop("x must be either a matrix or a vector of integer.")
   
@@ -158,7 +167,7 @@ checkProbability <- function(x, mu, pi, m)
   if (!(is.vector(mu) || is.matrix(mu)))
     stop("mu must be either a matrix or a vector.")
   if (is.vector(mu))
-    mu = t(as.matrix(mu))
+    mu <- t(as.matrix(mu))
   if (!is.numeric(mu))
     stop("mu must be either a matrix or a vector of integer.")
   
@@ -177,7 +186,7 @@ checkProbability <- function(x, mu, pi, m)
     stop("m must be a vector of integer.")
   if (sum(unlist(lapply(m, is.wholenumber))) != length(m))
     stop("m contains non integer.")
-  if (sum(m) != length(x))
+  if (sum(m) != ncol(x))
     stop("sum(m) and the length of x do not match.")
   if (sum(m) != length(mu))
     stop("sum(m) and the length of mu do not match.")
@@ -189,7 +198,8 @@ checkProbability <- function(x, mu, pi, m)
   {
     if (!checkRank(mu[, (1 + cumsum(c(0, m))[i]):(cumsum(c(0, m))[i + 1])], m[i]))
       stop("mu is not correct.")
-    if (!checkRank(x[, (1 + cumsum(c(0, m))[i]):(cumsum(c(0, m))[i + 1])], m[i]))
-      stop("x is not correct.")
+    for (j in 1:nrow(x))
+      if (!checkRank(x[j, (1 + cumsum(c(0, m))[i]):(cumsum(c(0, m))[i + 1])], m[i]))
+        stop("x is not correct.")
   }
 }
