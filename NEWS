@@ -1,0 +1,24 @@
+# 
+- add unit tests
+
+# v0.94.5 - 2021-01-26
+- replace random_shuffle in C++
+- beautify C++ code
+- missing roxygen tag for [
+
+# v0.94.4 - 2020-10-06
+- change maintainer mail
+- export summary function
+- update examples
+- fix imports/suggests/depends
+
+# v0.94.2 - 2020-02-20
+- add vignette describing the data format
+- beautify R code
+- factorization
+- correct roxygen S4 tag
+
+# v0.92 - 2014-02-12
+- ranks have to be given to the package in the ranking notation (see convertRank function), with the following convention:
+  - missing positions are replaced by 0
+  - tied are replaced by the lowest position they share
