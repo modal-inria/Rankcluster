@@ -17,15 +17,21 @@
  */
 int randWrapper(const int n);
 
-/** equivalent of std::shuffle with an R generator
- */
+/** equivalent of std::shuffle with an R generator */
 template <class RandomAccessIterator>
 void Rshuffle(RandomAccessIterator first, RandomAccessIterator last)
 {
-  for (auto i = (last-first) - 1;  i > 0; --i) {
-    std::swap (first[i], first[randWrapper(i + 1)]);
-  }
+    for (auto i = (last - first) - 1; i > 0; --i)
+    {
+        std::swap(first[i], first[randWrapper(i + 1)]);
+    }
 }
+
+/** Initialize a rank as 1 2 ... m */
+void initializeRank(std::vector<int> &rank);
+
+/** Initialize a rank as a random rank */
+void randomRank(std::vector<int> &rank);
 
 /**
  * search the position of i in x

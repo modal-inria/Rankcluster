@@ -21,6 +21,18 @@ int randWrapper(const int n)
     return floor(unif_rand() * n); 
 }
 
+void initializeRank(vector<int> &rank)
+{
+    for (size_t j = 0; j < rank.size(); j++)
+        rank[j] = j + 1;
+}
+
+void randomRank(vector<int> &rank)
+{
+    initializeRank(rank);
+    Rshuffle(rank.begin(), rank.end());
+}
+
 // retourne le rang de l'objet i dans la liste x (ordering representation) equivalent rank.gamma//----FAIRE CAS i PAS DEDANS?
 int positionRank(vector<int> const &x, int const &i)
 {
@@ -145,8 +157,7 @@ int rank2index(vector<int> const &rang, vector<int> const &tabFactorial)
     vector<int>::iterator it;
     vector<int> liste(m);
 
-    for (int i(0); i < m; i++)
-        liste[i] = i + 1;
+    initializeRank(liste);
 
     liste.erase(remove(liste.begin(), liste.end(), rang[0]), liste.end());
 
@@ -187,8 +198,7 @@ vector<int> index2rank(int index, int const &m, vector<int> const &tabFactorial)
         index--;
         r[0] = index / tabFactorial[m - 2] + 1;
 
-        for (int i(0); i < m; i++)
-            liste[i] = i + 1;
+        initializeRank(liste);
 
         //on supprime l'élément égale à r[0]
         liste.erase(remove(liste.begin(), liste.end(), r[0]), liste.end());
@@ -229,8 +239,7 @@ vector<int> index2rank(int index, int const &m)
         index--;
         r[0] = index / factorial(m - 1) + 1;
 
-        for (int i(0); i < m; i++)
-            liste[i] = i + 1;
+        initializeRank(liste);
 
         //on supprime l'élément égale à r[0]
         liste.erase(remove(liste.begin(), liste.end(), r[0]), liste.end());
@@ -261,8 +270,7 @@ vector<int> index2rankb(int index, int const &m, vector<int> const &tabFactorial
     index--;
     r[0] = index / tabFactorial[m - 2] + 1;
 
-    for (int i(0); i < m; i++)
-        liste[i] = i + 1;
+    initializeRank(liste);
 
     //on supprime l'élément égale à r[0]
     liste.erase(remove(liste.begin(), liste.end(), r[0]), liste.end());
@@ -454,8 +462,7 @@ vector<vector<int>> simulISR(int const &n, int const &m, vector<int> const &mu, 
     double correct;
     bool compar, avance;
 
-    for (int i(0); i < m; i++)
-        rgTemp[i] = i + 1;
+    initializeRank(rgTemp);
 
     for (int i(0); i < n; i++)
     {

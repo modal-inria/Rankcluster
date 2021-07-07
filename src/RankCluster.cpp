@@ -310,8 +310,7 @@ void RankCluster::gibbsY(int indexDim)
 
     //rank 1 2..m
     vector<int> yTemp(m_[indexDim]);
-    for (int j = 0; j < m_[indexDim]; j++)
-        yTemp[j] = j + 1;
+    initializeRank(yTemp);
 
     for (int ind = 0; ind < n_; ind++)
     {
@@ -319,8 +318,7 @@ void RankCluster::gibbsY(int indexDim)
         vector<int> y(m_[indexDim]), yCandidate(m_[indexDim]), yCurrent(m_[indexDim]);
 
         //initialization of p1 and y1
-        y = yTemp;
-        Rshuffle(y.begin(), y.end()); //simulation of alea rank
+        randomRank(y);
         yCurrent = y;
         logPcurrent = lnProbaCond(data_[indexDim][ind].rank, yCurrent, mu_[indexDim][z_[ind]], p_[indexDim][z_[ind]]);
 
@@ -1321,8 +1319,7 @@ void RankCluster::estimateCriterion(double &L, double &bic, double &icl)
     for (int dim(0); dim < d_; dim++)
     {
         vector<int> rankTemp(m_[dim]);
-        for (int i(0); i < m_[dim]; i++)
-            rankTemp[i] = i + 1;
+        initializeRank(rankTemp);
         for (int ind(0); ind < n_; ind++)
         {
             //initialization of y
@@ -1366,8 +1363,7 @@ void RankCluster::estimateCriterion(double &L, double &bic, double &icl)
     for (int j(0); j < d_; j++)
     {
         yTemp[j].resize(m_[j]);
-        for (int i(0); i < m_[j]; i++)
-            yTemp[j][i] = i + 1;
+        initializeRank(yTemp[j]);
     }
 
     vector<double> logL(parameter_.nGibbsL - parameter_.burnL, 0);
