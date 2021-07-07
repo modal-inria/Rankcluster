@@ -76,8 +76,9 @@
 #'
 #' @export
 #'
-rankclust <- function(data, m = ncol(data), K = 1, criterion = "bic", Qsem = 100, Bsem = 20, RjSE = m * (m - 1) / 2, RjM = m * (m - 1) / 2, Ql = 500, Bl = 100,
-                    maxTry = 3, run = 1, detail = FALSE)
+rankclust <- function(data, m = ncol(data), K = 1, criterion = "bic", Qsem = 100, Bsem = 20, 
+                      RjSE = m * (m - 1) / 2, RjM = m * (m - 1) / 2, Ql = 500, Bl = 100,
+                      maxTry = 3, run = 1, detail = FALSE)
 {
 
   .checkArgRankclust(data, m, K, criterion, Qsem, Bsem, RjSE, RjM, Ql, Bl, detail, maxTry, run)
