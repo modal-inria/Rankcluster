@@ -159,8 +159,19 @@ protected:
         */
     void readRankingRank(std::vector<std::vector<int>> const &X, int const &dim, int const &j, std::vector<int> const &indM);
 
-    ///initialization of parameters
+    // initialization of parameters
     void initialization();
+    void initializeZ();
+    void initializeP();
+    void initializeMu();
+    void initializeY();
+    void initializePartialRank();
+    void fillIndexPartialData();
+    void saveInitialization();
+
+    void estimateProportion();
+
+
     /** SE step */
     void SEstep();
     /**unidimensional gibbs sampler for y estimation

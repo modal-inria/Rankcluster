@@ -194,78 +194,105 @@ void RankCluster::conversion2data(vector<vector<int>> const &X)
 
 void RankCluster::initialization()
 {
-    double alea;
+    // t0 = clock();
+    initializeZ();
+    initializeP();
+    initializeMu();
+    estimateProportion();
+    initializePartialRank();
+    fillIndexPartialData();
+    saveInitialization();
+    // t1 = clock();
 
-    //zik initialization with multinomial of equal proba
-    if (g_ != 1)
-    {
-        for (int i = 0; i < n_; i++)
-        {
-            alea = runif(0., 1.);
-            for (int j = 0; j < g_; j++)
-                if ((alea > (double)j / g_) & (alea < (double)(j + 1) / g_))
-                {
-                    z_[i] = j;
-                    break;
-                }
-        }
-    }
-    else
-    {
-        for (int i(0); i < n_; i++)
-            z_[i] = 0;
-    }
+    // if(parameter_.detail)
+    //     cout << "Initialization completed in " <<(double) (t1-t0)/CLOCKS_PER_SEC << "s." << endl;
+}
 
-    //mu & p  initialization
+// random initialization of z_: multinomial law of size g_
+void RankCluster::initializeZ()
+{
+    for (int i = 0; i < n_; i++)
+        z_[i] = randWrapper(g_);
+}
+
+// initialization of p_ with double between 0.5 and 1
+void RankCluster::initializeP()
+{
     for (int k = 0; k < d_; k++)
     {
         for (int i = 0; i < g_; i++)
         {
-            //initialization of p_ with double between 0.5 and 1
-            alea = (double)runif(0.5, 1.);
-            p_[k][i] = alea;
-            //initialization of mu_ with alea rank of size m_
-            mu_[k][i].resize(m_[k]);
-            for (int j = 0; j < m_[k]; j++)
-                mu_[k][i][j] = j + 1;
-            Rshuffle(mu_[k][i].begin(), mu_[k][i].end());
+            p_[k][i] = (double) runif(0.5, 1.);
         }
     }
+}
 
-    //proportion initialization
+// random initialization of mu_ with random rank of size m_
+void RankCluster::initializeMu()
+{
+    for (int k = 0; k < d_; k++)
+    {
+        for (int i = 0; i < g_; i++)
+        {
+            mu_[k][i].resize(m_[k]);
+            randomRank(mu_[k][i]);
+        }
+    }
+}
+
+// estimate proportion using z_: proportion of each class among z_
+void RankCluster::estimateProportion()
+{
+    for (int k = 0; k < g_; k++)
+        proportion_[k] = 0;
+
     for (int i = 0; i < n_; i++)
         proportion_[z_[i]]++;
 
-    for (int i = 0; i < g_; i++)
-        proportion_[i] /= (double)n_;
+    for (int k = 0; k < g_; k++)
+        proportion_[k] /= (double)n_;
+}
 
-    //partial data and order of presentation initialization
+// order of presentation random initialization
+void RankCluster::initializeY()
+{
     for (int dim = 0; dim < d_; dim++)
     {
         vector<int> rankTemp(m_[dim]);
-        for (int i = 0; i < m_[dim]; i++)
-            rankTemp[i] = i + 1;
+        initializeRank(rankTemp);
         for (int ind = 0; ind < n_; ind++)
         {
-            //initialization of y
             Rshuffle(rankTemp.begin(), rankTemp.end());
             data_[dim][ind].y = rankTemp;
+        }
+    }
+}
 
+// order of partial rank: random initialization with missing index
+void RankCluster::initializePartialRank()
+{
+    for (int dim = 0; dim < d_; dim++)
+    {
+        for (int ind = 0; ind < n_; ind++)
+        {
             if (data_[dim][ind].isNotFull)
             {
                 for (int ii = 0; ii < (int)data_[dim][ind].missingIndex.size(); ii++)
                 {
-                    //initialization of Partial Rank
-                    vector<int> rankTemp2(data_[dim][ind].missingIndex[ii]);
-                    Rshuffle(rankTemp2.begin(), rankTemp2.end());
+                    vector<int> rankTemp(data_[dim][ind].missingIndex[ii]);
+                    Rshuffle(rankTemp.begin(), rankTemp.end());
 
                     for (int iii = 0; iii < (int)data_[dim][ind].missingData[ii].size(); iii++)
-                        data_[dim][ind].rank[rankTemp2[iii]] = data_[dim][ind].missingData[ii][iii];
+                        data_[dim][ind].rank[rankTemp[iii]] = data_[dim][ind].missingData[ii][iii];
                 }
             }
         }
     }
+}
 
+
+void RankCluster::fillIndexPartialData()
+{
     indexPartialData_ = vector<vector<int>>(d_);
     for (int dim = 0; dim < d_; dim++)
     {
@@ -275,14 +302,17 @@ void RankCluster::initialization()
                 indexPartialData_[dim].push_back(ind);
         }
     }
+}
 
-    vector<vector<vector<int>>> donneesPartiel(d_);
+// save initialization in output_ member
+void RankCluster::saveInitialization()
+{
+    vector<vector<vector<int>>> partialRankData(d_);
     for (int dim = 0; dim < d_; dim++)
         for (vector<int>::iterator it = indexPartialData_[dim].begin(); it != indexPartialData_[dim].end(); it++)
-            donneesPartiel[dim].push_back(data_[dim][*it].rank);
+            partialRankData[dim].push_back(data_[dim][*it].rank);
 
-    //sauvegarde initialisation
-    output_.initialPartialRank = donneesPartiel;
+    output_.initialPartialRank = partialRankData;
     output_.initialP = p_;
     output_.initialZ = z_;
     output_.initialMu = mu_;
