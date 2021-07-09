@@ -122,6 +122,20 @@ double lnProbaCond(vector<int> const &x, vector<int> const &y, vector<int> const
 {
     vector<int> comp(2);
     comp = comparaison(x, y, mu);
+
+    // manage special case, otherwise it returns NaN
+    if (p == 1)
+    {
+        if (comp[0] == comp[1])
+            return 0.;
+    }
+
+    if (p == 0)
+    {
+        if (comp[1] == 0)
+            return 0.;
+    }
+
     return comp[1] * log(p) + (comp[0] - comp[1]) * log(1. - p);
 }
 

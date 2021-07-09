@@ -24,6 +24,12 @@ test_that("probability works with a vector: univariate case", {
   
   p <- probability(4:1, 1:4, 1)
   expect_equal(p, 0)
+  
+  p <- probability(1:4, 1:4, 0)
+  expect_equal(p, 0)
+  
+  p <- probability(4:1, 1:4, 0)
+  expect_equal(p, 1)
 })
 
 test_that("probability works with a vector: multivariate case", {
