@@ -502,21 +502,16 @@ void RankCluster::gibbsX(int indexDim)
 
 void RankCluster::Mstep()
 {
-    //MAJ proportion
+    // update proportion
+    estimateProportion();
+  
     for (int k(0); k < g_; k++)
     {
-        proportion_[k] = 0;
-        for (int ind(0); ind < n_; ind++)
-        {
-            if (z_[ind] == k)
-                proportion_[k]++;
-        }
-        proportion_[k] /= (double)n_;
         if (proportion_[k] == 0)
             throw string("Algorithm did not converge: a proportion is equal to 0");
     }
 
-    //simulation of mu for each dim and cluster
+    // simulation of mu for each dim and cluster
     for (int dim(0); dim < d_; dim++)
     {
         for (int numCl(0); numCl < g_; numCl++)
