@@ -110,14 +110,7 @@ vector<int> comparaison(vector<int> const &x, vector<int> const &y, vector<int> 
     return comparaison;
 }
 
-//Calcul proba conditionnelle p(x|y;mu,pi)
-double probaCond(vector<int> const &x, vector<int> const &y, vector<int> const &mu, double const &p)
-{
-    vector<int> comp(2);
-    comp = comparaison(x, y, mu);
-    return pow(p, comp[1]) * pow(1 - p, comp[0] - comp[1]);
-}
-
+/** Compute log p(x|y;mu,pi) */
 double lnProbaCond(vector<int> const &x, vector<int> const &y, vector<int> const &mu, double const &p)
 {
     vector<int> comp(2);
@@ -137,6 +130,11 @@ double lnProbaCond(vector<int> const &x, vector<int> const &y, vector<int> const
     }
 
     return comp[1] * log(p) + (comp[0] - comp[1]) * log(1. - p);
+}
+
+double probaCond(vector<int> const &x, vector<int> const &y, vector<int> const &mu, double const &p)
+{
+    return exp(lnProbaCond(x, y, mu, p));
 }
 
 //factorial function
