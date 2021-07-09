@@ -6,7 +6,6 @@
 #include <set>
 #include <iostream>
 
-#include "functions.h"
 
 struct Rank
 {
@@ -16,16 +15,6 @@ struct Rank
     std::set<int> missingNumber;
 };
 
-/**
- * Simulate a sample of mixture of ISR
- * @param simul sample will be modified
- * @param n size of sample
- * @param m size of rank
- * @param mu reference rank
- * @param p dispersion parameter: probability of a godd comparaison
- * @param prop proportion of the mixture
- */
-void simulMixtureISR(std::vector<std::vector<int>> &simul, int const &n, int const &m, std::vector<std::vector<int>> const &mu, std::vector<double> const &p, std::vector<double> const &prop);
 
 /**
  * khi2 adequation test
@@ -62,7 +51,7 @@ double khi2partial(std::vector<Rank> &data, std::vector<double> const &p, std::v
 void updateD(double &divKL, std::vector<int> &index, std::vector<std::vector<std::vector<double>>> const &p1, std::vector<std::vector<std::vector<double>>> const &p2, int const &d, int const &g,
              std::vector<double> const &proportion1, std::vector<double> const &proportion2);
 /**
- * Recursive function for updating the index for compute probabilities in kullback 
+ * Recursive function for updating the index for compute probabilities in kullback
  * @param index current index
  * @param i actual dimension
  * @param factm factorial of the size of rank for each dimension

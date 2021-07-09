@@ -6,67 +6,11 @@
 #include <Rmath.h>
 
 #include "test.h"
+#include "functions.h"
+#include "ISRfunctions.h"
 
 using namespace std;
 
-//fonction pour simuler un N-échantillon d'ISR(mu,p)
-void simulMixtureISR(vector<vector<int>> &simul, int const &n, int const &m, vector<vector<int>> const &mu,
-                     vector<double> const &p, vector<double> const &prop)
-{
-    vector<int> s(m), rgTemp(m);
-    int l, classe(0);
-    double correct, alea(0);
-    bool compar, avance;
-
-    vector<double> limite(prop.size() + 1, 0);
-    for (int i(1); i < (int)limite.size(); i++)
-        limite[i] = limite[i - 1] + prop[i - 1];
-
-    for (int i(0); i < m; i++)
-        rgTemp[i] = i + 1;
-
-    for (int i(0); i < n; i++)
-    {
-        //tirage aléatoire de la classe
-        alea = (double)runif(0., 1.);
-        for (int j(0); j < (int)prop.size(); j++)
-        {
-            if ((alea > limite[j]) & (alea < limite[j + 1]))
-            {
-                classe = j;
-                break;
-            }
-        }
-
-        //simulation d'un rang aléatoire: permutation du vecteur 1 2..m
-        s = rgTemp;
-        Rshuffle(s.begin(), s.end());
-
-        simul[i][0] = s[0];
-        for (int j(1); j < m; j++)
-        {
-            l = 0;
-            avance = true;
-            while (avance && l < j)
-            {
-                correct = (double)runif(0., 1.);
-                compar = (positionRank(mu[classe], s[j]) < positionRank(mu[classe], simul[i][l]));
-                if ((compar && correct < p[classe]) || (!compar && correct > p[classe]))
-                {
-                    for (int k(j - 1); k >= l; k--)
-                        simul[i][k + 1] = simul[i][k];
-
-                    simul[i][l] = s[j];
-                    avance = false;
-                }
-                else
-                    l++;
-            }
-            if (l == j)
-                simul[i][l] = s[j];
-        }
-    }
-}
 
 double khi2(vector<vector<int>> const &data, vector<double> const &p, vector<double> const &prop, vector<vector<int>> const &mu, int const &nBoot)
 {

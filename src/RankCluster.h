@@ -2,7 +2,9 @@
 #define RANKCLUSTER_H_
 
 /* @file RankCluster.h
- * @brief Definition of the class @c RankCluster and struct PartialRank, SEMparameters and OutParameters
+ * @brief Implementation of methods of the class @c RankCluster
+ * See https://hal.archives-ouvertes.fr/hal-00441209v3/document and
+ * https://www.sciencedirect.com/science/article/abs/pii/S0167947312003118 for mathematical background
  */
 //#include <RcppEigen.h>
 #include <vector>
@@ -10,6 +12,7 @@
 #include <utility>
 #include "Eigen/Dense"
 
+#include "ISRfunctions.h"
 #include "functions.h"
 
 // create your own data structures
@@ -241,7 +244,7 @@ private:
     int d_;
     // number of cluster
     int g_;
-    // data of the form data[dimension[index]]
+    // data of the form data[dimension][index]
     std::vector<std::vector<PartialRank>> data_;
     // estimated cluster of each individual
     std::vector<int> z_;

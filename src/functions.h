@@ -8,6 +8,7 @@
 #ifndef FUNCTIONS_H_
 #define FUNCTIONS_H_
 
+#include <Eigen/Dense>
 #include <vector>
 #include <utility>
 #include <Rmath.h>
@@ -40,30 +41,6 @@ void randomRank(std::vector<int> &rank);
  * @return the position of i in x
  */
 int positionRank(std::vector<int> const &x, int const &i);
-
-/**
- * compute  A(x,y) and G(x,y,mu)
- * @param x rank
- * @param y order of presentation of x
- * @param mu order of reference
- * @return a vector of 2 elements (A(x,y),G(x,y,mu))
- *
- * A(x,y)=total number of comparaison in the insertion sorting algorithm
- * G(x,y,mu)= total number of good comparaison according to mu in the insertion sorting algorithm
- *
- */
-std::vector<int> comparaison(std::vector<int> const &x, std::vector<int> const &y, std::vector<int> const &mu);
-
-/**
- * compute the conditional probability  p(x|y;mu,p)
- * @param x rank
- * @param y order of presentation of x
- * @param mu order of reference
- * @param p probability of making a good comparaison
- * @return p(x|y;mu,p)
- */
-double probaCond(std::vector<int> const &x, std::vector<int> const &y, std::vector<int> const &mu, double const &p);
-double lnProbaCond(std::vector<int> const &x, std::vector<int> const &y, std::vector<int> const &mu, double const &p);
 
 /**
  * factorial function (recursive)
@@ -183,31 +160,12 @@ void tri_insertionMulti(std::vector<int> &mu, std::vector<double> &prop, std::ve
                         int const &d, int const &n);
 
 /**
- * simulation of a n-sample of ISR(mu,p)
- * @param n size of the sample
- * @param m size of the rank
- * @param mu rank
- * @param p probability of a good comparison
- * @return a n-sample of ISR(mu,p)
- */
-std::vector<std::vector<int>> simulISR(int const &n, int const &m, std::vector<int> const &mu, double const &p);
-
-/**
  * compute frequency of a data set
  * @param listeRang data
  * @return a pair with the unique rank and the frequency of each unique rank
  */
 std::pair<std::vector<std::vector<std::vector<int>>>, std::vector<int>>
 freqMulti(std::vector<std::vector<std::vector<int>>> const &listeRang);
-
-/**
- * compute probability of x according to multivariate ISR
- * @param x rank for each dimension for compute probability
- * @param mu reference rank for each dimension
- * @param pi dispersion parameter for each dimension
- * @return p(x;mu,pi)
- */
-double proba(std::vector<std::vector<int>> const &x, std::vector<std::vector<int>> const &mu, std::vector<double> const &pi);
 
 
 /**

@@ -8,7 +8,6 @@
 #include <iostream>
 #include <algorithm>
 #include <cmath>
-#include <map>
 #include <Rmath.h>
 
 #include "functions.h"
@@ -21,19 +20,22 @@ int randWrapper(const int n)
     return floor(unif_rand() * n);
 }
 
+// generate a rank containing 1, 2, .., m
 void initializeRank(vector<int> &rank)
 {
     for (size_t j = 0; j < rank.size(); j++)
         rank[j] = j + 1;
 }
 
+// generate a random Rank
 void randomRank(vector<int> &rank)
 {
     initializeRank(rank);
     Rshuffle(rank.begin(), rank.end());
 }
 
-// retourne le rang de l'objet i dans la liste x (ordering representation) equivalent rank.gamma//----FAIRE CAS i PAS DEDANS?
+// return the position of object i in x (ordering representation). Equivalent rank.gamma
+// TODO manage the case where is is not in x ?
 int positionRank(vector<int> const &x, int const &i)
 {
     int j(0);
@@ -43,113 +45,20 @@ int positionRank(vector<int> const &x, int const &i)
     return j; //entre 0 et m-1
 }
 
-// calcul de A(x,y) et G(x,y,mu)
-vector<int> comparaison(vector<int> const &x, vector<int> const &y, vector<int> const &mu)
-{
-    int const m(mu.size());
-    int gplus(0), gmoins(0), gjmoinsb(0), gjplusb(0), index(0);
-    vector<int> ajmoins, ajplus, ajplusb, ajmoinsb, ajplusbIndex;
-    ajplusb.reserve(m);           //le Aj+ en cours
-    ajmoinsb.reserve(m);          //le Aj- en cours
-    ajplusbIndex.reserve(m);      //les index du Aj+ en cours
-    ajplus.reserve(m * (m - 1));  //l'union de tt les Aj+
-    ajmoins.reserve(m * (m - 1)); //l'union de tt les Aj-
 
-    for (int j(1); j < m; j++)
-    {
-        gjmoinsb = 0;
-        gjplusb = 0;
-        for (int i(0); i < j; i++)
-        {
-            //calcul Aj-
-            if (positionRank(x, y[i]) < positionRank(x, y[j]))
-            {
-                ajmoins.push_back(i);
-                ajmoinsb.push_back(i);
-            }
-            else //calcul Aj+//if (positionRank(x,y[i])>positionRank(x,y[j]))
-            {
-                ajplusb.push_back(positionRank(x, y[i]));
-                ajplusbIndex.push_back(i);
-            }
-        }
-
-        if (ajplusb.size() > 0) //si le Aj+ en cours est non vide, on rajoute l'index du min à Aj+
-        {
-            index = min_element(ajplusb.begin(), ajplusb.end()) - ajplusb.begin();
-            ajplus.push_back(ajplusbIndex[index]);
-
-            //calcul de G+
-            if (positionRank(mu, y[j]) < positionRank(mu, y[ajplus[ajplus.size() - 1]]))
-            {
-                gplus++;
-                gjplusb++;
-            }
-            ajplusb.erase(ajplusb.begin(), ajplusb.end());
-            ajplusbIndex.erase(ajplusbIndex.begin(), ajplusbIndex.end());
-        }
-        if (ajmoinsb.size() > 0) //si le Aj- en cours est non vide on calcule G-
-        {
-            //calcul de G-
-            for (unsigned int i(0); i < ajmoinsb.size(); i++)
-            {
-                if (positionRank(mu, y[ajmoinsb[i]]) < positionRank(mu, y[j]))
-                {
-                    gmoins++;
-                    gjmoinsb++;
-                }
-            }
-            ajmoinsb.erase(ajmoinsb.begin(), ajmoinsb.end());
-        }
-    }
-
-    vector<int> comparaison(2, 0);
-    comparaison[0] = ajmoins.size() + ajplus.size();
-    comparaison[1] = gmoins + gplus;
-
-    return comparaison;
-}
-
-/** Compute log p(x|y;mu,pi) */
-double lnProbaCond(vector<int> const &x, vector<int> const &y, vector<int> const &mu, double const &p)
-{
-    vector<int> comp(2);
-    comp = comparaison(x, y, mu);
-
-    // manage special case, otherwise it returns NaN
-    if (p == 1)
-    {
-        if (comp[0] == comp[1])
-            return 0.;
-    }
-
-    if (p == 0)
-    {
-        if (comp[1] == 0)
-            return 0.;
-    }
-
-    return comp[1] * log(p) + (comp[0] - comp[1]) * log(1. - p);
-}
-
-double probaCond(vector<int> const &x, vector<int> const &y, vector<int> const &mu, double const &p)
-{
-    return exp(lnProbaCond(x, y, mu, p));
-}
-
-//factorial function
-int factorial(int const &nombre)
+// factorial function
+int factorial(int const &m)
 {
     int temp;
 
-    if (nombre <= 1)
+    if (m <= 1)
         return 1;
 
-    temp = nombre * factorial(nombre - 1);
+    temp = m * factorial(m - 1);
     return temp;
 }
 
-//calcul des factorielles de 1! to m!
+// compute all factorial values from 1! to to m!
 vector<int> tab_factorial(int const &m)
 {
     vector<int> tab(m);
@@ -465,48 +374,6 @@ void tri_insertionMulti(vector<int> &mu, vector<double> &prop, vector<vector<dou
     }
 }
 
-// Simulate n samples from an ISR(mu, p)
-vector<vector<int>> simulISR(int const &n, int const &m, vector<int> const &mu, double const &p)
-{
-    vector<vector<int>> simul(n, vector<int>(m, 0));
-    vector<int> s(m), rgTemp(m);
-    int l;
-    double correct;
-    bool compar, avance;
-
-    initializeRank(rgTemp);
-
-    for (int i(0); i < n; i++)
-    {
-        //simulation d'un rang aléatoire: permutation du vecteur 1 2..m
-        s = rgTemp;
-        Rshuffle(s.begin(), s.end());
-        simul[i][0] = s[0];
-        for (int j(1); j < m; j++)
-        {
-            l = 0;
-            avance = true;
-            while (avance && l < j)
-            {
-                correct = (double)runif(0., 1.);
-                compar = (positionRank(mu, s[j]) < positionRank(mu, simul[i][l]));
-                if ((compar && correct < p) || (!compar && correct > p))
-                {
-                    for (int k(j - 1); k >= l; k--)
-                        simul[i][k + 1] = simul[i][k];
-
-                    simul[i][l] = s[j];
-                    avance = false;
-                }
-                else
-                    l++;
-            }
-            if (l == j)
-                simul[i][l] = s[j];
-        }
-    }
-    return simul;
-}
 
 //frequence d'un jeu de données multi varié
 typedef struct TableauRang TableauRang;
@@ -604,48 +471,6 @@ pair<vector<vector<vector<int>>>, vector<int>> freqMulti(vector<vector<vector<in
     delete currRang;
 
     return make_pair(donnees, freq);
-}
-
-double proba(vector<vector<int>> const &x, vector<vector<int>> const &mu, vector<double> const &pi)
-{
-    int d = pi.size();
-    vector<double> probaDim(d, 0);
-    double finalProba;
-    vector<int> tabFact, listeY, y;
-    vector<int> m(mu.size());
-    map<int, vector<int>> diffDim;
-
-    for (int dim = 0; dim < d; dim++)
-    {
-        m[dim] = mu[dim].size();
-        diffDim[m[dim]].push_back(dim);
-    }
-
-    for (map<int, vector<int>>::iterator it = diffDim.begin(); it != diffDim.end(); it++)
-    {
-        int m = it->first;
-        tabFact = tab_factorial(m);
-        listeY = listeSigma(m, tabFact);
-        double div = 2. / (double)tabFact[m - 1];
-        vector<int> aa = index2rankb(1, m, tabFact);
-
-        for (int i = 0; i < tabFact[m - 1] / 2; i++)
-        {
-            y = index2rankb(listeY[i], m, tabFact);
-
-            for (int j = 0; j < (int)(it->second).size(); j++)
-                probaDim[(it->second)[j]] += probaCond(x[(it->second)[j]], y, mu[(it->second)[j]], pi[(it->second)[j]]);
-        }
-
-        for (int j = 0; j < (int)(it->second).size(); j++)
-            probaDim[(it->second)[j]] *= div;
-    }
-
-    finalProba = probaDim[0];
-    for (int dim = 1; dim < d; dim++)
-        finalProba *= probaDim[dim];
-
-    return finalProba;
 }
 
 

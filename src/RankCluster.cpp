@@ -1,5 +1,7 @@
 /* @file RankCluster.cpp
  * @brief Implementation of methods of the class @c RankCluster
+ * See https://hal.archives-ouvertes.fr/hal-00441209v3/document and
+ * https://www.sciencedirect.com/science/article/abs/pii/S0167947312003118 for mathematical background
  */
 
 #include "RankCluster.h"
@@ -500,11 +502,18 @@ void RankCluster::gibbsX(int indexDim)
     }
 }
 
+
+/**********************************************************************************************
+ *
+ * M STEP METHODS
+ *
+ **********************************************************************************************/
+
 void RankCluster::Mstep()
 {
     // update proportion
     estimateProportion();
-  
+
     for (int k(0); k < g_; k++)
     {
         if (proportion_[k] == 0)
@@ -684,6 +693,13 @@ void RankCluster::simuM(int indexDim, int indCl)
     p_[indexDim][indCl] = P[indice];
     mu_[indexDim][indCl] = MU[indice];
 }
+
+
+/**********************************************************************************************
+ *
+ * LIKELIHOOD, CRITERIA AND OTHER OUTPUTS METHODS
+ *
+ **********************************************************************************************/
 
 typedef struct ListeMu ListeMu;
 void RankCluster::likelihood(vector<vector<vector<vector<int>>>> &listeMu, vector<vector<vector<double>>> &resP, vector<vector<double>> &resProp)
