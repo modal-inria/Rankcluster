@@ -18,13 +18,19 @@ using namespace std;
 using namespace Eigen;
 //using namespace Rcpp;
 
-//constructor
+
+/**********************************************************************************************
+ *
+ * CONSTRUCTORS, DESTRUCTOR
+ *
+ **********************************************************************************************/
+
 RankCluster::RankCluster()
 {
 }
 
-//constructor
-RankCluster::RankCluster(std::vector<std::vector<int>> const &X, int g, vector<int> const &m, SEMparameters const &param)
+RankCluster::RankCluster(std::vector<std::vector<int>> const &X, int g,
+                         vector<int> const &m, SEMparameters const &param)
     : m_(m), n_(X.size()), d_(m.size()), g_(g),
       data_(d_, vector<PartialRank>(n_)),
       z_(n_),
@@ -45,9 +51,9 @@ RankCluster::RankCluster(std::vector<std::vector<int>> const &X, int g, vector<i
     //    {dataOk_=false;}
 }
 
-//constructor
 RankCluster::RankCluster(vector<vector<int>> const &X, vector<int> const &m, SEMparameters const &param,
-                         vector<double> const &proportion, vector<vector<double>> const &p, vector<vector<vector<int>>> const &mu)
+                         vector<double> const &proportion, vector<vector<double>> const &p,
+                         vector<vector<vector<int>>> const &mu)
     : m_(m), n_(X.size()), d_(m.size()), g_(proportion.size()),
       data_(d_, vector<PartialRank>(n_)),
       z_(n_), mu_(mu), p_(p),
@@ -66,7 +72,7 @@ RankCluster::RankCluster(vector<vector<int>> const &X, vector<int> const &m, SEM
     //    {dataOk_=false;}
 }
 
-//copy constructor
+// copy constructor
 RankCluster::RankCluster(RankCluster &rankClusterObject)
     : m_(rankClusterObject.m()),
       n_(rankClusterObject.n()),
@@ -80,14 +86,21 @@ RankCluster::RankCluster(RankCluster &rankClusterObject)
       partial_(rankClusterObject.partial()),
       dataOk_(rankClusterObject.dataOk())
 {
-    //nothing to do
+    // nothing to do
 }
 
-//destructor
+// destructor
 RankCluster::~RankCluster()
 {
     // nothing
 }
+
+
+/**********************************************************************************************
+ *
+ * READ DATA
+ *
+ **********************************************************************************************/
 
 void RankCluster::readRankingRank(vector<vector<int>> const &X, int const &dim, int const &j, vector<int> const &indM)
 {
@@ -192,6 +205,12 @@ void RankCluster::conversion2data(vector<vector<int>> const &X)
     }
 }
 
+
+/**********************************************************************************************
+ *
+ * INITIALIZATION METHODS
+ *
+ **********************************************************************************************/
 void RankCluster::initialization()
 {
     // t0 = clock();
@@ -319,16 +338,24 @@ void RankCluster::saveInitialization()
     output_.initialProportion = proportion_;
 }
 
+
+
+/**********************************************************************************************
+ *
+ * SE STEP METHODS
+ *
+ **********************************************************************************************/
+
 void RankCluster::SEstep()
 {
-    //simulation of order of presentation for each dimension
+    // simulation of order of presentation for each dimension
     for (int dim = 0; dim < d_; dim++)
         gibbsY(dim);
 
-    //simulation of z
+    // simulation of z
     zSimulation();
 
-    //simulation of partial rank for each dimension
+    // simulation of partial rank for each dimension
     for (int dim = 0; dim < d_; dim++)
         gibbsX(dim);
 }
@@ -357,16 +384,16 @@ void RankCluster::gibbsY(int indexDim)
         {
             for (int k(0); k < m_[indexDim] - 1; k++)
             {
-                //new y to test (old y with inversion of 2 adjacents elements)
+                // new y to test (old y with inversion of 2 adjacents elements)
                 yCandidate = y;
                 yCandidate[k] = y[k + 1];
                 yCandidate[k + 1] = y[k];
 
-                //compute the probability of accept the changement of y
+                // compute the probability of accept the change of y
                 logPcandidate = lnProbaCond(data_[indexDim][ind].rank, yCandidate, mu_[indexDim][z_[ind]], p_[indexDim][z_[ind]]);
 
                 bool changeAccepted = acceptChange(logPcurrent, logPcandidate);
-                if  (changeAccepted)//changement acceptation
+                if (changeAccepted) //change acceptation
                 {
                     y = yCandidate;
                     logPcurrent = logPcandidate;
@@ -390,7 +417,7 @@ void RankCluster::zSimulation()
 
         for (int ind(0); ind < n_; ind++)
         {
-            //computation of the probability to belong to each cluster
+            // computation of the probability to belong to each cluster
             for (int k(0); k < g_; k++)
                 tik[k] = 1;
 
@@ -406,7 +433,7 @@ void RankCluster::zSimulation()
             for (int i(0); i < g_; i++)
                 tik[i] /= sumTik;
 
-            //z follow a multinomial law of parameter tik
+            // z follow a multinomial law of parameter tik
             for (int k(1); k < g_ + 1; k++)
                 lim[k] = lim[k - 1] + tik[k - 1];
 
@@ -435,10 +462,10 @@ void RankCluster::gibbsX(int indexDim)
     {
         if (data_[indexDim][ind].isNotFull)
         {
-            //Algorithme de Gibbs
+            // Gibbs algorithm
             vector<int> x(m_[indexDim]), xCurrent(m_[indexDim]), xCandidate(m_[indexDim]);
 
-            //initialisation de mu et p pour Gibbs
+            // initialisation de mu et p pour Gibbs
             x = data_[indexDim][ind].rank;
             xCurrent = x;
             logPcurrent = lnProbaCond(xCurrent, data_[indexDim][ind].y, mu_[indexDim][z_[ind]], p_[indexDim][z_[ind]]);
@@ -449,7 +476,7 @@ void RankCluster::gibbsX(int indexDim)
                 {
                     for (int i = 0; i < (int)data_[indexDim][ind].missingIndex[ii].size() - 1; i++)
                     {
-                        //nouveau x à tester, ancien x auquel on inverse 2 éléments partiels
+                        // nouveau x à tester, ancien x auquel on inverse 2 éléments partiels
                         xCandidate = x;
                         xCandidate[data_[indexDim][ind].missingIndex[ii][i]] = x[data_[indexDim][ind].missingIndex[ii][i + 1]];
                         xCandidate[data_[indexDim][ind].missingIndex[ii][i + 1]] = x[data_[indexDim][ind].missingIndex[ii][i]];
@@ -457,7 +484,7 @@ void RankCluster::gibbsX(int indexDim)
                         logPcandidate = lnProbaCond(xCandidate, data_[indexDim][ind].y, mu_[indexDim][z_[ind]], p_[indexDim][z_[ind]]);
 
                         bool changeAccepted = acceptChange(logPcurrent, logPcandidate);
-                        if  (changeAccepted)//changement acceptation
+                        if (changeAccepted) //change acceptation
                         {
                             x = xCandidate;
                             logPcurrent = logPcandidate;
@@ -585,7 +612,7 @@ void RankCluster::simuM(int indexDim, int indCl)
 
             // acceptation of change or not
             bool changeAccepted = acceptChange(logPcurrent, logPcandidate);
-            if  (changeAccepted)//changement acceptation
+            if  (changeAccepted) //change acceptation
             {
                 mu = muCandidate;
                 logPcurrent = logPcandidate;
@@ -1075,11 +1102,16 @@ double RankCluster::computeLikelihood(vector<vector<vector<int>>> const &mu, vec
     return l;
 }
 
-//compute the final partition
+/** compute the final partition
+ * The final partition is the argmax per row of tik
+ */
 void RankCluster::computePartition()
 {
+    // TODO can be done directly with eigen
+    // see https://stackoverflow.com/questions/11430588/find-rowwise-maxcoeff-and-index-of-maxcoeff-in-eigen
+
     if (g_ > 1)
-    { //calcul partition
+    {
         double max;
         for (int ind(0); ind < n_; ind++)
         {
@@ -1093,7 +1125,6 @@ void RankCluster::computePartition()
                     z_[ind] = k;
                 }
             }
-            //cout<<z_[ind]<<" "<< output_.tik(ind,z_[ind])<<endl;
         }
     }
 }
@@ -1439,7 +1470,7 @@ void RankCluster::estimateCriterion(double &L, double &bic, double &icl)
                     y2[J][K] = y[J][K + 1];
                     y2[J][K + 1] = y[J][K];
 
-                    for (int k(0); k < g_; k++) //tester un stockage des proba calcul� pour �viter r�p�tition de calculs dans la boucle
+                    for (int k(0); k < g_; k++) //tester un stockage des proba calculées pour éviter répétition de calculs dans la boucle
                         proba2(J, k) = probaCond(x[J], y2[J], mu_[J][k], p_[J][k]);
 
                     p2 = (long double)(propb * proba2.colwise().prod()).sum();

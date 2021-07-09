@@ -1,9 +1,9 @@
 /*
-* functions.cpp
-*
-*  Created on: 1 mars 2013
-*      Author: grimonprez
-*/
+ * functions.cpp
+ *
+ *  Created on: 1 mars 2013
+ *      Author: Quentin Grimonprez
+ */
 
 #include <iostream>
 #include <algorithm>
@@ -16,9 +16,9 @@
 using namespace std;
 
 // generate an integer between 0 and n -1
-int randWrapper(const int n) 
+int randWrapper(const int n)
 {
-    return floor(unif_rand() * n); 
+    return floor(unif_rand() * n);
 }
 
 void initializeRank(vector<int> &rank)
@@ -74,7 +74,7 @@ vector<int> comparaison(vector<int> const &x, vector<int> const &y, vector<int> 
             }
         }
 
-        if (ajplusb.size() > 0) //si le Aj+ en cours est non vide, on rajoute l'index du min � Aj+
+        if (ajplusb.size() > 0) //si le Aj+ en cours est non vide, on rajoute l'index du min à Aj+
         {
             index = min_element(ajplusb.begin(), ajplusb.end()) - ajplusb.begin();
             ajplus.push_back(ajplusbIndex[index]);
@@ -453,7 +453,7 @@ void tri_insertionMulti(vector<int> &mu, vector<double> &prop, vector<vector<dou
     }
 }
 
-//fonction pour simuler un N-échantillon d'ISR(mu,p)
+// Simulate n samples from an ISR(mu, p)
 vector<vector<int>> simulISR(int const &n, int const &m, vector<int> const &mu, double const &p)
 {
     vector<vector<int>> simul(n, vector<int>(m, 0));
@@ -635,6 +635,7 @@ double proba(vector<vector<int>> const &x, vector<vector<int>> const &mu, vector
 
     return finalProba;
 }
+
 
 bool acceptChange(double const logP1, double const logP2)
 {

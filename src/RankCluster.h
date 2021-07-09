@@ -15,63 +15,63 @@
 // create your own data structures
 struct PartialRank
 {
-    ///rank
+    // rank
     std::vector<int> rank;
-    ///order of presentation
+    // order of presentation
     std::vector<int> y;
-    ///if true, the rank contains partial or ties
+    // if true, the rank contains partial or ties
     bool isNotFull;
-    /// missing element of the rank or ties
+    // missing element of the rank or ties
     std::vector<std::vector<int>> missingData;
-    ///index of the 0 or ties
+    // index of the 0 or ties
     std::vector<std::vector<int>> missingIndex;
 };
 
 struct SEMparameters
 {
-    ///number of iteration in the gibbs of SE step for each dimension of rank
+    // number of iteration in the gibbs of SE step for each dimension of rank
     std::vector<int> nGibbsSE;
-    ///number of iteration in the gibbs of M step for each dimension of rank
+    // number of iteration in the gibbs of M step for each dimension of rank
     std::vector<int> nGibbsM;
-    ///maximum number of iteration of the SEM algorithm
+    // maximum number of iteration of the SEM algorithm
     int maxIt;
-    ///burn-in period of SEM algorithm
+    // burn-in period of SEM algorithm
     int burnAlgo;
-    /// number of iteration in the gibbs of the likelihood computation
+    // number of iteration in the gibbs of the likelihood computation
     int nGibbsL;
-    ///burn-in period of the likelihood computation
+    // burn-in period of the likelihood computation
     int burnL;
-    ///maximum number of try of the SEM
+    // maximum number of try of the SEM
     int maxTry;
-    ///if true print details
+    // if true print details
     bool detail;
 };
 
 struct OutParameters
 {
-    ///loglikelihood
+    // loglikelihood
     double L;
-    ///bic criterion
+    // bic criterion
     double bic;
-    ///icl criterion
+    // icl criterion
     double icl;
-    ///
+    //
     Eigen::ArrayXXd tik;
-    ///
+    //
     Eigen::ArrayXd entropy;
-    ///
+    //
     Eigen::ArrayXXd probabilities;
-    ///percentage of confidence in final estimation of missing data
+    // percentage of confidence in final estimation of missing data
     std::vector<std::vector<std::vector<double>>> partialRankScore;
 
-    //algorithm initialization
+    // algorithm initialization
     std::vector<std::vector<std::vector<int>>> initialPartialRank;
     std::vector<std::vector<double>> initialP;
     std::vector<int> initialZ;
     std::vector<double> initialProportion;
     std::vector<std::vector<std::vector<int>>> initialMu;
 
-    //distance between parameters
+    // distance between parameters
     std::vector<std::vector<double>> distProp;
     std::vector<std::vector<std::vector<double>>> distP;
     std::vector<std::vector<std::vector<int>>> distMu;
@@ -82,7 +82,7 @@ struct OutParameters
 class RankCluster
 {
 public:
-    // defaut constructor
+    // default constructor
     RankCluster();
     /**
     * @param X data one row= a multivariate rank
@@ -91,21 +91,21 @@ public:
     * @param param parameters of SEM algorithm
     */
     RankCluster(std::vector<std::vector<int>> const &X, int g, std::vector<int> const &m, SEMparameters const &param);
-    //constructor with given initialization of parameters
+    // constructor with given initialization of parameters
     RankCluster(std::vector<std::vector<int>> const &X, std::vector<int> const &m, SEMparameters const &param,
                 std::vector<double> const &proportion, std::vector<std::vector<double>> const &p,
                 std::vector<std::vector<std::vector<int>>> const &mu);
 
-    ///copy constructor
+    // copy constructor
     RankCluster(RankCluster &rankClusterObject);
 
-    ///destructor
+    // destructor
     virtual ~RankCluster();
 
-    /// run the SEM algorithm
+    // run the SEM algorithm
     void run();
 
-    //getters
+    // getters
     inline int d() const { return d_; }
     inline int n() const { return n_; }
     inline int g() const { return g_; }
@@ -123,7 +123,7 @@ public:
     inline std::vector<std::vector<int>> indexPb() const { return indexPb_; }
     inline SEMparameters parameter() const { return parameter_; }
 
-    //output getters
+    // output getters
     inline Eigen::ArrayXXd tik() const { return output_.tik; }
     inline Eigen::ArrayXd entropy() const { return output_.entropy; }
     inline Eigen::ArrayXXd probabilities() const { return output_.probabilities; }
@@ -143,20 +143,21 @@ public:
     inline std::vector<std::vector<std::vector<int>>> distPartialRank() const { return output_.distPartialRank; }
     inline std::vector<std::vector<std::vector<double>>> partialRankScore() const { return output_.partialRankScore; }
 
-    ///reestimation of criterion
+    /** re-estimation of criterion */
     void estimateCriterion(double &L, double &bic, double &icl);
 
 protected:
-    /**convert X in vector<vector<PartialRank>>
-        * @param X raw data one row= a multi dimensional rank
-        */
+    /** convert X in vector<vector<PartialRank>>
+     * @param X raw data one row= a multi dimensional rank
+     */
     void conversion2data(std::vector<std::vector<int>> const &X);
+
     /** read rank. used in conversion2data
-        * @param X raw data one row= a multi dimensinnal rank
-        * @param dim actual dimension
-        * @param j actual index of the sample
-        * @param indM transformation of m_
-        */
+     * @param X raw data one row= a multi dimensional rank
+     * @param dim actual dimension
+     * @param j actual index of the sample
+     * @param indM transformation of m_
+     */
     void readRankingRank(std::vector<std::vector<int>> const &X, int const &dim, int const &j, std::vector<int> const &indM);
 
     // initialization of parameters
@@ -174,29 +175,36 @@ protected:
 
     /** SE step */
     void SEstep();
-    /**unidimensional gibbs sampler for y estimation
-    * @param indexDim index of the dimension (<d_)
-    */
+
+    /** univariate gibbs sampler for y estimation
+     * @param indexDim index of the dimension (<d_)
+     */
     void gibbsY(int indexDim);
-    ///simulation of z_
+
+    /** simulate partition using the current estimated parameters */
     void zSimulation();
-    /**unidimensionnal gibbs sampler for partial rank estimation
-    * @param indexDim index of the dimension (<d_)
-    */
+
+    /** univariate gibbs sampler for partial rank estimation
+     * @param indexDim index of the dimension (<d_)
+     */
     void gibbsX(int indexDim);
-    ///M step
+
+    /** M step */
     void Mstep();
+
     /** simulation of mu
-    * @param indexDim index of the dimension
-    * @param indCl index of teh cluster
-    */
+     * @param indexDim index of the dimension
+     * @param indCl index of the cluster
+     */
     void simuM(int indexDim, int indCl);
+
     /** likelihood step
      * @param listeMu mu for every iterations of the SEM
      * @param resP pi for every iterations of the SEM
      * @param resProp proportion for every iterations of the SEM
      */
-    void likelihood(std::vector<std::vector<std::vector<std::vector<int>>>> &listeMu, std::vector<std::vector<std::vector<double>>> &resP,
+    void likelihood(std::vector<std::vector<std::vector<std::vector<int>>>> &listeMu,
+                    std::vector<std::vector<std::vector<double>>> &resP,
                     std::vector<std::vector<double>> &resProp);
 
     /** compute the log likelihood for a set of parameter
@@ -205,53 +213,57 @@ protected:
      * @param proportion estimated proportion
      * @param tik used for store tik
      * @param Y used for store estimated y
-     * @param xTemp used for store estimated partial rank
+     * @param xTemp used for store estimated partial ranks
+     * @param probabilities probability of each individual at each iteration
      * @param score used for confidence in estimated partial rank
-     * @param iterproba probability of each individuals at each iteration
      */
-    double computeLikelihood(std::vector<std::vector<std::vector<int>>> const &mu, std::vector<std::vector<double>> const &p,
-                             std::vector<double> const &proportion, Eigen::ArrayXXd &tik, std::vector<std::vector<std::vector<int>>> &Y,
+    double computeLikelihood(std::vector<std::vector<std::vector<int>>> const &mu,
+                             std::vector<std::vector<double>> const &p,
+                             std::vector<double> const &proportion, Eigen::ArrayXXd &tik,
+                             std::vector<std::vector<std::vector<int>>> &Y,
                              std::vector<std::vector<std::vector<int>>> &xTemp, Eigen::ArrayXXd &probabilities,
                              std::vector<std::vector<std::vector<double>>> &score);
-    ///compute the final z_
+
+    /** compute the final partition (z_) */
     void computePartition();
-    ///compute distance between final parameters and each iteration parameters
+
+    /** compute distance between final parameters and each iteration parameters */
     void computeDistance(std::vector<std::vector<double>> const &resProp, std::vector<std::vector<std::vector<double>>> const &resP,
                          std::vector<std::vector<std::vector<std::vector<int>>>> const &resMu, std::vector<std::vector<int>> const &resZ,
                          std::vector<std::vector<std::vector<std::vector<int>>>> const &resDonneesPartiel);
 
 private:
-    ///contains the size of rank for each dim
+    // contains the size of rank for each dim
     std::vector<int> m_;
-    ///number of individuals
+    // number of individuals
     int n_;
-    ///number of dimension
+    // number of dimension
     int d_;
-    ///number of cluster
+    // number of cluster
     int g_;
-    ///data of teh form data[dimension[index]]
+    // data of the form data[dimension[index]]
     std::vector<std::vector<PartialRank>> data_;
-    ///estimated cluster of each individual
+    // estimated cluster of each individual
     std::vector<int> z_;
-    /// estimated rank parameter of each cluster :  mu_[dimension][cluster][indice]
+    // estimated rank parameter of each cluster:  mu_[dimension][cluster][indice]
     std::vector<std::vector<std::vector<int>>> mu_;
-    /// estimated probability parameter of each cluster :  p_[dimension][cluster]
+    // estimated probability parameter of each cluster :  p_[dimension][cluster]
     std::vector<std::vector<double>> p_;
-    /// estimated proportion of the mixture model
+    // estimated proportion of the mixture model
     std::vector<double> proportion_;
-    ///algorithm parameters
+    // algorithm parameters
     SEMparameters parameter_;
-    ///distance and initialization of the algorithm
+    // distance and initialization of the algorithm
     OutParameters output_;
-    ///true if there is partial rank in the data
+    // true if there is partial rank in the data
     bool partial_;
-    ///index of partial data
+    // index of partial data
     std::vector<std::vector<int>> indexPartialData_;
-    /// if true, SEM has converged
+    // if true, SEM has converged
     bool convergence_;
-    /// if true, good data
+    // if true, good data
     bool dataOk_;
-    ///index of rank with problem for each dimension
+    // index of rank with problem for each dimension
     std::vector<std::vector<int>> indexPb_;
 };
 

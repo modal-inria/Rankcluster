@@ -2,7 +2,7 @@
  * functions.h
  *
  *  Created on: 1 mars 2013
- *      Author: grimonprez
+ *      Author: Quentin Grimonprez
  */
 
 #ifndef FUNCTIONS_H_
@@ -102,11 +102,11 @@ std::vector<int> rank2index(std::vector<std::vector<int>> const &listeRang, std:
  * @param index index of the rank
  * @param m size of the rank
  * @param tabFactorial vector containing 1! to m! (@see tab_factorial)(optional)
- * @return le rang correspondant à l'index
- * index=rank
- * 0=1 2 ... m
+ * @return the rank corresponding to the index
+ * index | rank
+ * 0 | 1 2 ... m
  *
- * m!= m m-1 .. 1
+ * m! | m m-1 ... 1
  */
 std::vector<int> index2rank(int index, int const &m, std::vector<int> const &tabFactorial);
 std::vector<int> index2rankb(int index, int const &m, std::vector<int> const &tabFactorial);
@@ -140,7 +140,7 @@ void inverseRang(std::vector<int> &rang, int const &m);
 double BIC(double loglikelihood, int nbDonnees, int nbParam);
 
 /**
- * compute the Rand index of 2 partitions
+ * Compute the Rand index between 2 partitions
  * @param z1 partition
  * @param z2 partition
  * @return a double, the Rand index
@@ -148,10 +148,11 @@ double BIC(double loglikelihood, int nbDonnees, int nbParam);
 double indiceRand(std::vector<int> const &z1, std::vector<int> const &z2);
 
 /**
- * conversion from ordering representation to ranking representation
+ * Conversion from ordering representation to ranking representation
+ *
  * @param x a rank
  * @param m size of the rank
- * @return a rank : the ranking representation of x
+ * @return a rank: the ranking representation of x
  */
 std::vector<int> order2rank(std::vector<int> const &x, int const &m);
 
@@ -164,7 +165,7 @@ std::vector<int> order2rank(std::vector<int> const &x, int const &m);
 int distanceKendall(std::vector<int> const &x, std::vector<int> const &y);
 
 /**
- * sort the parameters in order that the first cluster is the cluster with the more little ndex of mu
+ * Sort the parameters such that the first cluster is the cluster with the more little index of mu
  * @param mu index of the rank of the first dimension of listeMu
  * @param p parameter of the ISR
  * @param prop proportion of the mixture model
@@ -173,26 +174,28 @@ int distanceKendall(std::vector<int> const &x, std::vector<int> const &y);
  * @param g number of cluster
  * @param d number of dimension
  * @param n number of individual
- * listeMu, p, prop and z are modify if necessary
+ *
+ * listeMu, p, prop and z are modified if necessary
  *
  */
 void tri_insertionMulti(std::vector<int> &mu, std::vector<double> &prop, std::vector<std::vector<double>> &p,
-                        std::vector<std::vector<std::vector<int>>> &listeMu, std::vector<int> &z, int const &g, int const &d, int const &n);
+                        std::vector<std::vector<std::vector<int>>> &listeMu, std::vector<int> &z, int const &g,
+                        int const &d, int const &n);
 
 /**
  * simulation of a n-sample of ISR(mu,p)
  * @param n size of the sample
  * @param m size of the rank
  * @param mu rank
- * @param p probability of a good comapraison
+ * @param p probability of a good comparison
  * @return a n-sample of ISR(mu,p)
  */
 std::vector<std::vector<int>> simulISR(int const &n, int const &m, std::vector<int> const &mu, double const &p);
 
 /**
- * compute frequence of a data set
+ * compute frequency of a data set
  * @param listeRang data
- * @return a pair with the unique rank and the frequence of each unique rank
+ * @return a pair with the unique rank and the frequency of each unique rank
  */
 std::pair<std::vector<std::vector<std::vector<int>>>, std::vector<int>>
 freqMulti(std::vector<std::vector<std::vector<int>>> const &listeRang);
@@ -209,9 +212,9 @@ double proba(std::vector<std::vector<int>> const &x, std::vector<std::vector<int
 
 /**
  * accept or not a change in a gibbs sampler
- * 
+ *
  * Sample x~U(0, 1), accept the change if x < p2/(p1 + p2)
- * 
+ *
  * @param logP1 log-probability of the current element
  * @param logP2 log-probability of the candidate
  * @return true if the change is accepted
