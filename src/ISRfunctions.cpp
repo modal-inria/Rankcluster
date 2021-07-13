@@ -231,13 +231,13 @@ double proba(vector<vector<int>> const &x, vector<vector<int>> const &mu, vector
     {
         int m = it->first;
         tabFact = tab_factorial(m);
-        listeY = listeSigma(m, tabFact);
+        listeY = listIndexOrderOfPresentation(m, tabFact);
         double mult = 2. / (double)tabFact[m - 1];
-        vector<int> aa = index2rankb(1, m, tabFact);
+        vector<int> aa = index2rankNoCheck(1, m, tabFact);
 
         for (int i = 0; i < tabFact[m - 1] / 2; i++)
         {
-            y = index2rankb(listeY[i], m, tabFact);
+            y = index2rankNoCheck(listeY[i], m, tabFact);
 
             // for each dimension that have a rank of size m
             for (int j = 0; j < (int)(it->second).size(); j++)

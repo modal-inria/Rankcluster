@@ -1166,7 +1166,7 @@ void RankCluster::computeDistance(vector<vector<double>> const &resProp, vector<
     for (int i(0); i < iterTotal; i++)
     {
         //distance between partition
-        output_.distZ[i] = indiceRand(z_, resZ[i]);
+        output_.distZ[i] = computeRandIndex(z_, resZ[i]);
 
         for (int cl(0); cl < g_; cl++)
         {
@@ -1289,7 +1289,7 @@ void RankCluster::run()
                             if (p_[l][k] < 0.5)
                             {
                                 p_[l][k] = 1 - p_[l][k];
-                                inverseRang(mu_[l][k]);
+                                invertRank(mu_[l][k]);
                             }
                         }
                     }
@@ -1367,7 +1367,7 @@ void RankCluster::run()
                     if (p_[j][k] < 0.5)
                     {
                         p_[j][k] = 1 - p_[j][k];
-                        inverseRang(mu_[j][k]);
+                        invertRank(mu_[j][k]);
                     }
                 }
 

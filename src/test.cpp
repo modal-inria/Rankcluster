@@ -24,7 +24,7 @@ double khi2(vector<vector<int>> const &data, vector<double> const &p, vector<dou
 
     //generation of the index of y
     vector<int> tabFact(tab_factorial(m)), listeY;
-    listeY = listeSigma(m, tabFact);
+    listeY = listIndexOrderOfPresentation(m, tabFact);
 
     //generation of all the rank for the dim
     for (int i(0); i < factM; i++)
@@ -96,7 +96,7 @@ double khi2partial(vector<Rank> &data, vector<double> const &p, vector<double> c
 
     //generation of the index of y
     vector<int> tabFact(tab_factorial(m)), listeY;
-    listeY = listeSigma(m, tabFact);
+    listeY = listIndexOrderOfPresentation(m, tabFact);
 
     //generation of all the rank for the dim
     for (int i(0); i < factM; i++)
@@ -309,7 +309,7 @@ void computePQ(vector<vector<vector<double>>> &p, vector<vector<vector<double>>>
             x = vector<vector<int>>(n, vector<int>(m[0]));
             //generation of the index of y
             vector<int> tabFact(tab_factorial(m[dim]));
-            listeY = listeSigma(m[dim], tabFact);
+            listeY = listIndexOrderOfPresentation(m[dim], tabFact);
 
             //generation of all the rank for the dim
             for (int i(0); i < n; i++)

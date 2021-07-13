@@ -69,121 +69,43 @@ vector<int> tab_factorial(int const &m)
     return tab;
 }
 
-//conversion d'un rang en index
-int rank2index(vector<int> const &rang, vector<int> const &tabFactorial)
+// convert a single rank into an index (int)
+int rank2index(vector<int> const &rank, vector<int> const &tabFactorial)
 {
-    int const m(rang.size());
+    int const m(rank.size());
     int index(0);
-    index = (rang[0] - 1) * tabFactorial[m - 2];
+    index = (rank[0] - 1) * tabFactorial[m - 2];
     vector<int>::iterator it;
     vector<int> liste(m);
 
     initializeRank(liste);
 
-    liste.erase(remove(liste.begin(), liste.end(), rang[0]), liste.end());
+    liste.erase(remove(liste.begin(), liste.end(), rank[0]), liste.end());
 
-    for (int j(1); j < m - 1; j++)
+    for (int j = 1; j < m - 1; j++)
     {
-        it = search_n(liste.begin(), liste.end(), 1, rang[j]);
+        it = search_n(liste.begin(), liste.end(), 1, rank[j]);
         index += (int(it - liste.begin()) * tabFactorial[m - j - 2]);
-        liste.erase(remove(liste.begin(), liste.end(), rang[j]), liste.end());
+        liste.erase(remove(liste.begin(), liste.end(), rank[j]), liste.end());
     }
 
     return index + 1;
 }
 
-vector<int> rank2index(vector<vector<int>> const &listeRang, vector<int> const &tabFact)
+// convert several ranks into index
+vector<int> rank2index(vector<vector<int>> const &rankList, vector<int> const &tabFact)
 {
-    const unsigned int n(listeRang.size());
+    int n(rankList.size());
     vector<int> listeIndex(n);
-    for (unsigned int i(0); i < n; i++)
-        listeIndex[i] = rank2index(listeRang[i], tabFact);
+
+    for (size_t i = 0; i < n; i++)
+        listeIndex[i] = rank2index(rankList[i], tabFact);
 
     return listeIndex;
 }
 
-//conversion d'un index en rang
-vector<int> index2rank(int index, int const &m, vector<int> const &tabFactorial)
-{
-    if (index > factorial(m))
-    {
-        vector<int> temp(m, 0);
-        return temp;
-        //cout<<"ERREUR "<<index<<"<"<<m<<"!"<<endl;
-    }
-    else
-    {
-        vector<int> liste(m), r(m, 0);
-        int temp(0), temp2(0);
-
-        index--;
-        r[0] = index / tabFactorial[m - 2] + 1;
-
-        initializeRank(liste);
-
-        //on supprime l'élément égale à r[0]
-        liste.erase(remove(liste.begin(), liste.end(), r[0]), liste.end());
-
-        for (int j(1); j < m - 1; j++)
-        {
-            temp = index;
-            for (int k(1); k < j + 1; k++)
-                temp %= tabFactorial[m - k - 1];
-
-            temp2 = temp / tabFactorial[m - j - 2];
-            r[j] = liste[temp2];
-
-            //replace (liste.begin(), liste.end(), r[j], 0);
-            liste.erase(remove(liste.begin(), liste.end(), r[j]), liste.end());
-        }
-        r[m - 1] = liste[0];
-
-        return r;
-    }
-}
-
-vector<int> index2rank(int index, int const &m)
-{
-    vector<int> r(m, 0);
-
-    if (index > factorial(m))
-    {
-        vector<int> temp(m, 0);
-        return temp;
-        //cout<<"ERREUR "<<index<<"<"<<m<<"!"<<endl;
-    }
-    else
-    {
-        vector<int> liste(m);
-        int temp(0), temp2(0);
-
-        index--;
-        r[0] = index / factorial(m - 1) + 1;
-
-        initializeRank(liste);
-
-        //on supprime l'élément égale à r[0]
-        liste.erase(remove(liste.begin(), liste.end(), r[0]), liste.end());
-
-        for (int j(1); j < m - 1; j++)
-        {
-            temp = index;
-            for (int k(1); k < j + 1; k++)
-                temp %= factorial(m - k);
-
-            temp2 = temp / factorial(m - j - 1);
-            r[j] = liste[temp2];
-
-            //replace (liste.begin(), liste.end(), r[j], 0);
-            liste.erase(remove(liste.begin(), liste.end(), r[j]), liste.end());
-        }
-        r[m - 1] = liste[0];
-
-        return r;
-    }
-}
-
-vector<int> index2rankb(int index, int const &m, vector<int> const &tabFactorial)
+// Convert an index to a rank. This one does not check that the index exists (lesser than m!).
+vector<int> index2rankNoCheck(int index, int const &m, vector<int> const &tabFactorial)
 {
     vector<int> liste(m), r(m, 0);
     int temp(0), temp2(0);
@@ -193,7 +115,7 @@ vector<int> index2rankb(int index, int const &m, vector<int> const &tabFactorial
 
     initializeRank(liste);
 
-    //on supprime l'élément égale à r[0]
+    // we remove the element equal to r[0]
     liste.erase(remove(liste.begin(), liste.end(), r[0]), liste.end());
 
     for (int j(1); j < m - 1; j++)
@@ -213,7 +135,29 @@ vector<int> index2rankb(int index, int const &m, vector<int> const &tabFactorial
     return r;
 }
 
-vector<int> listeSigma(int const &m, vector<int> const &tabFactorial)
+vector<int> index2rank(int index, int const &m, vector<int> const &tabFactorial)
+{
+    if (index > factorial(m))
+    {
+        vector<int> temp(m, 0);
+        return temp;
+        //cout << "ERROR " << index << "<" << m << "!" << endl;
+    }
+    else
+    {
+        return index2rankNoCheck(index, m, tabFactorial);
+    }
+}
+
+vector<int> index2rank(int index, int const &m)
+{
+    vector<int> tabFactorial;
+    tabFactorial = tab_factorial(m);
+
+    return index2rank(index, m, tabFactorial);
+}
+
+vector<int> listIndexOrderOfPresentation(int const &m, vector<int> const &tabFactorial)
 {
     vector<int> liste(tabFactorial[m - 1] / 2);
     int const1(0), const2(0), ind(0);
@@ -231,21 +175,16 @@ vector<int> listeSigma(int const &m, vector<int> const &tabFactorial)
     return liste;
 }
 
-//inversion d'un rang
-//ex: transforme 1 2 3 4 en 4 3 2 1
-void inverseRang(vector<int> &rang)
+// Invert a rank
+// ex: transform 1 2 3 4 into 4 3 2 1
+void invertRank(vector<int> &rank)
 {
-    for (unsigned int j(0); j < rang.size() / 2; j++)
-        swap(rang[j], rang[rang.size() - j - 1]);
+    for (unsigned int j(0); j < rank.size() / 2; j++)
+        swap(rank[j], rank[rank.size() - j - 1]);
 }
 
-void inverseRang(vector<int> &rang, int const &m)
-{
-    for (int j(0); j < m / 2; j++)
-        swap(rang[j], rang[m - j - 1]);
-}
 
-//calcul BIC
+// compute BIC
 double BIC(double loglikelihood, int nbDonnees, int nbParam)
 {
     double bic(0);
@@ -253,7 +192,7 @@ double BIC(double loglikelihood, int nbDonnees, int nbParam)
     return bic;
 }
 
-double indiceRand(vector<int> const &z1, vector<int> const &z2)
+double computeRandIndex(vector<int> const &z1, vector<int> const &z2)
 {
     const int N(z1.size());
     double a(0), b(0), c(0), d(0);
@@ -281,19 +220,11 @@ double indiceRand(vector<int> const &z1, vector<int> const &z2)
     return (a + b) / (a + b + c + d);
 }
 
-/*vector<int> order2rank(vector<int> &x,int const& m)
-{
-vector<int> y(x);
-for(int i(0);i<m;i++)
-x[i]=positionRank(y,i+1)+1;
 
-return x;
-}*/
-
-vector<int> order2rank(vector<int> const &x, int const &m)
+vector<int> ordering2ranking(vector<int> const &x)
 {
     vector<int> y(x);
-    for (int i(0); i < m; i++)
+    for (size_t i(0); i < x.size(); i++)
         y[i] = positionRank(x, i + 1) + 1;
 
     return y;
@@ -303,8 +234,8 @@ int distanceKendall(vector<int> const &x, vector<int> const &y)
 {
     const int m(x.size());
     vector<int> xr(m), yr(m);
-    xr = order2rank(x, m);
-    yr = order2rank(y, m);
+    xr = ordering2ranking(x);
+    yr = ordering2ranking(y);
     int distK(0);
 
     for (int i(0); i < m - 1; i++)
@@ -316,8 +247,9 @@ int distanceKendall(vector<int> const &x, vector<int> const &y)
 }
 
 // mu: index des elements de la 1ere dim
-//listeMu: listMu[dim][composante][elem]
-void tri_insertionMulti(vector<int> &mu, vector<double> &prop, vector<vector<double>> &p, vector<vector<vector<int>>> &listeMu, vector<int> &z, int const &g, int const &d, int const &n)
+// listeMu: listMu[dim][composante][elem]
+void tri_insertionMulti(vector<int> &mu, vector<double> &prop, vector<vector<double>> &p,
+                        vector<vector<vector<int>>> &listeMu, vector<int> &z, int const &g, int const &d, int const &n)
 {
     int i, j, elem;
     double elemprop;
@@ -328,8 +260,8 @@ void tri_insertionMulti(vector<int> &mu, vector<double> &prop, vector<vector<dou
         order[l] = l;
     int elemorder;
 
-    //sort algorithm
-    //we sort the cluster of the first dim and make changement for all dim
+    // sort algorithm
+    // we sort the cluster of the first dimension and replicate the change for all other dimensions
     for (i = 1; i < g; ++i)
     {
         elem = mu[i];
@@ -360,7 +292,7 @@ void tri_insertionMulti(vector<int> &mu, vector<double> &prop, vector<vector<dou
             listeMu[l][j] = elemmu[l];
     }
 
-    //re order the z
+    //re order the partition z
     for (int l = 0; l < n; l++)
     {
         for (int k = 0; k < g; k++)
@@ -375,11 +307,12 @@ void tri_insertionMulti(vector<int> &mu, vector<double> &prop, vector<vector<dou
 }
 
 
-//frequence d'un jeu de données multi varié
+// frequency of a multivariate dataset
 typedef struct TableauRang TableauRang;
-pair<vector<vector<vector<int>>>, vector<int>> freqMulti(vector<vector<vector<int>>> const &listeRang)
+pair<vector<vector<vector<int>>>, vector<int>> freqMulti(vector<vector<vector<int>>> const &rankList)
 {
-    //rassemblement des mu identiques, proba->moyenne des proba,p->moyenne des p
+    // we group the same mu values.
+    // For a group of mu, the new p is the mean of the different p values in the group (same for proba)
     struct TableauRang;
     struct TableauRang
     {
@@ -389,11 +322,11 @@ pair<vector<vector<vector<int>>>, vector<int>> freqMulti(vector<vector<vector<in
     };
 
     bool continuer(true), egaliteRang;
-    const int d(listeRang.size()), N(listeRang[0].size());
+    const int d(rankList.size()), N(rankList[0].size());
     vector<vector<int>> rang(d);
     vector<int> M(d);
     for (int i(0); i < d; i++)
-        M[i] = listeRang[i][0].size();
+        M[i] = rankList[i][0].size();
 
     TableauRang *headRang = new TableauRang;
     TableauRang *currRang = headRang;
@@ -401,7 +334,7 @@ pair<vector<vector<vector<int>>>, vector<int>> freqMulti(vector<vector<vector<in
     currRang->compteur = 1;
     currRang->suivant = 0;
     for (int i(0); i < d; i++)
-        rang[i] = listeRang[i][0];
+        rang[i] = rankList[i][0];
     currRang->rang = rang;
 
     for (int j(1); j < N; j++)
@@ -415,7 +348,7 @@ pair<vector<vector<vector<int>>>, vector<int>> freqMulti(vector<vector<vector<in
             {
                 for (int k(0); k < M[J]; k++)
                 {
-                    if (currRang->rang[J][k] != listeRang[J][j][k])
+                    if (currRang->rang[J][k] != rankList[J][j][k])
                     {
                         egaliteRang = false;
                         break;
@@ -439,7 +372,7 @@ pair<vector<vector<vector<int>>>, vector<int>> freqMulti(vector<vector<vector<in
                     currRang->compteur = 1;
                     currRang->suivant = 0;
                     for (int i(0); i < d; i++)
-                        rang[i] = listeRang[i][j];
+                        rang[i] = rankList[i][j];
                     currRang->rang = rang;
                 }
                 else
@@ -448,7 +381,7 @@ pair<vector<vector<vector<int>>>, vector<int>> freqMulti(vector<vector<vector<in
         }
     }
 
-    //stockage des infos
+    // storage
     vector<vector<vector<int>>> donnees(d);
     vector<int> freq;
 
