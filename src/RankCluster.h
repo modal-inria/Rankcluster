@@ -184,6 +184,9 @@ protected:
      */
     void gibbsY(int indexDim);
 
+    /** Compute tik for the individual ind*/
+    Eigen::ArrayXd computeTik(int const ind);
+
     /** simulate partition using the current estimated parameters */
     void zSimulation();
 

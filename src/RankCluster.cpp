@@ -409,50 +409,42 @@ void RankCluster::gibbsY(int indexDim)
     }
 }
 
+
+Eigen::ArrayXd RankCluster::computeTik(int const ind)
+{
+    Eigen::ArrayXd tik = ArrayXd::Zero(g_);
+
+    for (int k(0); k < g_; k++)
+    {
+        for (int l(0); l < d_; l++)
+            tik(k) += lnProbaCond(data_[l][ind].rank, data_[l][ind].y, mu_[l][k], p_[l][k]);
+
+        tik[k] += log(proportion_[k]);
+    }
+    normalizeLogProbaInPlace(tik);
+
+    return tik;
+}
+
 void RankCluster::zSimulation()
 {
-
     if (g_ != 1)
     {
-        double alea(0), sumTik(0);
-        vector<double> lim(g_ + 1, 0), tik(g_);
+        Eigen::ArrayXd tik(g_);
 
         for (int ind(0); ind < n_; ind++)
         {
             // computation of the probability to belong to each cluster
-            for (int k(0); k < g_; k++)
-                tik[k] = 1;
-
-            sumTik = 0;
-            for (int k(0); k < g_; k++)
-            {
-                for (int l(0); l < d_; l++)
-                    tik[k] *= probaCond(data_[l][ind].rank, data_[l][ind].y, mu_[l][k], p_[l][k]);
-                tik[k] *= proportion_[k];
-                sumTik += tik[k];
-            }
-
-            for (int i(0); i < g_; i++)
-                tik[i] /= sumTik;
+            tik = computeTik(ind);
 
             // z follow a multinomial law of parameter tik
-            for (int k(1); k < g_ + 1; k++)
-                lim[k] = lim[k - 1] + tik[k - 1];
-
-            alea = (double)runif(0., 1.);
-
-            for (int j(0); j < g_; j++)
-                if ((lim[j] <= alea) && (alea <= lim[j + 1]))
-                {
-                    z_[ind] = j;
-                    break;
-                }
+            z_[ind] = sampleMultinomial(tik);
         }
     }
     else
     {
-        for (int i = 0; i < (int)z_.size(); i++)
-            z_[i] = 0;
+        for (int ind(0); ind < n_; ind++)
+            z_[ind] = 0;
     }
 }
 

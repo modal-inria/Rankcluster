@@ -426,3 +426,40 @@ bool acceptChange(double const logP1, double const logP2)
 
     return (alea < proba2);
 }
+
+
+double LSE(Eigen::ArrayXd &logProba)
+{
+    double m = logProba.maxCoeff();
+
+    return m + std::log((logProba - m).exp().sum());
+}
+
+Eigen::ArrayXd normalizeLogProba(Eigen::ArrayXd &logProba)
+{
+    double lse = LSE(logProba);
+
+    return (logProba - lse).exp();
+}
+
+void normalizeLogProbaInPlace(Eigen::ArrayXd &logProba)
+{
+    double lse = LSE(logProba);
+
+    logProba = (logProba - lse).exp();
+}
+
+int sampleMultinomial(Eigen::ArrayXd const &proba)
+{
+    int g = proba.size();
+    vector<double> lim(g + 1, 0.);
+
+    for (int k = 0; k < g; k++)
+        lim[k + 1] = lim[k] + proba(k);
+
+    double alea = (double) runif(0., 1.);
+
+    for (int j = 0; j < g; j++)
+        if ((lim[j] <= alea) && (alea <= lim[j + 1]))
+            return j;
+}

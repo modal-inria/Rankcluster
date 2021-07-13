@@ -180,4 +180,30 @@ freqMulti(std::vector<std::vector<std::vector<int>>> const &rankList);
  */
 bool acceptChange(double const logP1, double const logP2);
 
+/** LogSumExp function
+ * https://en.wikipedia.org/wiki/LogSumExp
+ *
+ * LSE(x1, x2, ..., xn) = (max xi) + log(exp(x1 - (max xi)) + ... + exp(xn - (max xi)))
+ * LSE(x1, x2, ..., xn) = log(exp(x1) + ... + exp(xn))
+ *
+ * Application for proba: LSE(log(p1), ..., log(pn)) = log(p1 + ... + pn)
+ */
+double LSE(Eigen::ArrayXd &logProba);
+
+/**
+ * LSE trick to normalize a vector of log probabilities
+ * Given (log(p1), ..., log(pn)), it returns (p1/sum(pi), ..., pn/sum(pi))
+ *
+ * Useful to compute tik
+ */
+Eigen::ArrayXd normalizeLogProba(Eigen::ArrayXd &logProba);
+void normalizeLogProbaInPlace(Eigen::ArrayXd &logProba);
+
+/**
+ * Sample accortoding to a multinomial with proba
+ *
+ * @param proba vector of probabilities of each element
+ */
+int sampleMultinomial(Eigen::ArrayXd const &proba);
+
 #endif /* FUNCTIONS_H_ */
