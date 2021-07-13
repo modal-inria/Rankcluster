@@ -1,5 +1,5 @@
-#include "runTest.h"
-#include "runFunctions.h"
+#include "RinterfaceTest.h"
+#include "RinterfaceFunctions.h"
 
 using namespace Rcpp;
 using namespace std;

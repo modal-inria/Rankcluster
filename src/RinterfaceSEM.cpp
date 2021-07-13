@@ -1,4 +1,4 @@
-#include "run.h"
+#include "RinterfaceSEM.h"
 
 using namespace Rcpp;
 using namespace std;

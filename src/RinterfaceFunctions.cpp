@@ -1,6 +1,6 @@
 #include "functions.h"
-#include "runFunctions.h"
-#include "runTest.h"
+#include "RinterfaceFunctions.h"
+#include "RinterfaceTest.h"
 #include "RankCluster.h"
 #ifdef _OPENMP
 #include <omp.h>
