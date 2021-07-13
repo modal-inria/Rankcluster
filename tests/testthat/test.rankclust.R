@@ -45,10 +45,10 @@ test_that("rankclust finds the right parameters on a simple case", {
   res <- rankclust(x, K = 2)
   
   expect_s4_class(res, "Rankclust")
-  expect_equal(res@K, 1:3)
+  expect_equal(res@K, 2)
   expect_equal(res@criterion, "bic")
   expect_true(res@convergence)
-  expect_length(res@results, 3)
+  expect_length(res@results, 1)
   expect_true(res@results[[1]]@convergence)
   expect_false(res@results[[1]]@partial)
   expect_equivalent(res@results[[1]]@mu, matrix(c(1:4, 4:1), nrow = 2, byrow = TRUE))
