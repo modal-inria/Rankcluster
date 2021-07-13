@@ -64,7 +64,7 @@ double khi2(vector<vector<int>> const &data, vector<double> const &p, vector<dou
     for (int iter(0); iter < nBoot; iter++)
     {
         vector<double> effSim(factM, 0);
-        simulMixtureISR(simulation, n, m, mu, p, prop);
+        simulMixtureISR(simulation, mu, p, prop);
         for (int i(0); i < n; i++)
         {
             indexData = rank2index(simulation[i], tabFact);
@@ -192,7 +192,7 @@ double khi2partial(vector<Rank> &data, vector<double> const &p, vector<double> c
     for (int iter(0); iter < nBoot; iter++)
     {
         vector<double> effSim(factM, 0);
-        simulMixtureISR(simulation, n, m, mu, p, prop);
+        simulMixtureISR(simulation, mu, p, prop);
         for (int i(0); i < n; i++)
         {
             //on réintroduit des 0 dans la simulation au même endroit

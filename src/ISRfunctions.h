@@ -56,13 +56,11 @@ std::vector<std::vector<int>> simulISR(int const &n, int const &m, std::vector<i
 /**
  * Simulate a sample of mixture of ISR
  * @param simul sample will be modified
- * @param n size of sample
- * @param m size of rank
  * @param mu reference rank
  * @param p dispersion parameter: probability of a good comparison
  * @param prop proportion of the mixture
  */
-void simulMixtureISR(std::vector<std::vector<int>> &simul, int const &n, int const &m, std::vector<std::vector<int>> const &mu, std::vector<double> const &p, std::vector<double> const &prop);
+void simulMixtureISR(std::vector<std::vector<int>> &simul, std::vector<std::vector<int>> const &mu, std::vector<double> const &p, std::vector<double> const &prop);
 
 
 #endif /* ISR_FUNCTIONS_H_ */
