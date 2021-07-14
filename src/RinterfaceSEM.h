@@ -4,7 +4,7 @@
 #include "RankCluster.h"
 #include <RcppEigen.h>
 
-RcppExport SEXP semR(SEXP X, SEXP m, SEXP K, SEXP Qsem, SEXP Bsem, SEXP Ql, SEXP Bl, SEXP RjSE, SEXP RjM, SEXP maxTry, SEXP run, SEXP detail);
+RcppExport SEXP semR(SEXP X, SEXP m, SEXP K, SEXP Qsem, SEXP Bsem, SEXP Ql, SEXP Bl, SEXP RjSE, SEXP RjM, SEXP maxTry, SEXP run, SEXP verbose);
 
 template <class out, class inp>
 inline out convertMatrix(const inp &matrixinput)

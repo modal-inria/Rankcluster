@@ -108,7 +108,7 @@ void RankCluster::readRankingRank(vector<vector<int>> const &X, int const &dim, 
 {
     //initialization
     int indiceElement = 0;
-    data_[dim][j].isNotFull = false;
+    data_[dim][j].isPartial = false;
 
     //multi dim rank temporary
     vector<vector<int>> temp(m_[dim] + 1);
@@ -142,7 +142,7 @@ void RankCluster::readRankingRank(vector<vector<int>> const &X, int const &dim, 
             //tied case
             if (temp[i].size() > 1)
             {
-                data_[dim][j].isNotFull = true;
+                data_[dim][j].isPartial = true;
                 partial_ = true;
                 skip = temp[i].size() - 1;
                 data_[dim][j].missingData.push_back(temp[i]);
@@ -176,7 +176,7 @@ void RankCluster::readRankingRank(vector<vector<int>> const &X, int const &dim, 
     //add partial
     if (temp[0].size() != 0)
     {
-        data_[dim][j].isNotFull = true;
+        data_[dim][j].isPartial = true;
         partial_ = true;
         data_[dim][j].missingData.push_back(temp[0]);
         data_[dim][j].missingIndex.push_back(partialIndex);
@@ -225,7 +225,7 @@ void RankCluster::initialization()
     saveInitialization();
     // t1 = clock();
 
-    // if(parameter_.detail)
+    // if(parameter_.verbose)
     //     cout << "Initialization completed in " <<(double) (t1-t0)/CLOCKS_PER_SEC << "s." << endl;
 }
 
@@ -296,7 +296,7 @@ void RankCluster::initializePartialRank()
     {
         for (int ind = 0; ind < n_; ind++)
         {
-            if (data_[dim][ind].isNotFull)
+            if (data_[dim][ind].isPartial)
             {
                 for (int ii = 0; ii < (int)data_[dim][ind].missingIndex.size(); ii++)
                 {
@@ -319,7 +319,7 @@ void RankCluster::fillIndexPartialData()
     {
         for (int ind = 0; ind < n_; ind++)
         {
-            if (data_[dim][ind].isNotFull)
+            if (data_[dim][ind].isPartial)
                 indexPartialData_[dim].push_back(ind);
         }
     }
@@ -454,7 +454,7 @@ void RankCluster::gibbsX(int indexDim)
 
     for (int ind = 0; ind < n_; ind++)
     {
-        if (data_[indexDim][ind].isNotFull)
+        if (data_[indexDim][ind].isPartial)
         {
             // Gibbs algorithm
             vector<int> x(m_[indexDim]), xCurrent(m_[indexDim]), xCandidate(m_[indexDim]);
@@ -782,7 +782,7 @@ void RankCluster::likelihood(vector<vector<vector<vector<int>>>> &listeMu, vecto
     int compteur(0);
 
     //calcul logvraisemblance
-    //if(parameter_.detail)
+    //if(parameter_.verbose)
     //cout<<"Number of reference rank which must compute the log-likelihood: "<<nbMu<<endl;
 
     double Llast(-numeric_limits<double>::max()), L;
@@ -806,7 +806,7 @@ void RankCluster::likelihood(vector<vector<vector<vector<int>>>> &listeMu, vecto
     //for each mu, we will compute the associate log likelihood
     while (currMu->suivant != 0)
     {
-        //if(parameter_.detail)
+        //if(parameter_.verbose)
         //cout<<"*";
 
         //mean of the parameter
@@ -863,7 +863,7 @@ void RankCluster::likelihood(vector<vector<vector<vector<int>>>> &listeMu, vecto
             currMu->p[compt2][compt1] /= currMu->compteur;
     }
 
-    //if(parameter_.detail)
+    //if(parameter_.verbose)
     //cout<<"*"<<endl;
 
     //compute log likelihood
@@ -902,7 +902,7 @@ void RankCluster::likelihood(vector<vector<vector<vector<int>>>> &listeMu, vecto
     }
     delete currMu; //delete the last mu
 
-    //if(parameter_.detail)
+    //if(parameter_.verbose)
     //cout<<"Computing time for log-likelihood approximation: "<<(double) tL/CLOCKS_PER_SEC<<"s ("<<(double) tL/CLOCKS_PER_SEC/compteur<<"s per mu)."<<endl;
 }
 
@@ -1012,7 +1012,7 @@ double RankCluster::computeLikelihood(vector<vector<vector<int>>> const &mu, vec
             /*simulation des x_i^j qui sont partiels*/
             for (int J = 0; J < d_; J++)
             {
-                if (data_[J][ind].isNotFull) //simulation de xi si partiel
+                if (data_[J][ind].isPartial) //simulation de xi si partiel
                 {
                     x1 = x[J];
                     proba1X = proba1.row(J);
@@ -1070,7 +1070,7 @@ double RankCluster::computeLikelihood(vector<vector<vector<int>>> const &mu, vec
                 //compute score partial rank
                 for (int dim = 0; dim < d_; dim++)
                 {
-                    if (data_[dim][ind].isNotFull)
+                    if (data_[dim][ind].isPartial)
                     {
                         for (int indElem = 0; indElem < m_[dim]; indElem++)
                             scoreCount[dim][indElem][x[dim][indElem] - 1]++;
@@ -1090,7 +1090,7 @@ double RankCluster::computeLikelihood(vector<vector<vector<int>>> const &mu, vec
         for (int j(0); j < d_; j++)
         {
             Y[j][ind] = y[j];
-            if (data_[j][ind].isNotFull)
+            if (data_[j][ind].isPartial)
             {
                 xTemp[j][compteur[j]] = x[j];
                 for (int elem = 0; elem < m_[j]; elem++)
@@ -1209,7 +1209,7 @@ void RankCluster::computeDistance(vector<vector<double>> const &resProp, vector<
         {
             for (int dim(0); dim < d_; dim++)
             {
-                if (data_[dim][ind].isNotFull)
+                if (data_[dim][ind].isPartial)
                 {
                     rangTemp[dim] = distRangPartiel[iter][dim][compteurElemPartiel[dim]];
                     compteurElemPartiel[dim]++;
@@ -1232,7 +1232,7 @@ void RankCluster::run()
         {
             //double t0,t1,t2,t3,tM(0),tSE(0);
 
-            //if(parameter_.detail)
+            //if(parameter_.verbose)
             //{
             //cout<<"##########################################################"<<endl;
             //cout<<"#  SEM-Gibbs Algorithm for multivariate partial ranking  #"<<endl;
@@ -1242,7 +1242,7 @@ void RankCluster::run()
             initialization();
             //t1=clock();
 
-            //if(parameter_.detail)
+            //if(parameter_.verbose)
             //cout<<"Initialization: "<<(double) (t1-t0)/CLOCKS_PER_SEC<<"s."<<endl;
 
             //objects for storing the estimated parameters at each iteration
@@ -1254,10 +1254,10 @@ void RankCluster::run()
             vector<vector<vector<vector<int>>>> resDonneesPartiel(parameter_.maxIt - parameter_.burnAlgo, output_.initialPartialRank);
 
             //algorithm
-            //if(parameter_.detail)
+            //if(parameter_.verbose)
             for (int iter(0); iter < parameter_.maxIt; iter++)
             {
-                //if(parameter_.detail)
+                //if(parameter_.verbose)
                 //cout<<"*";
 
                 //t2=clock();
@@ -1311,10 +1311,10 @@ void RankCluster::run()
                 } //end storage
             }     //end SEM
 
-            //if(parameter_.detail)
+            //if(parameter_.verbose)
             //cout<<endl<<endl<<"Loglikelihood estimation"<<endl;
             //t2=clock();
-            //if(parameter_.detail)
+            //if(parameter_.verbose)
             //{
             //cout<<"Computing time for SE step: "<<(double) tSE/CLOCKS_PER_SEC<<"s ( "<<(double) tSE/CLOCKS_PER_SEC/parameter_.maxIt<<"s per step)."<<endl;
             //cout<<"Computing time for M step: "<<(double) tM/CLOCKS_PER_SEC<<"s ( "<<(double) tM/CLOCKS_PER_SEC/parameter_.maxIt<<"s per step )."<<endl;
@@ -1347,7 +1347,7 @@ void RankCluster::run()
                 output_.icl += 2 * output_.entropy(i);
             }
 
-            //if(parameter_.detail)
+            //if(parameter_.verbose)
             //{
             //cout<<"Total computing time : "<<(double) (t3-t0)/CLOCKS_PER_SEC<<"s"<<endl;
             //}
@@ -1390,7 +1390,7 @@ void RankCluster::estimateCriterion(double &L, double &bic, double &icl)
             Rshuffle(rankTemp.begin(), rankTemp.end());
             data_[dim][ind].y = rankTemp;
 
-            if (data_[dim][ind].isNotFull)
+            if (data_[dim][ind].isPartial)
             {
                 for (int i = 0; i < (int)data_[dim][ind].missingData.size(); i++)
                 {
@@ -1499,7 +1499,7 @@ void RankCluster::estimateCriterion(double &L, double &bic, double &icl)
             /*simulation of partial rank with a gibbs sampler*/
             for (int J = 0; J < d_; J++)
             {
-                if (data_[J][ind].isNotFull) //simulation of xi if it is a partial rank
+                if (data_[J][ind].isPartial) //simulation of xi if it is a partial rank
                 {
                     x1 = x[J];
                     proba1X = proba1.row(J);

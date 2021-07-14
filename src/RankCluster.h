@@ -23,7 +23,7 @@ struct PartialRank
     // order of presentation
     std::vector<int> y;
     // if true, the rank contains partial or ties
-    bool isNotFull;
+    bool isPartial;
     // missing element of the rank or ties
     std::vector<std::vector<int>> missingData;
     // index of the 0 or ties
@@ -47,7 +47,7 @@ struct SEMparameters
     // maximum number of try of the SEM
     int maxTry;
     // if true print details
-    bool detail;
+    bool verbose;
 };
 
 struct OutParameters

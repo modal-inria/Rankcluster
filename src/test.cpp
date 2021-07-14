@@ -18,7 +18,7 @@ double khi2(vector<vector<int>> const &data, vector<double> const &p, vector<dou
     int factM(factorial(m));
     double dkhi2(0), pvalue(0), mult((double)2 / factM), prob(0);
 
-    //************** cacul des effectifs theoriques
+    //************** calcul des effectifs theoriques
     vector<double> effTheo(factM, 0);
     vector<vector<int>> x(factM, vector<int>(m));
 
@@ -84,13 +84,13 @@ double khi2(vector<vector<int>> const &data, vector<double> const &p, vector<dou
     return pvalue;
 }
 
-double khi2partial(vector<Rank> &data, vector<double> const &p, vector<double> const &prop, vector<vector<int>> const &mu, int const &nBoot)
+double khi2partial(vector<RankStruct> &data, vector<double> const &p, vector<double> const &prop, vector<vector<int>> const &mu, int const &nBoot)
 {
     int const g(prop.size()), m(data[0].rank.size()), n(data.size());
     int factM(factorial(m));
     double dkhi2(0), pvalue(0), mult((double)2 / factM), prob(0);
 
-    //************** cacul des effectifs theoriques
+    //************** calcul des effectifs theoriques
     vector<double> effTheo(factM, 0);
     vector<vector<int>> x(factM, vector<int>(m));
 
@@ -117,7 +117,7 @@ double khi2partial(vector<Rank> &data, vector<double> const &p, vector<double> c
         //cout<<x[ind]<<"     "<<effTheo[ind]<<endl;
     }
 
-    //************** cacul des effectifs empiriques
+    //************** calcul des effectifs empiriques
     vector<double> effEmp(factM, 0);
     vector<vector<int>> freq;
     int indexData;
