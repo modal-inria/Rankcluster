@@ -2,7 +2,7 @@
 #' 
 #' @description This functions estimates a clustering of ranking data, potentially multivariate, partial and containing tied, based on a mixture of multivariate ISR model [2].
 #' By specifying only one cluster, the function performs a modelling of the ranking data using the multivariate ISR model.
-#' The estimation is performed thanks to a SEM-Gibbs algorithm in the general case.
+#' The estimation is performed thanks to a SEM-Gibbs algorithm.
 #'
 #' 
 #' @param data a matrix in which each row is a ranking (partial or not; for partial ranking,
@@ -12,7 +12,7 @@
 #' @param m a vector composed of the sizes of the rankings of each dimension (default value is the number of column of the matrix data).
 #' @param K an integer or a vector of integer with the number of clusters.
 #' @param criterion criterion "bic" or "icl", criterion to minimize for selecting the number of clusters.
-#' @param Qsem the total number of iterations for the SEM algorithm (defaut value=40).
+#' @param Qsem the total number of iterations for the SEM algorithm (default value=40).
 #' @param Bsem burn-in period for SEM algorithm (default value=10).
 #' @param RjSE a vector containing, for each dimension, the number of iterations of the Gibbs sampler
 #' used both in the SE step for partial rankings and for the presentation orders generation (default value=mj(mj-1)/2).
@@ -24,7 +24,7 @@
 #' @param run number of runs of the algorithm for each value of K.
 #' @param detail boolean, if TRUE, time and others informations will be print during the process (default value FALSE).
 #'
-#' @return An object of class rankclust (See \code{\link{Output-class}} and \code{\link{Rankclust-class}}).
+#' @return An object of class Rankclust (See \code{\link{Output-class}} and \code{\link{Rankclust-class}}).
 #' If the output object is named \code{res}. You can access the result by res[number of groups]@@slotName where \code{slotName} is an element of the class Output.
 #'
 #' 
@@ -33,10 +33,11 @@
 #'
 #' - missing positions are replaced by 0
 #'
-#' - tied are replaced by the lowest position they share"
+#' - tied are replaced by the lowest position they share
 #'
+#' See the vignette dataFormat for mode details (\code{RShowDoc("dataFormat", package = "Rankcluster")}).
 #'
-#'   The ranking representation r=(r_1,...,r_m) contains the
+#' The ranking representation r=(r_1,...,r_m) contains the
 #' ranks assigned to the objects, and means that the ith
 #' object is in r_ith position.
 #'

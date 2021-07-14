@@ -32,7 +32,7 @@ placed end to end in each row. The data must be in ranking notation (see Details
 
 \item{criterion}{criterion "bic" or "icl", criterion to minimize for selecting the number of clusters.}
 
-\item{Qsem}{the total number of iterations for the SEM algorithm (defaut value=40).}
+\item{Qsem}{the total number of iterations for the SEM algorithm (default value=40).}
 
 \item{Bsem}{burn-in period for SEM algorithm (default value=10).}
 
@@ -53,23 +53,24 @@ for estimation of log-likelihood (default value=100).}
 \item{detail}{boolean, if TRUE, time and others informations will be print during the process (default value FALSE).}
 }
 \value{
-An object of class rankclust (See \code{\link{Output-class}} and \code{\link{Rankclust-class}}).
+An object of class Rankclust (See \code{\link{Output-class}} and \code{\link{Rankclust-class}}).
 If the output object is named \code{res}. You can access the result by res[number of groups]@slotName where \code{slotName} is an element of the class Output.
 }
 \description{
 This functions estimates a clustering of ranking data, potentially multivariate, partial and containing tied, based on a mixture of multivariate ISR model [2].
 By specifying only one cluster, the function performs a modelling of the ranking data using the multivariate ISR model.
-The estimation is performed thanks to a SEM-Gibbs algorithm in the general case.
+The estimation is performed thanks to a SEM-Gibbs algorithm.
 }
 \details{
 The ranks have to be given to the package in the ranking notation (see \link{convertRank} function), with the following convention:
 
 - missing positions are replaced by 0
 
-- tied are replaced by the lowest position they share"
+- tied are replaced by the lowest position they share
 
+See the vignette dataFormat for mode details (\code{RShowDoc("dataFormat", package = "Rankcluster")}).
 
-  The ranking representation r=(r_1,...,r_m) contains the
+The ranking representation r=(r_1,...,r_m) contains the
 ranks assigned to the objects, and means that the ith
 object is in r_ith position.
 
