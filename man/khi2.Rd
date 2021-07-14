@@ -18,7 +18,7 @@ khi2(data, proportion, mu, pi, nBoot = 1000)
 \item{nBoot}{number of bootstrap iterations used to estimate the p-value.}
 }
 \value{
-a real, the p-value of the test.
+the p-value of the test.
 }
 \description{
 This function computes the p-value of the khi2 goodness-of-fit test (only for univariate data).
@@ -29,7 +29,7 @@ pi <- c(0.8, 0.75)
 mu <- matrix(c(1, 2, 3, 4, 4, 2, 1, 3), nrow = 2, byrow = TRUE)
 # simulate a data set with declared parameters.
 data <- rbind(simulISR(proportion[1] * 100, pi[1], mu[1, ]),
-simulISR(proportion[2] * 100, pi[2], mu[2, ]))
+              simulISR(proportion[2] * 100, pi[2], mu[2, ]))
 pval <- khi2(data, proportion, mu, pi)
 
 }
