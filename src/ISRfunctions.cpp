@@ -14,7 +14,7 @@ using namespace std;
  * These values are useful to compute the probability according to an ISR.
  * See appendix A and B: https://hal.archives-ouvertes.fr/hal-00441209v3/document
  */
-vector<int> comparaison(vector<int> const &x, vector<int> const &y, vector<int> const &mu)
+vector<int> comparaison(Rank const &x, Rank const &y, Rank const &mu)
 {
     int const m(mu.size());
     int gplus(0), gmoins(0), gjmoinsb(0), gjplusb(0), index(0);
@@ -81,7 +81,7 @@ vector<int> comparaison(vector<int> const &x, vector<int> const &y, vector<int> 
 }
 
 /** Compute log p(x|y;mu,pi) according to an ISR model */
-double lnProbaCond(vector<int> const &x, vector<int> const &y, vector<int> const &mu, double const &p)
+double lnProbaCond(Rank const &x, Rank const &y, Rank const &mu, double const &p)
 {
     vector<int> comp(2);
     comp = comparaison(x, y, mu);
@@ -102,17 +102,17 @@ double lnProbaCond(vector<int> const &x, vector<int> const &y, vector<int> const
     return comp[1] * log(p) + (comp[0] - comp[1]) * log(1. - p);
 }
 
-double probaCond(vector<int> const &x, vector<int> const &y, vector<int> const &mu, double const &p)
+double probaCond(Rank const &x, Rank const &y, Rank const &mu, double const &p)
 {
     return exp(lnProbaCond(x, y, mu, p));
 }
 
 
 // Simulate n samples from an ISR(mu, p)
-vector<vector<int>> simulISR(int const &n, int const &m, vector<int> const &mu, double const &p)
+vector<Rank> simulISR(int const &n, int const &m, Rank const &mu, double const &p)
 {
-    vector<vector<int>> simul(n, vector<int>(m, 0));
-    vector<int> s(m), rgTemp(m);
+    vector<Rank> simul(n, Rank(m, 0));
+    Rank s(m), rgTemp(m);
     int l;
     double correct;
     bool compar, avance;
@@ -153,7 +153,7 @@ vector<vector<int>> simulISR(int const &n, int const &m, vector<int> const &mu, 
 
 
 // Simulate n samples from a mixture of ISR(mu, p)
-void simulMixtureISR(vector<vector<int>> &simul, vector<vector<int>> const &mu,
+void simulMixtureISR(vector<Rank> &simul, vector<Rank> const &mu,
                      vector<double> const &p, vector<double> const &prop)
 {
     int classe = 0;
@@ -174,12 +174,13 @@ void simulMixtureISR(vector<vector<int>> &simul, vector<vector<int>> const &mu,
     }
 }
 
-double proba(vector<vector<int>> const &x, vector<vector<int>> const &mu, vector<double> const &pi)
+double proba(vector<Rank> const &x, vector<Rank> const &mu, vector<double> const &pi)
 {
     int d = pi.size();
     vector<double> probaDim(d, 0);
     double finalProba;
-    vector<int> tabFact, listeY, y;
+    vector<int> tabFact, listeY;
+    Rank y;
     vector<int> m(mu.size());
     map<int, vector<int>> diffDim;
 

@@ -13,6 +13,8 @@
 #include <utility>
 #include <Rmath.h>
 
+#include "Typedef.h"
+
 
 /**r random number generator, code from : http://gallery.rcpp.org/articles/r-function-from-c++/
  * generate an integer between 0 and n - 1
@@ -30,10 +32,10 @@ void Rshuffle(RandomAccessIterator first, RandomAccessIterator last)
 }
 
 /** Initialize a rank as 1 2 ... m */
-void initializeRank(std::vector<int> &rank);
+void initializeRank(Rank &rank);
 
 /** Initialize a rank as a random rank */
-void randomRank(std::vector<int> &rank);
+void randomRank(Rank &rank);
 
 /**
  * search the position of i in x
@@ -41,7 +43,7 @@ void randomRank(std::vector<int> &rank);
  * @param i integer which we want the position in x
  * @return the position of i in x
  */
-int positionRank(std::vector<int> const &x, int const &i);
+int positionRank(Rank const &x, int const &i);
 
 /**
  * factorial function (recursive)
@@ -64,7 +66,7 @@ std::vector<int> tab_factorial(int const &m);
  * @param  tabFactorial \see tab_factorial
  * @return index
  */
-int rank2index(std::vector<int> const &rank, std::vector<int> const &tabFactorial);
+int rank2index(Rank const &rank, std::vector<int> const &tabFactorial);
 
 /**
  *-----------rank->index------------
@@ -73,7 +75,7 @@ int rank2index(std::vector<int> const &rank, std::vector<int> const &tabFactoria
  * @param  tabFactorial @see tab_factorial
  * @return vector of index
  */
-std::vector<int> rank2index(std::vector<std::vector<int>> const &rankList, std::vector<int> const &tabFact);
+std::vector<int> rank2index(std::vector<Rank> const &rankList, std::vector<int> const &tabFact);
 
 /**
  * conversion index->rank
@@ -86,9 +88,9 @@ std::vector<int> rank2index(std::vector<std::vector<int>> const &rankList, std::
  *
  * m! | m m-1 ... 1
  */
-std::vector<int> index2rank(int index, int const &m, std::vector<int> const &tabFactorial);
-std::vector<int> index2rankNoCheck(int index, int const &m, std::vector<int> const &tabFactorial);
-std::vector<int> index2rank(int index, int const &m);
+Rank index2rank(int index, int const &m, std::vector<int> const &tabFactorial);
+Rank index2rankNoCheck(int index, int const &m, std::vector<int> const &tabFactorial);
+Rank index2rank(int index, int const &m);
 
 /**
  * Return a vector containing the index of order of presentation y for which we have to compute probability
@@ -105,7 +107,7 @@ std::vector<int> listIndexOrderOfPresentation(int const &m, std::vector<int> con
  * invert a rank (1 2 3 become 3 2 1)
  * @param rank rank to invert
  */
-void invertRank(std::vector<int> &rank);
+void invertRank(Rank &rank);
 
 /**
  * Compute the BIC
@@ -129,7 +131,7 @@ double computeRandIndex(std::vector<int> const &z1, std::vector<int> const &z2);
  * @param x a rank
  * @return a rank: the ranking representation of x
  */
-std::vector<int> ordering2ranking(std::vector<int> const &x);
+Rank ordering2ranking(Rank const &x);
 
 /**
  *  Compute the Kendall's distance between 2 ranks (in ordering representation)
@@ -140,7 +142,7 @@ std::vector<int> ordering2ranking(std::vector<int> const &x);
  * @param y a rank in ordering representation of the same size than x
  * @return an integer, the kendall distance between x and y
  */
-int distanceKendall(std::vector<int> const &x, std::vector<int> const &y);
+int distanceKendall(Rank const &x, Rank const &y);
 
 /**
  * Sort the parameters such that the first cluster is the cluster with the more little index of mu
@@ -156,8 +158,8 @@ int distanceKendall(std::vector<int> const &x, std::vector<int> const &y);
  * listeMu, p, prop and z are modified if necessary
  *
  */
-void tri_insertionMulti(std::vector<int> &mu, std::vector<double> &prop, std::vector<std::vector<double>> &p,
-                        std::vector<std::vector<std::vector<int>>> &listeMu, std::vector<int> &z, int const &g,
+void tri_insertionMulti(Rank &mu, std::vector<double> &prop, std::vector<std::vector<double>> &p,
+                        std::vector<std::vector<Rank>> &listeMu, std::vector<int> &z, int const &g,
                         int const &d, int const &n);
 
 /**
@@ -165,8 +167,7 @@ void tri_insertionMulti(std::vector<int> &mu, std::vector<double> &prop, std::ve
  * @param rankList data
  * @return a pair with the unique rank and the frequency of each unique rank
  */
-std::pair<std::vector<std::vector<std::vector<int>>>, std::vector<int>>
-freqMulti(std::vector<std::vector<std::vector<int>>> const &rankList);
+std::pair<std::vector<std::vector<Rank>>, std::vector<int>> freqMulti(std::vector<std::vector<Rank>> const &rankList);
 
 
 /**
@@ -200,7 +201,7 @@ Eigen::ArrayXd normalizeLogProba(Eigen::ArrayXd &logProba);
 void normalizeLogProbaInPlace(Eigen::ArrayXd &logProba);
 
 /**
- * Sample accortoding to a multinomial with proba
+ * Sample according to a multinomial with given probabilities
  *
  * @param proba vector of probabilities of each element
  */

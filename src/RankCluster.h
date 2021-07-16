@@ -4,7 +4,7 @@
 /* @file RankCluster.h
  * @brief Implementation of methods of the class @c RankCluster
  * See https://hal.archives-ouvertes.fr/hal-00441209v3/document and
- * https://www.sciencedirect.com/science/article/abs/pii/S0167947312003118 for mathematical background
+ * https://hal.inria.fr/hal-00743384/document for mathematical background
  */
 //#include <RcppEigen.h>
 #include <vector>
@@ -14,21 +14,8 @@
 
 #include "ISRfunctions.h"
 #include "functions.h"
+#include "Typedef.h"
 
-// create your own data structures
-struct PartialRank
-{
-    // rank
-    std::vector<int> rank;
-    // order of presentation
-    std::vector<int> y;
-    // if true, the rank contains partial or ties
-    bool isPartial;
-    // missing element of the rank or ties
-    std::vector<std::vector<int>> missingData;
-    // index of the 0 or ties
-    std::vector<std::vector<int>> missingIndex;
-};
 
 struct SEMparameters
 {
@@ -68,11 +55,11 @@ struct OutParameters
     std::vector<std::vector<std::vector<double>>> partialRankScore;
 
     // algorithm initialization
-    std::vector<std::vector<std::vector<int>>> initialPartialRank;
+    std::vector<std::vector<Rank>> initialPartialRank;
     std::vector<std::vector<double>> initialP;
     std::vector<int> initialZ;
     std::vector<double> initialProportion;
-    std::vector<std::vector<std::vector<int>>> initialMu;
+    std::vector<std::vector<Rank>> initialMu;
 
     // distance between parameters
     std::vector<std::vector<double>> distProp;
@@ -115,11 +102,11 @@ public:
     inline std::vector<int> m() const { return m_; }
     inline std::vector<int> z() const { return z_; }
     inline std::vector<std::vector<double>> p() const { return p_; }
-    inline std::vector<std::vector<std::vector<int>>> mu() const { return mu_; }
+    inline std::vector<std::vector<Rank>> mu() const { return mu_; }
     inline std::vector<double> proportion() const { return proportion_; }
     inline std::vector<std::vector<int>> indexPartialData() const { return indexPartialData_; }
     inline std::vector<std::vector<PartialRank>> data() const { return data_; }
-    inline std::vector<int> rank(int dim, int index) const { return data_[dim][index].rank; }
+    inline std::vector<int> rank(int dim, int index) const { return data_[dim][index].x; }
     inline bool dataOk() const { return dataOk_; }
     inline bool convergence() const { return convergence_; }
     inline bool partial() const { return partial_; }
@@ -134,10 +121,10 @@ public:
     inline double bic() const { return output_.bic; }
     inline double icl() const { return output_.icl; }
     inline double L() const { return output_.L; }
-    inline std::vector<std::vector<std::vector<int>>> initialPartialRank() const { return output_.initialPartialRank; }
+    inline std::vector<std::vector<Rank>> initialPartialRank() const { return output_.initialPartialRank; }
     inline std::vector<std::vector<double>> initialP() const { return output_.initialP; }
     inline std::vector<int> initialZ() const { return output_.initialZ; }
-    inline std::vector<std::vector<std::vector<int>>> initialMu() const { return output_.initialMu; }
+    inline std::vector<std::vector<Rank>> initialMu() const { return output_.initialMu; }
     inline std::vector<double> initialProportion() const { return output_.initialProportion; }
     inline std::vector<std::vector<double>> distProp() const { return output_.distProp; }
     inline std::vector<std::vector<std::vector<double>>> distP() const { return output_.distP; }
@@ -209,7 +196,7 @@ protected:
      * @param resP pi for every iterations of the SEM
      * @param resProp proportion for every iterations of the SEM
      */
-    void likelihood(std::vector<std::vector<std::vector<std::vector<int>>>> &listeMu,
+    void likelihood(std::vector<std::vector<std::vector<Rank>>> &listeMu,
                     std::vector<std::vector<std::vector<double>>> &resP,
                     std::vector<std::vector<double>> &resProp);
 
@@ -223,20 +210,22 @@ protected:
      * @param probabilities probability of each individual at each iteration
      * @param score used for confidence in estimated partial rank
      */
-    double computeLikelihood(std::vector<std::vector<std::vector<int>>> const &mu,
+    double computeLikelihood(std::vector<std::vector<Rank>> const &mu,
                              std::vector<std::vector<double>> const &p,
                              std::vector<double> const &proportion, Eigen::ArrayXXd &tik,
-                             std::vector<std::vector<std::vector<int>>> &Y,
-                             std::vector<std::vector<std::vector<int>>> &xTemp, Eigen::ArrayXXd &probabilities,
+                             std::vector<std::vector<Rank>> &Y,
+                             std::vector<std::vector<Rank>> &xTemp, Eigen::ArrayXXd &probabilities,
                              std::vector<std::vector<std::vector<double>>> &score);
 
     /** compute the final partition (z_) */
     void computePartition();
 
     /** compute distance between final parameters and each iteration parameters */
-    void computeDistance(std::vector<std::vector<double>> const &resProp, std::vector<std::vector<std::vector<double>>> const &resP,
-                         std::vector<std::vector<std::vector<std::vector<int>>>> const &resMu, std::vector<std::vector<int>> const &resZ,
-                         std::vector<std::vector<std::vector<std::vector<int>>>> const &resDonneesPartiel);
+    void computeDistance(std::vector<std::vector<double>> const &resProp,
+                         std::vector<std::vector<std::vector<double>>> const &resP,
+                         std::vector<std::vector<std::vector<Rank>>> const &resMu,
+                         std::vector<std::vector<int>> const &resZ,
+                         std::vector<std::vector<std::vector<Rank>>> const &resDonneesPartiel);
 
 private:
     // contains the size of rank for each dim
@@ -252,7 +241,7 @@ private:
     // estimated cluster of each individual
     std::vector<int> z_;
     // estimated rank parameter of each cluster:  mu_[dimension][cluster][indice]
-    std::vector<std::vector<std::vector<int>>> mu_;
+    std::vector<std::vector<Rank>> mu_;
     // estimated probability parameter of each cluster :  p_[dimension][cluster]
     std::vector<std::vector<double>> p_;
     // estimated proportion of the mixture model

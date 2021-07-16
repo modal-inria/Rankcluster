@@ -12,7 +12,8 @@
 using namespace std;
 
 
-double khi2(vector<vector<int>> const &data, vector<double> const &p, vector<double> const &prop, vector<vector<int>> const &mu, int const &nBoot)
+double khi2(vector<vector<int>> const &data, vector<double> const &p, vector<double> const &prop,
+            vector<vector<int>> const &mu, int const &nBoot)
 {
     int const g(prop.size()), m(data[0].size()), n(data.size());
     int factM(factorial(m));
@@ -84,7 +85,8 @@ double khi2(vector<vector<int>> const &data, vector<double> const &p, vector<dou
     return pvalue;
 }
 
-double khi2partial(vector<RankStruct> &data, vector<double> const &p, vector<double> const &prop, vector<vector<int>> const &mu, int const &nBoot)
+double khi2partial(vector<RankStruct> &data, vector<double> const &p, vector<double> const &prop,
+                   vector<vector<int>> const &mu, int const &nBoot)
 {
     int const g(prop.size()), m(data[0].rank.size()), n(data.size());
     int factM(factorial(m));
@@ -257,7 +259,8 @@ double khi2partial(vector<RankStruct> &data, vector<double> const &p, vector<dou
 }
 
 //---------------------------- divergence de kullback
-void updateD(double &divKL, vector<int> &index, vector<vector<vector<double>>> const &p1, vector<vector<vector<double>>> const &p2, int const &d, int const &g,
+void updateD(double &divKL, vector<int> &index, vector<vector<vector<double>>> const &p1,
+             vector<vector<vector<double>>> const &p2, int const &d, int const &g,
              vector<double> const &proportion1, vector<double> const &proportion2)
 {
     double p1b(0), p2b(0);
@@ -293,8 +296,9 @@ void updateIndex(vector<int> &index, int i, vector<int> const &factm, bool &stop
     }
 }
 
-void computePQ(vector<vector<vector<double>>> &p, vector<vector<vector<double>>> &q, vector<vector<vector<int>>> const &mu1,
-               vector<vector<vector<int>>> const &mu2, vector<vector<double>> const &p1, vector<vector<double>> const &p2, vector<int> const &m, int d, int g)
+void computePQ(vector<vector<vector<double>>> &p, vector<vector<vector<double>>> &q,
+               vector<vector<vector<int>>> const &mu1, vector<vector<vector<int>>> const &mu2,
+               vector<vector<double>> const &p1, vector<vector<double>> const &p2, vector<int> const &m, int d, int g)
 {
     bool isDimDiff(true);
     int n = factorial(m[0]);
@@ -344,7 +348,8 @@ void computePQ(vector<vector<vector<double>>> &p, vector<vector<vector<double>>>
 }
 
 double divKL(vector<int> const &m, vector<vector<vector<int>>> const &mu1, vector<vector<vector<int>>> const &mu2,
-             vector<vector<double>> const &p1, vector<vector<double>> const &p2, vector<double> const &proportion1, vector<double> const &proportion2)
+             vector<vector<double>> const &p1, vector<vector<double>> const &p2,
+             vector<double> const &proportion1, vector<double> const &proportion2)
 {
     double divKL(0);
     int const d = m.size();

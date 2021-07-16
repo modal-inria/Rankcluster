@@ -25,7 +25,8 @@ struct RankStruct
  * @param nBoot number of iteration for estimation
  * @return estimated pvalue of khi2 adequation test
  */
-double khi2(std::vector<std::vector<int>> const &data, std::vector<double> const &p, std::vector<double> const &prop, std::vector<std::vector<int>> const &mu, int const &nBoot);
+double khi2(std::vector<std::vector<int>> const &data, std::vector<double> const &p, std::vector<double> const &prop,
+            std::vector<std::vector<int>> const &mu, int const &nBoot);
 
 /**
  * khi2 adequation test for partial rank
@@ -36,7 +37,8 @@ double khi2(std::vector<std::vector<int>> const &data, std::vector<double> const
  * @param nBoot number of iteration for estimation
  * @return estimated pvalue of khi2 adequation test
  */
-double khi2partial(std::vector<RankStruct> &data, std::vector<double> const &p, std::vector<double> const &prop, std::vector<std::vector<int>> const &mu, int const &nBoot);
+double khi2partial(std::vector<RankStruct> &data, std::vector<double> const &p, std::vector<double> const &prop,
+                   std::vector<std::vector<int>> const &mu, int const &nBoot);
 
 /**
  * Updating the Kullback-Leibler divergence
@@ -48,7 +50,8 @@ double khi2partial(std::vector<RankStruct> &data, std::vector<double> const &p, 
  * @param proportion1 proportion of the mixture of the first set of parameters
  * @param proportion2 proportion of the mixture of the second set of parameters
  */
-void updateD(double &divKL, std::vector<int> &index, std::vector<std::vector<std::vector<double>>> const &p1, std::vector<std::vector<std::vector<double>>> const &p2, int const &d, int const &g,
+void updateD(double &divKL, std::vector<int> &index, std::vector<std::vector<std::vector<double>>> const &p1,
+             std::vector<std::vector<std::vector<double>>> const &p2, int const &d, int const &g,
              std::vector<double> const &proportion1, std::vector<double> const &proportion2);
 /**
  * Recursive function for updating the index for compute probabilities in kullback
@@ -72,8 +75,10 @@ void updateIndex(std::vector<int> &index, int i, std::vector<int> const &factm, 
  * @param d dimension
  * @param g number of cluster
  */
-void computePQ(std::vector<std::vector<std::vector<double>>> &p, std::vector<std::vector<std::vector<double>>> &q, std::vector<std::vector<std::vector<int>>> const &mu1,
-               std::vector<std::vector<std::vector<int>>> const &mu2, std::vector<std::vector<double>> const &p1, std::vector<std::vector<double>> const &p2, std::vector<int> const &m, int d, int g);
+void computePQ(std::vector<std::vector<std::vector<double>>> &p, std::vector<std::vector<std::vector<double>>> &q,
+               std::vector<std::vector<std::vector<int>>> const &mu1,
+               std::vector<std::vector<std::vector<int>>> const &mu2, std::vector<std::vector<double>> const &p1,
+               std::vector<std::vector<double>> const &p2, std::vector<int> const &m, int d, int g);
 
 /**
  * Compute the Kullback-Leibler divergence between the first and the second set of parameters
@@ -86,7 +91,9 @@ void computePQ(std::vector<std::vector<std::vector<double>>> &p, std::vector<std
  * @param proportion2 proportion of the mixture of the second set of parameters
  * @return Kullback-Leibler divergence
  */
-double divKL(std::vector<int> const &m, std::vector<std::vector<std::vector<int>>> const &mu1, std::vector<std::vector<std::vector<int>>> const &mu2,
-             std::vector<std::vector<double>> const &p1, std::vector<std::vector<double>> const &p2, std::vector<double> const &proportion1, std::vector<double> const &proportion2);
+double divKL(std::vector<int> const &m, std::vector<std::vector<std::vector<int>>> const &mu1,
+             std::vector<std::vector<std::vector<int>>> const &mu2, std::vector<std::vector<double>> const &p1,
+             std::vector<std::vector<double>> const &p2, std::vector<double> const &proportion1,
+             std::vector<double> const &proportion2);
 
 #endif /* TEST_H_ */

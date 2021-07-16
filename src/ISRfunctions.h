@@ -6,6 +6,7 @@
 #define ISR_FUNCTIONS_H_
 
 #include <vector>
+#include "Typedef.h"
 
 
 /**
@@ -19,7 +20,7 @@
  * G(x,y,mu)= total number of good comparison according to mu in the insertion sorting algorithm
  *
  */
-std::vector<int> comparaison(std::vector<int> const &x, std::vector<int> const &y, std::vector<int> const &mu);
+std::vector<int> comparaison(Rank const &x, Rank const &y, Rank const &mu);
 
 /**
  * compute the conditional probability  p(x|y;mu,p)
@@ -29,8 +30,8 @@ std::vector<int> comparaison(std::vector<int> const &x, std::vector<int> const &
  * @param p probability of making a good comparison
  * @return p(x|y;mu,p)
  */
-double probaCond(std::vector<int> const &x, std::vector<int> const &y, std::vector<int> const &mu, double const &p);
-double lnProbaCond(std::vector<int> const &x, std::vector<int> const &y, std::vector<int> const &mu, double const &p);
+double probaCond(Rank const &x, Rank const &y, Rank const &mu, double const &p);
+double lnProbaCond(Rank const &x, Rank const &y, Rank const &mu, double const &p);
 
 
 /**
@@ -40,7 +41,7 @@ double lnProbaCond(std::vector<int> const &x, std::vector<int> const &y, std::ve
  * @param pi dispersion parameter for each dimension
  * @return p(x;mu,pi)
  */
-double proba(std::vector<std::vector<int>> const &x, std::vector<std::vector<int>> const &mu, std::vector<double> const &pi);
+double proba(std::vector<Rank> const &x, std::vector<Rank> const &mu, std::vector<double> const &pi);
 
 
 /**
@@ -51,7 +52,7 @@ double proba(std::vector<std::vector<int>> const &x, std::vector<std::vector<int
  * @param p probability of a good comparison
  * @return a n-sample of ISR(mu,p)
  */
-std::vector<std::vector<int>> simulISR(int const &n, int const &m, std::vector<int> const &mu, double const &p);
+std::vector<Rank> simulISR(int const &n, int const &m, Rank const &mu, double const &p);
 
 /**
  * Simulate a sample of mixture of ISR
@@ -60,7 +61,8 @@ std::vector<std::vector<int>> simulISR(int const &n, int const &m, std::vector<i
  * @param p dispersion parameter: probability of a good comparison
  * @param prop proportion of the mixture
  */
-void simulMixtureISR(std::vector<std::vector<int>> &simul, std::vector<std::vector<int>> const &mu, std::vector<double> const &p, std::vector<double> const &prop);
+void simulMixtureISR(std::vector<Rank> &simul, std::vector<Rank> const &mu, std::vector<double> const &p,
+                     std::vector<double> const &prop);
 
 
 #endif /* ISR_FUNCTIONS_H_ */
