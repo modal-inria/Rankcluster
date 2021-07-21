@@ -697,7 +697,7 @@ void RankCluster::simuM(int indexDim, int indCl)
  **********************************************************************************************/
 
 typedef struct ListeMu ListeMu;
-void RankCluster::likelihood(vector<vector<vector<Rank>>> &listeMu, vector<vector<vector<double>>> &resP,
+void RankCluster::likelihood(vector<vector<vector<Rank>>> &resMu, vector<vector<vector<double>>> &resP,
                              vector<vector<double>> &resProp)
 {
     //we put the same mu together and make the mean of their parameters
@@ -721,7 +721,7 @@ void RankCluster::likelihood(vector<vector<vector<Rank>>> &listeMu, vector<vecto
     ListeMu *next = 0;
     currMu->compteur = 1;
     currMu->suivant = 0;
-    currMu->rangComplet = listeMu[0];
+    currMu->rangComplet = resMu[0];
     currMu->p = resP[0];
     currMu->prop = resProp[0];
 
@@ -739,7 +739,7 @@ void RankCluster::likelihood(vector<vector<vector<Rank>>> &listeMu, vector<vecto
                 for (int k(0); k < g_; k++)
                 {
                     for (int i(0); i < m_[J]; i++)
-                        if (currMu->rangComplet[J][k][i] != listeMu[j][J][k][i])
+                        if (currMu->rangComplet[J][k][i] != resMu[j][J][k][i])
                         {
                             egaliteRang = false;
                             break;
@@ -771,7 +771,7 @@ void RankCluster::likelihood(vector<vector<vector<Rank>>> &listeMu, vector<vecto
                     currMu = next;
                     currMu->compteur = 1;
                     currMu->suivant = 0;
-                    currMu->rangComplet = listeMu[j];
+                    currMu->rangComplet = resMu[j];
                     currMu->prop = resProp[j];
                     currMu->p = resP[j];
                 }
@@ -785,7 +785,7 @@ void RankCluster::likelihood(vector<vector<vector<Rank>>> &listeMu, vector<vecto
     //cout<<"Temps regroupement mu: "<<(double) (t2-t1)/CLOCKS_PER_SEC<<"s"<<endl;
     int compteur(0);
 
-    //calcul logvraisemblance
+    // compute log-likelihood
     //if(parameter_.verbose)
     //cout<<"Number of reference rank which must compute the log-likelihood: "<<nbMu<<endl;
 
@@ -829,7 +829,7 @@ void RankCluster::likelihood(vector<vector<vector<Rank>>> &listeMu, vector<vecto
 
         if (L > Llast)
         {
-            //the current mu has a better loglikelihood, we save the parameter
+            //the current mu has a better log-likelihood, we save the parameter
             Llast = L;
             mu_ = currMu->rangComplet;
             p_ = currMu->p;
@@ -880,7 +880,7 @@ void RankCluster::likelihood(vector<vector<vector<Rank>>> &listeMu, vector<vecto
 
     if (L > Llast)
     {
-        //the current mu has a better loglikelihood, we save the parameter
+        //the current mu has a better log-likelihood, we save the parameter
         Llast = L;
         mu_ = currMu->rangComplet;
         p_ = currMu->p;

@@ -171,7 +171,7 @@ protected:
      */
     void gibbsY(int indexDim);
 
-    /** Compute tik for the individual ind*/
+    /** Compute tik (probability to belong to the different clusters) for the individual ind*/
     Eigen::ArrayXd computeTik(int const ind);
 
     /** simulate partition using the current estimated parameters */
@@ -192,11 +192,11 @@ protected:
     void simuM(int indexDim, int indCl);
 
     /** likelihood step
-     * @param listeMu mu for every iterations of the SEM
-     * @param resP pi for every iterations of the SEM
-     * @param resProp proportion for every iterations of the SEM
+     * @param resMu mu for every iteration of the SEM
+     * @param resP pi for every iteration of the SEM
+     * @param resProp proportion for every iteration of the SEM
      */
-    void likelihood(std::vector<std::vector<std::vector<Rank>>> &listeMu,
+    void likelihood(std::vector<std::vector<std::vector<Rank>>> &resMu,
                     std::vector<std::vector<std::vector<double>>> &resP,
                     std::vector<std::vector<double>> &resProp);
 
@@ -240,7 +240,7 @@ private:
     std::vector<std::vector<PartialRank>> data_;
     // estimated cluster of each individual
     std::vector<int> z_;
-    // estimated rank parameter of each cluster:  mu_[dimension][cluster][indice]
+    // estimated rank parameter of each cluster:  mu_[dimension][cluster]
     std::vector<std::vector<Rank>> mu_;
     // estimated probability parameter of each cluster :  p_[dimension][cluster]
     std::vector<std::vector<double>> p_;
