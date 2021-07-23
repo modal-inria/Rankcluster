@@ -175,7 +175,7 @@ protected:
     Eigen::ArrayXd computeTik(int const ind);
 
     /** simulate partition using the current estimated parameters */
-    void zSimulation();
+    void sampleZ();
 
     /** univariate gibbs sampler for partial rank estimation
      * @param indexDim index of the dimension (<d_)

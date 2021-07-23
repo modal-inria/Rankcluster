@@ -4,8 +4,6 @@
  * https://hal.inria.fr/hal-00743384/document for mathematical background
  */
 
-#include "RankCluster.h"
-
 #include <cstdlib>
 #include <algorithm>
 #include <string>
@@ -15,6 +13,8 @@
 #include <iostream>
 #include <ctime>
 #include <Rmath.h>
+
+#include "RankCluster.h"
 
 using namespace std;
 using namespace Eigen;
@@ -354,8 +354,7 @@ void RankCluster::SEstep()
     for (int dim = 0; dim < d_; dim++)
         gibbsY(dim);
 
-    // simulation of z
-    zSimulation();
+    sampleZ();
 
     // simulation of partial rank for each dimension
     for (int dim = 0; dim < d_; dim++)
@@ -386,7 +385,7 @@ void RankCluster::gibbsY(int indexDim)
         {
             for (int k(0); k < m_[indexDim] - 1; k++)
             {
-                // new y to test (old y with inversion of 2 adjacents elements)
+                // new y to test (old y with inversion of 2 adjacent elements)
                 yCandidate = y;
                 yCandidate[k] = y[k + 1];
                 yCandidate[k + 1] = y[k];
@@ -427,7 +426,8 @@ Eigen::ArrayXd RankCluster::computeTik(int const ind)
     return tik;
 }
 
-void RankCluster::zSimulation()
+/* z follow a multinomial law of parameter tik */
+void RankCluster::sampleZ()
 {
     if (g_ != 1)
     {
@@ -438,7 +438,6 @@ void RankCluster::zSimulation()
             // computation of the probability to belong to each cluster
             tik = computeTik(ind);
 
-            // z follow a multinomial law of parameter tik
             z_[ind] = sampleMultinomial(tik);
         }
     }
@@ -460,7 +459,7 @@ void RankCluster::gibbsX(int indexDim)
             // Gibbs algorithm
             Rank x(m_[indexDim]), xCurrent(m_[indexDim]), xCandidate(m_[indexDim]);
 
-            // initialisation de mu et p pour Gibbs
+            // mu and log-probability initialization
             x = data_[indexDim][ind].x;
             xCurrent = x;
             logPcurrent = lnProbaCond(xCurrent, data_[indexDim][ind].y, mu_[indexDim][z_[ind]], p_[indexDim][z_[ind]]);
@@ -471,7 +470,7 @@ void RankCluster::gibbsX(int indexDim)
                 {
                     for (int i = 0; i < (int)data_[indexDim][ind].missingIndex[ii].size() - 1; i++)
                     {
-                        // nouveau x à tester, ancien x auquel on inverse 2 éléments partiels
+                        // new rank to test: old rank where 2 partial elements are exchanged
                         xCandidate = x;
                         xCandidate[data_[indexDim][ind].missingIndex[ii][i]] = x[data_[indexDim][ind].missingIndex[ii][i + 1]];
                         xCandidate[data_[indexDim][ind].missingIndex[ii][i + 1]] = x[data_[indexDim][ind].missingIndex[ii][i]];
@@ -480,7 +479,7 @@ void RankCluster::gibbsX(int indexDim)
                                                     p_[indexDim][z_[ind]]);
 
                         bool changeAccepted = acceptChange(logPcurrent, logPcandidate);
-                        if (changeAccepted) //change acceptation
+                        if (changeAccepted)
                         {
                             x = xCandidate;
                             logPcurrent = logPcandidate;
