@@ -49,7 +49,7 @@ RankCluster::RankCluster(std::vector<std::vector<int>> const &X, int g,
     // convert data in the good notation and create information about missing and partial
     conversion2data(X);
     //  }
-    //  catch(string const& chaine)
+    //  catch(string const& errorString)
     //    {dataOk_=false;}
 }
 
@@ -70,7 +70,7 @@ RankCluster::RankCluster(vector<vector<int>> const &X, vector<int> const &m, SEM
     // convert data in the good notation and create information about missing and partial
     conversion2data(X);
     //  }
-    //  catch(string const& chaine)
+    //  catch(string const& errorString)
     //    {dataOk_=false;}
 }
 
@@ -516,178 +516,177 @@ void RankCluster::Mstep()
     // simulation of mu for each dim and cluster
     for (int dim(0); dim < d_; dim++)
     {
-        for (int numCl(0); numCl < g_; numCl++)
-            simuM(dim, numCl);
+        for (int classNumber(0); classNumber < g_; classNumber++)
+            estimateMuP(dim, classNumber);
     }
 }
 
-void RankCluster::simuM(int indexDim, int indCl)
+
+
+void RankCluster::estimateMuP(int indexDim, int classNumber)
 {
-    double logPcurrent(0), logPcandidate(0);
-    double s1(0), lim(-numeric_limits<double>::max());
-    vector<int> tabFact(m_[indexDim]), comp(2);
+    vector<int> tabFact = tab_factorial(m_[indexDim]);
 
-    tabFact = tab_factorial(m_[indexDim]);
-
+    // vector to store results of each iteration
     vector<Rank> MU(parameter_.nGibbsM[indexDim]);
-    vector<double> P(parameter_.nGibbsM[indexDim], 0), L(parameter_.nGibbsM[indexDim], 0);
-    int indMu, compteur(0);
-    int tailleComposante(0);
+    vector<double> P(parameter_.nGibbsM[indexDim], 0.), L(parameter_.nGibbsM[indexDim], 0.);
 
-    for (int i(0); i < n_; i++)
-        if (z_[i] == indCl)
-            tailleComposante++;
+    // elements will be grouped per mu. If the new mu is the same, we do not recompute P and likelihood
+    map<int, vector<double>> resPerMu;
+    map<int, vector<double>>::iterator iteratorResPerMu;
+    int indMu;
 
-    vector<double> G(tailleComposante), A_G(tailleComposante);
+    // initialization of mu
+    Rank mu = mu_[indexDim][classNumber];
 
-    map<int, vector<double>> muTeste;
-    map<int, vector<double>>::iterator itmapmu;
-
-    //Algorithme de Gibbs
-    Rank mu(m_[indexDim]), muCurrent(m_[indexDim]), muCandidate(m_[indexDim]);
-
-    //initialization of mu  and p
-    mu = mu_[indexDim][indCl];
-    muCurrent = mu;
-    logPcurrent = 0;
-
-    //initial proba
+    // initial completed log-likelihood
+    double logPcurrent = 0.;
+    int sizeCluster = 0.;
     for (int ind(0); ind < n_; ind++)
     {
-        if (z_[ind] == indCl)
+        if (z_[ind] == classNumber)
         {
-            logPcurrent += lnProbaCond(data_[indexDim][ind].x, data_[indexDim][ind].y, muCurrent, p_[indexDim][indCl]);
+            logPcurrent += lnProbaCond(data_[indexDim][ind].x, data_[indexDim][ind].y, mu, p_[indexDim][classNumber]);
+            sizeCluster++;
         }
     }
 
+    // Gibbs algorithm
     for (int iter(0); iter < parameter_.nGibbsM[indexDim]; iter++)
     {
-        //new mu
-        for (int k(0); k < m_[indexDim] - 1; k++)
-        {
-            //new mu to test
-            muCandidate = mu;
-            muCandidate[k] = mu[k + 1];
-            muCandidate[k + 1] = mu[k];
-
-            logPcandidate = 0;
-
-            //new proba
-            for (int ind(0); ind < n_; ind++)
-            {
-                if (z_[ind] == indCl)
-                {
-                    logPcandidate += lnProbaCond(data_[indexDim][ind].x, data_[indexDim][ind].y,
-                                                 muCandidate, p_[indexDim][indCl]);
-                }
-            }
-
-            // //p1+p2
-            // //ln(p1+p2)~ln(
-            // long double diffln;
-            // if (lnp1 > lnp2)
-            // {
-            //     diffln = lnp2 - lnp1;
-            //     lnp1Plusp2 = lnp1;
-            // }
-            // else
-            // {
-            //     diffln = lnp1 - lnp2;
-            //     lnp1Plusp2 = lnp2;
-            // }
-
-            // //taylor development of order for estiamting lnp1Plusp2
-            // for (int ordre(1); ordre < 6; ordre++)
-            // {
-            //     //* (long double) std::pow((int) -1,(int) ordre-1)
-            //     int sign = 1;
-            //     if (ordre % 2 == 1)
-            //         sign = -1;
-            //     lnp1Plusp2 += (long double)sign / ordre * exp(diffln * ordre);
-            // }
-
-            // alea = (long double)runif(0., 1.);
-
-            // acceptation of change or not
-            bool changeAccepted = acceptChange(logPcurrent, logPcandidate);
-            if  (changeAccepted) //change acceptation
-            {
-                mu = muCandidate;
-                logPcurrent = logPcandidate;
-                muCurrent = mu;
-            }
-            else
-                mu = muCurrent;
-
-        } //fin parcours mu
+        simulateCandidateMuKJ(indexDim, classNumber, mu, logPcurrent);
         MU[iter] = mu;
 
-        //MAJ p
         indMu = rank2index(MU[iter], tabFact);
-        itmapmu = muTeste.find(indMu);
+        iteratorResPerMu = resPerMu.find(indMu);
 
-        if (itmapmu == muTeste.end()) //if we have already tested this mu, we do not redo computation
+        if (iteratorResPerMu == resPerMu.end()) //if we have already tested this mu, we do not redo computation
         {
-            s1 = 0;
-            compteur = 0;
-            //computation of G and A-G (number of good and bad comparison) for loglikelihood
-            double somG(0), somA_G(0);
-            for (int ind(0); ind < n_; ind++)
-            {
-                if (z_[ind] == indCl)
-                {
-                    comp = comparaison(data_[indexDim][ind].x, data_[indexDim][ind].y, MU[iter]);
-                    G[compteur] = comp[1];
-                    A_G[compteur] = comp[0] - comp[1];
-                    s1 += comp[0];
-                    somG += G[compteur];
-                    somA_G += A_G[compteur];
-                    compteur++;
-                }
-            }
+            double sumG(0.), sumA_G(0.);
+            vector<double> vecTemp(2);
 
-            P[iter] = somG / s1;
+            P[iter] = updatePKJ(indexDim, classNumber, sizeCluster, mu, sumG, sumA_G);
 
-            if ((P[iter] != 0) & (P[iter] != 1))
-            {
-                //L[iter]+=(G[i]*log(P[iter])+A_G[i]*log(1-P[iter]));
-                L[iter] = somG * log(P[iter]) + somA_G * log(1 - P[iter]);
-            }
-            else
-            {
-                if ((P[iter] == 0) & (somG == 0))
-                    L[iter] = 0;
-                else
-                {
-                    if ((P[iter] == 1) & (somA_G == 0))
-                        L[iter] = 0;
-                    else
-                        L[iter] = lim;
-                }
-            }
-            /*vector<double> stock(3);
-            stock[0]=somG;
-            stock[1]=somA_G;
-            stock[2]=s1;*/
-            vector<double> stock(2);
-            stock[0] = P[iter];
-            stock[1] = L[iter];
-            muTeste[indMu] = stock; //MAJ des mu test�
+            L[iter] = computeCompletedLoglikehoodKJ(P[iter], sumG, sumA_G);
+
+            vecTemp[0] = P[iter];
+            vecTemp[1] = L[iter];
+            resPerMu[indMu] = vecTemp;
         }
         else
         {
-            L[iter] = (itmapmu->second)[1];
-            P[iter] = (itmapmu->second)[0];
+            P[iter] = (iteratorResPerMu->second)[0];
+            L[iter] = (iteratorResPerMu->second)[1];
         }
 
-        p_[indexDim][indCl] = P[iter];
+        p_[indexDim][classNumber] = P[iter];
     }
 
+    // find the best (mu, p) according to completed log-likelihood
     int indice(max_element(L.begin(), L.end()) - L.begin());
-    p_[indexDim][indCl] = P[indice];
-    mu_[indexDim][indCl] = MU[indice];
+    p_[indexDim][classNumber] = P[indice];
+    mu_[indexDim][classNumber] = MU[indice];
 }
 
+
+void RankCluster::simulateCandidateMuKJ(int indexDim, int classNumber, Rank &mu, double &logPcurrent)
+{
+    Rank muCandidate, muCurrent(mu);  // ? is muCurrent necessary ?
+    double logPcandidate;
+
+    // new mu
+    for (int k(0); k < m_[indexDim] - 1; k++)
+    {
+        // new mu to test
+        muCandidate = mu;
+        muCandidate[k] = mu[k + 1];
+        muCandidate[k + 1] = mu[k];
+
+        logPcandidate = 0.;
+
+        // new probability
+        for (int ind(0); ind < n_; ind++)
+        {
+            if (z_[ind] == classNumber)
+            {
+                logPcandidate += lnProbaCond(data_[indexDim][ind].x, data_[indexDim][ind].y,
+                                             muCandidate, p_[indexDim][classNumber]);
+            }
+        }
+
+        // acceptation of change or not
+        bool changeAccepted = acceptChange(logPcurrent, logPcandidate);
+        if  (changeAccepted)
+        {
+            mu = muCandidate;
+            logPcurrent = logPcandidate;
+            muCurrent = mu;
+        }
+        else
+            mu = muCurrent;
+    }
+
+}
+
+/*
+ * sumG and sumA_G are modified to be used in computeCompletedLoglikehoodKJ function
+ */
+double RankCluster::updatePKJ(int indexDim, int classNumber, int nObsClass, Rank const& mu,
+                              double &sumG, double &sumA_G)
+{
+    double s1 = 0.;
+    vector<int> comp(2);
+
+    // computation of G and A-G (number of good and bad comparison) for log-likelihood
+    sumG = 0.;
+    sumA_G = 0.;
+
+    for (int ind(0); ind < n_; ind++)
+    {
+        if (z_[ind] == classNumber)
+        {
+            comp = comparaison(data_[indexDim][ind].x, data_[indexDim][ind].y, mu);
+
+            s1 += comp[0];
+            sumG += comp[1];
+            sumA_G += (comp[0] - comp[1]);
+        }
+    }
+
+    return sumG / s1;
+}
+
+/*
+ * Compute the completed log-likelihood to choose the best couple (mu_k^j, p_k^j).
+ *
+ * Maximizing the completed log-likelihood for a new couple (mu_k^j, p_k^j)
+ * (dimension j = indexDim, cluster k = classNumber)
+ * is equivalent to maximizing
+ * \sum_{individuals i of class k} P(x_i^k | y_i^k; mu_k^j, p_k^j) =
+ * \sum_{individuals i of class k} G_i^j log(p_k^j) + \sum_{individuals i of class k} A_i^j - G_i^j) log(1 - p_k^j)
+ */
+double RankCluster::computeCompletedLoglikehoodKJ(double p, double sumG, double sumA_G)
+{
+    double loglikelihood = 0.;
+    if ((p != 0) & (p != 1))
+    {
+        loglikelihood = sumG * log(p) + sumA_G * log(1 - p);
+    }
+    else
+    {
+        if ((p == 0) & (sumG == 0))
+            loglikelihood = 0.;
+        else
+        {
+            if ((p == 1) & (sumA_G == 0))
+                loglikelihood = 0.;
+            else
+                loglikelihood = -numeric_limits<double>::max();
+        }
+    }
+
+    return loglikelihood;
+}
 
 /**********************************************************************************************
  *
@@ -951,7 +950,7 @@ double RankCluster::computeLikelihood(vector<vector<Rank>> const &mu, vector<vec
         //cout<<"ind "<<ind<<endl;
         vector<Rank> y(d_), y2(d_), y1(d_);
         li = 0;
-        //algorithme de Gibbs pour simuler yi
+        //Gibbs Algorithm to sample yi
 
         //initialisation de y et p pour Gibbs
         y = yTemp;
@@ -1116,7 +1115,7 @@ double RankCluster::computeLikelihood(vector<vector<Rank>> const &mu, vector<vec
  */
 void RankCluster::computePartition()
 {
-    // TODO can be done directly with eigen
+    // TODO can be done directly with Eigen
     // see https://stackoverflow.com/questions/11430588/find-rowwise-maxcoeff-and-index-of-maxcoeff-in-eigen
 
     if (g_ > 1)
