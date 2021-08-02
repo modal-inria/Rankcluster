@@ -697,88 +697,25 @@ void RankCluster::selectBestParameters(vector<vector<vector<Rank>>> &resMu,
                                        vector<vector<vector<double>>> &resP,
                                        vector<vector<double>> &resProp)
 {
-    //we put the same mu together and make the mean of their parameters
-    //double t1,t2,tL(0);
+    // double t1, t2, tL(0);
 
-    //t1=clock();
+    // t1 = clock();
 
-    bool continuer(true), egaliteRang;
-
-    MuList *headMu = new MuList;
+    MuList *headMu = findDifferentMu(resMu, resP, resProp);
     MuList *currMu = headMu;
     MuList *next = 0;
-    currMu->freq = 1;
-    currMu->nextMu = 0;
-    currMu->fullRank = resMu[0];
-    currMu->p = resP[0];
-    currMu->prop = resProp[0];
 
-    int nbMu(1);
-
-    for (int j(1); j < (parameter_.maxIt - parameter_.burnAlgo); j++) //we see all the mu
-    {
-        continuer = true;
-        currMu = headMu;
-        while (continuer)
-        {
-            egaliteRang = true;
-            //look if the j-th mu is the same that the current mu
-            for (int J(0); J < d_; J++)
-                for (int k(0); k < g_; k++)
-                {
-                    for (int i(0); i < m_[J]; i++)
-                        if (currMu->fullRank[J][k][i] != resMu[j][J][k][i])
-                        {
-                            egaliteRang = false;
-                            break;
-                        }
-                }
-
-            if (egaliteRang)
-            {
-                //same mu
-                currMu->freq++;
-                //we sum the proportion and p
-                for (int compt1(0); compt1 < g_; compt1++)
-                {
-                    currMu->prop[compt1] += resProp[j][compt1];
-                    for (int compt2(0); compt2 < d_; compt2++)
-                        currMu->p[compt2][compt1] += resP[j][compt2][compt1];
-                }
-                continuer = false; //no need to check other mu of the struct
-            }
-            else
-            {
-                //not the same mu
-                if (currMu->nextMu == 0)
-                { //if the current mu is the last, we add thz j-th mu in the struct
-                    nbMu++;
-                    continuer = false;
-                    next = new MuList;
-                    currMu->nextMu = next;
-                    currMu = next;
-                    currMu->freq = 1;
-                    currMu->nextMu = 0;
-                    currMu->fullRank = resMu[j];
-                    currMu->prop = resProp[j];
-                    currMu->p = resP[j];
-                }
-                else
-                    currMu = currMu->nextMu; //we will test the next mu
-            }
-        }
-    }
-
-    //t2=clock();
-    //cout<<"Temps regroupement mu: "<<(double) (t2-t1)/CLOCKS_PER_SEC<<"s"<<endl;
+    // t2 = clock();
+    // cout << "Temps regroupement mu: " << (double) (t2-t1)/CLOCKS_PER_SEC << "s" << endl;
 
     // compute log-likelihood
-    //if(parameter_.verbose)
-    //cout<<"Number of reference rank which must compute the log-likelihood: "<<nbMu<<endl;
+    // if(parameter_.verbose)
+    //     cout << "Number of reference rank which must compute the log-likelihood: " << nbMu << endl;
 
     double Llast(-numeric_limits<double>::max()), L;
 
     vector<vector<Rank>> Y(d_, vector<Rank>(n_)), xPartialTemp(output_.initialPartialRank);
+
     vector<vector<vector<double>>> scoreTemp(output_.initialPartialRank.size());
     for (int ii = 0; ii < (int)scoreTemp.size(); ii++)
     {
@@ -789,35 +726,29 @@ void RankCluster::selectBestParameters(vector<vector<vector<Rank>>> &resMu,
         }
     }
 
-    //Now, we have the list of all the different Mu
+    // Now, we have the list of all the different Mu
     currMu = headMu;
     ArrayXXd tik(n_, g_);
-    ArrayXXd probabilities(n_, g_); //estimate probability for an individual to belong to each cluster
+    ArrayXXd probabilities(n_, g_); // estimate probability for an individual to belong to each cluster
     bool hasNextElement;
 
-    //for each mu, we will compute the associate log likelihood
+    // for each mu, we will compute the associated log likelihood
     do
     {
-        //if(parameter_.verbose)
-        //cout<<"*";
+        // if(parameter_.verbose)
+        //     cout<<"*";
 
-        //mean of the parameter
-        for (int compt1(0); compt1 < g_; compt1++)
-        {
-            currMu->prop[compt1] /= currMu->freq;
-            for (int compt2(0); compt2 < d_; compt2++)
-                currMu->p[compt2][compt1] /= currMu->freq;
-        }
+        meanParameters(currMu);
 
-        //compute the log likelihood
-        //t1=clock();
+        // compute the log likelihood
+        // t1 = clock();
         L = computeLikelihood(currMu->fullRank, currMu->p, currMu->prop, tik, Y, xPartialTemp, probabilities, scoreTemp);
-        //t2=clock();
-        //tL+=t2-t1;
+        // t2 = clock();
+        // tL += t2-t1;
 
         if (L > Llast)
         {
-            //the current mu has a better log-likelihood, we save the parameter
+            // the current mu has a better log-likelihood, we save the parameter
             Llast = L;
             mu_ = currMu->fullRank;
             p_ = currMu->p;
@@ -842,61 +773,102 @@ void RankCluster::selectBestParameters(vector<vector<vector<Rank>>> &resMu,
 
         next = currMu->nextMu;
         hasNextElement = (currMu->nextMu != 0);
-        delete currMu; //delete the mu
+        delete currMu; // delete the mu
         currMu = next;
     }
     while(hasNextElement);
 
-    //the last mu of the struct
-    //mean of the parameter
-    for (int compt1 = 0; compt1 < g_; compt1++)
+
+    // if(parameter_.verbose)
+    // {
+    //     cout << "Computing time for log-likelihood approximation: " << (double)tL / CLOCKS_PER_SEC
+    //          << "s (" << (double)tL / CLOCKS_PER_SEC / compteur << "s per mu)." << endl;
+    // }
+
+}
+
+
+MuList * RankCluster::findDifferentMu(vector<vector<vector<Rank>>> &resMu, vector<vector<vector<double>>> &resP,
+                                      vector<vector<double>> &resProp)
+{
+    bool notFound(true), equalRank;
+
+    MuList *headMu = new MuList;
+    MuList *currMu = headMu;
+    currMu->freq = 1;
+    currMu->nextMu = 0;
+    currMu->fullRank = resMu[0];
+    currMu->p = resP[0];
+    currMu->prop = resProp[0];
+
+    int nbMu(1);
+
+    for (int it(1); it < (parameter_.maxIt - parameter_.burnAlgo); it++) //we see all the mu
     {
-        currMu->prop[compt1] /= currMu->compteur;
-        for (int compt2 = 0; compt2 < d_; compt2++)
-            currMu->p[compt2][compt1] /= currMu->compteur;
-    }
-
-    //if(parameter_.verbose)
-    //cout<<"*"<<endl;
-
-    //compute log likelihood
-    //t1=clock();
-    L = computeLikelihood(currMu->rangComplet, currMu->p, currMu->prop, tik, Y, xPartialTemp, probabilities, scoreTemp);
-
-    //t2=clock();
-    //tL+=t2-t1;
-    compteur++;
-
-    if (L > Llast)
-    {
-        //the current mu has a better log-likelihood, we save the parameter
-        Llast = L;
-        mu_ = currMu->rangComplet;
-        p_ = currMu->p;
-        proportion_ = currMu->prop;
-        output_.tik = tik;
-        output_.L = L;
-        output_.probabilities = probabilities;
-        output_.partialRankScore = scoreTemp;
-        vector<int> compteurPartiel(d_, 0);
-
-        for (int dim = 0; dim < d_; dim++)
+        notFound = true;
+        currMu = headMu;
+        while (notFound)
         {
-            for (int ind = 0; ind < n_; ind++)
-                data_[dim][ind].y = Y[dim][ind];
-
-            int compteur(0);
-            for (vector<int>::iterator it = indexPartialData_[dim].begin(); it != indexPartialData_[dim].end(); it++)
+            equalRank = true;
+            // look if the j-th mu is the same that the current mu
+            for (int j(0); j < d_; j++)
             {
-                data_[dim][*it].x = xPartialTemp[dim][compteur];
-                compteur++;
+                for (int k(0); k < g_; k++)
+                {
+                    for (int i(0); i < m_[j]; i++)
+                        if (currMu->fullRank[j][k][i] != resMu[it][j][k][i])
+                        {
+                            equalRank = false;
+                            break;
+                        }
+                }
+            }
+
+            if (equalRank)
+            {
+                currMu->freq++;
+                // we sum the proportion and p
+                for (int k(0); k < g_; k++)
+                {
+                    currMu->prop[k] += resProp[it][k];
+                    for (int j(0); j < d_; j++)
+                        currMu->p[j][k] += resP[it][j][k];
+                }
+                notFound = false; // no need to check other mu of the struct
+            }
+            else
+            {
+                // if the current mu is the last, we add the j-th mu in the struct
+                if (currMu->nextMu == 0)
+                {
+                    nbMu++;
+                    notFound = false;
+                    currMu->nextMu = new MuList;
+                    currMu = currMu->nextMu;
+                    currMu->freq = 1;
+                    currMu->nextMu = 0;
+                    currMu->fullRank = resMu[it];
+                    currMu->prop = resProp[it];
+                    currMu->p = resP[it];
+                }
+                else
+                    currMu = currMu->nextMu; // we will test the next mu
             }
         }
     }
-    delete currMu; //delete the last mu
 
-    //if(parameter_.verbose)
-    //cout<<"Computing time for log-likelihood approximation: "<<(double) tL/CLOCKS_PER_SEC<<"s ("<<(double) tL/CLOCKS_PER_SEC/compteur<<"s per mu)."<<endl;
+    return headMu;
+}
+
+
+void RankCluster::meanParameters(MuList * currMu)
+{
+    for (int k(0); k < g_; k++)
+    {
+        currMu->prop[k] /= (double) currMu->freq;
+        for (int j(0); j < d_; j++)
+            currMu->p[j][k] /= (double) currMu->freq;
+    }
 }
 
 //LL gibbs

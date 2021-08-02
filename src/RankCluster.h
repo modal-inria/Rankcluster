@@ -217,7 +217,8 @@ class RankCluster
         double computeCompletedLoglikehoodKJ(double p, double sumG, double sumA_G);
 
 
-        /** likelihood step
+        /** Select the best set of parameters (the ones maximizing the log-likelihood)
+         *
          * @param resMu mu for every iteration of the SEM
          * @param resP pi for every iteration of the SEM
          * @param resProp proportion for every iteration of the SEM
@@ -225,6 +226,19 @@ class RankCluster
         void selectBestParameters(std::vector<std::vector<std::vector<Rank>>> &resMu,
                                   std::vector<std::vector<std::vector<double>>> &resP,
                                   std::vector<std::vector<double>> &resProp);
+
+        /** List the different found mu
+         *
+         * @param resMu mu for every iteration of the SEM
+         * @param resP pi for every iteration of the SEM
+         * @param resProp proportion for every iteration of the SEM
+         */
+        MuList * findDifferentMu(std::vector<std::vector<std::vector<Rank>>> &resMu,
+                                 std::vector<std::vector<std::vector<double>>> &resP,
+                                 std::vector<std::vector<double>> &resProp);
+
+        /** Mean the parameters for a mu */
+        void meanParameters(MuList * currMu);
 
         /** compute the log likelihood for a set of parameter
          * @param mu estimated central rank
