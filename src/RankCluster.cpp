@@ -704,12 +704,12 @@ void RankCluster::selectBestParameters(vector<vector<vector<Rank>>> &resMu,
 
     bool continuer(true), egaliteRang;
 
-    ListeMu *headMu = new ListeMu;
-    ListeMu *currMu = headMu;
-    ListeMu *next = 0;
-    currMu->compteur = 1;
-    currMu->suivant = 0;
-    currMu->rangComplet = resMu[0];
+    MuList *headMu = new MuList;
+    MuList *currMu = headMu;
+    MuList *next = 0;
+    currMu->freq = 1;
+    currMu->nextMu = 0;
+    currMu->fullRank = resMu[0];
     currMu->p = resP[0];
     currMu->prop = resProp[0];
 
@@ -727,7 +727,7 @@ void RankCluster::selectBestParameters(vector<vector<vector<Rank>>> &resMu,
                 for (int k(0); k < g_; k++)
                 {
                     for (int i(0); i < m_[J]; i++)
-                        if (currMu->rangComplet[J][k][i] != resMu[j][J][k][i])
+                        if (currMu->fullRank[J][k][i] != resMu[j][J][k][i])
                         {
                             egaliteRang = false;
                             break;
@@ -737,7 +737,7 @@ void RankCluster::selectBestParameters(vector<vector<vector<Rank>>> &resMu,
             if (egaliteRang)
             {
                 //same mu
-                currMu->compteur++;
+                currMu->freq++;
                 //we sum the proportion and p
                 for (int compt1(0); compt1 < g_; compt1++)
                 {
@@ -750,21 +750,21 @@ void RankCluster::selectBestParameters(vector<vector<vector<Rank>>> &resMu,
             else
             {
                 //not the same mu
-                if (currMu->suivant == 0)
+                if (currMu->nextMu == 0)
                 { //if the current mu is the last, we add thz j-th mu in the struct
                     nbMu++;
                     continuer = false;
-                    next = new ListeMu;
-                    currMu->suivant = next;
+                    next = new MuList;
+                    currMu->nextMu = next;
                     currMu = next;
-                    currMu->compteur = 1;
-                    currMu->suivant = 0;
-                    currMu->rangComplet = resMu[j];
+                    currMu->freq = 1;
+                    currMu->nextMu = 0;
+                    currMu->fullRank = resMu[j];
                     currMu->prop = resProp[j];
                     currMu->p = resP[j];
                 }
                 else
-                    currMu = currMu->suivant; //we will test the next mu
+                    currMu = currMu->nextMu; //we will test the next mu
             }
         }
     }
@@ -804,14 +804,14 @@ void RankCluster::selectBestParameters(vector<vector<vector<Rank>>> &resMu,
         //mean of the parameter
         for (int compt1(0); compt1 < g_; compt1++)
         {
-            currMu->prop[compt1] /= currMu->compteur;
+            currMu->prop[compt1] /= currMu->freq;
             for (int compt2(0); compt2 < d_; compt2++)
-                currMu->p[compt2][compt1] /= currMu->compteur;
+                currMu->p[compt2][compt1] /= currMu->freq;
         }
 
         //compute the log likelihood
         //t1=clock();
-        L = computeLikelihood(currMu->rangComplet, currMu->p, currMu->prop, tik, Y, xPartialTemp, probabilities, scoreTemp);
+        L = computeLikelihood(currMu->fullRank, currMu->p, currMu->prop, tik, Y, xPartialTemp, probabilities, scoreTemp);
         //t2=clock();
         //tL+=t2-t1;
 
@@ -819,7 +819,7 @@ void RankCluster::selectBestParameters(vector<vector<vector<Rank>>> &resMu,
         {
             //the current mu has a better log-likelihood, we save the parameter
             Llast = L;
-            mu_ = currMu->rangComplet;
+            mu_ = currMu->fullRank;
             p_ = currMu->p;
             proportion_ = currMu->prop;
             output_.tik = tik;
@@ -840,8 +840,8 @@ void RankCluster::selectBestParameters(vector<vector<vector<Rank>>> &resMu,
             }
         }
 
-        next = currMu->suivant;
-        hasNextElement = (currMu->suivant != 0);
+        next = currMu->nextMu;
+        hasNextElement = (currMu->nextMu != 0);
         delete currMu; //delete the mu
         currMu = next;
     }
