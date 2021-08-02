@@ -693,24 +693,14 @@ double RankCluster::computeCompletedLoglikehoodKJ(double p, double sumG, double 
  * LIKELIHOOD, CRITERIA AND OTHER OUTPUTS METHODS
  *
  **********************************************************************************************/
-
-typedef struct ListeMu ListeMu;
-void RankCluster::likelihood(vector<vector<vector<Rank>>> &resMu, vector<vector<vector<double>>> &resP,
-                             vector<vector<double>> &resProp)
+void RankCluster::selectBestParameters(vector<vector<vector<Rank>>> &resMu,
+                                       vector<vector<vector<double>>> &resP,
+                                       vector<vector<double>> &resProp)
 {
     //we put the same mu together and make the mean of their parameters
     //double t1,t2,tL(0);
 
     //t1=clock();
-    struct ListeMu;
-    struct ListeMu
-    {
-        double compteur; //number of same mu
-        std::vector<std::vector<Rank>> rangComplet;
-        std::vector<std::vector<double>> p;
-        std::vector<double> prop;
-        ListeMu *suivant;
-    };
 
     bool continuer(true), egaliteRang;
 
@@ -781,7 +771,6 @@ void RankCluster::likelihood(vector<vector<vector<Rank>>> &resMu, vector<vector<
 
     //t2=clock();
     //cout<<"Temps regroupement mu: "<<(double) (t2-t1)/CLOCKS_PER_SEC<<"s"<<endl;
-    int compteur(0);
 
     // compute log-likelihood
     //if(parameter_.verbose)
@@ -804,9 +793,10 @@ void RankCluster::likelihood(vector<vector<vector<Rank>>> &resMu, vector<vector<
     currMu = headMu;
     ArrayXXd tik(n_, g_);
     ArrayXXd probabilities(n_, g_); //estimate probability for an individual to belong to each cluster
+    bool hasNextElement;
 
     //for each mu, we will compute the associate log likelihood
-    while (currMu->suivant != 0)
+    do
     {
         //if(parameter_.verbose)
         //cout<<"*";
@@ -851,10 +841,11 @@ void RankCluster::likelihood(vector<vector<vector<Rank>>> &resMu, vector<vector<
         }
 
         next = currMu->suivant;
+        hasNextElement = (currMu->suivant != 0);
         delete currMu; //delete the mu
         currMu = next;
-        compteur++;
     }
+    while(hasNextElement);
 
     //the last mu of the struct
     //mean of the parameter
@@ -1326,7 +1317,7 @@ void RankCluster::run()
             //}
 
             //compute loglikelihood and choice of the best parameters
-            likelihood(resMu, resP, resProp);
+            selectBestParameters(resMu, resP, resProp);
             //t3=clock();
 
             //compute the partition associated to the best result

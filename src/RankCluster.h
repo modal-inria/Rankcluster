@@ -222,9 +222,9 @@ class RankCluster
          * @param resP pi for every iteration of the SEM
          * @param resProp proportion for every iteration of the SEM
          */
-        void likelihood(std::vector<std::vector<std::vector<Rank>>> &resMu,
-                        std::vector<std::vector<std::vector<double>>> &resP,
-                        std::vector<std::vector<double>> &resProp);
+        void selectBestParameters(std::vector<std::vector<std::vector<Rank>>> &resMu,
+                                  std::vector<std::vector<std::vector<double>>> &resP,
+                                  std::vector<std::vector<double>> &resProp);
 
         /** compute the log likelihood for a set of parameter
          * @param mu estimated central rank
