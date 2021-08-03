@@ -23,13 +23,13 @@ struct PartialRank
 
 typedef std::vector<PartialRank> MultivariatePartialRank;
 
-struct ListeMu
+struct MuList
 {
-    double compteur; //number of same mu
-    std::vector<std::vector<Rank>> rangComplet;
+    int freq;
+    std::vector<std::vector<Rank>> fullRank;
     std::vector<std::vector<double>> p;
     std::vector<double> prop;
-    ListeMu *suivant;
+    MuList *nextMu;
 };
 
 
