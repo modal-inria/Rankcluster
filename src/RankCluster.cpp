@@ -1190,6 +1190,47 @@ void RankCluster::computeDistance(vector<vector<double>> const &resProp, vector<
     }
 }
 
+void RankCluster::storeParameters(int const iterNumber, vector<vector<double>> &resProp,
+                                  vector<vector<vector<double>>> &resP, vector<vector<vector<Rank>>> &resMu,
+                                  vector<vector<int>> &resZ, vector<vector<vector<Rank>>> &resPartialData)
+{
+    // for identifiability, we must have p >= 0.5. If not, we invert the rank.
+    for (int l(0); l < d_; l++)
+    {
+        for (int k(0); k < g_; k++)
+        {
+            if (p_[l][k] < 0.5)
+            {
+                p_[l][k] = 1 - p_[l][k];
+                invertRank(mu_[l][k]);
+            }
+        }
+    }
+
+    // the first cluster must be the cluster with the fewer index of mu
+    vector<int> indRank(g_);
+    for (int k(0); k < g_; k++)
+        indRank[k] = rank2index(mu_[0][k], tab_factorial(m_[0]));
+
+    tri_insertionMulti(indRank, proportion_, p_, mu_, z_, g_, d_, n_);
+
+    resP[iterNumber - parameter_.burnAlgo] = p_;
+    resProp[iterNumber - parameter_.burnAlgo] = proportion_;
+    resMu[iterNumber - parameter_.burnAlgo] = mu_;
+    resZ[iterNumber - parameter_.burnAlgo] = z_;
+
+    for (int dim(0); dim < d_; dim++)
+    {
+        int compteur(0);
+        for (vector<int>::iterator it = indexPartialData_[dim].begin(); it != indexPartialData_[dim].end(); it++)
+        {
+            resPartialData[iterNumber - parameter_.burnAlgo][dim][compteur] = data_[dim][*it].x;
+            compteur++;
+        }
+    }
+
+}
+
 void RankCluster::run()
 {
     convergence_ = false;
@@ -1198,107 +1239,73 @@ void RankCluster::run()
     {
         try
         {
-            //double t0,t1,t2,t3,tM(0),tSE(0);
+            // double t0, t1, t2, t3, tM(0), tSE(0);
 
-            //if(parameter_.verbose)
-            //{
-            //cout<<"##########################################################"<<endl;
-            //cout<<"#  SEM-Gibbs Algorithm for multivariate partial ranking  #"<<endl;
-            //cout<<"##########################################################"<<endl;
-            //}
-            //t0=clock();
+            // if (parameter_.verbose)
+            // {
+            //     cout << "##########################################################" << endl;
+            //     cout << "#  SEM-Gibbs Algorithm for multivariate partial ranking  #" << endl;
+            //     cout << "##########################################################" << endl;
+            // }
+            // t0 = clock();
             initialization();
-            //t1=clock();
+            // t1 = clock();
 
-            //if(parameter_.verbose)
-            //cout<<"Initialization: "<<(double) (t1-t0)/CLOCKS_PER_SEC<<"s."<<endl;
+            // if (parameter_.verbose)
+            //     cout << "Initialization: " << (double)(t1 - t0) / CLOCKS_PER_SEC << "s." << endl;
 
-            //objects for storing the estimated parameters at each iteration
-            vector<int> indrang(g_);
-            vector<vector<vector<double>>> resP(parameter_.maxIt - parameter_.burnAlgo, vector<vector<double>>(d_, vector<double>(g_)));
+            // objects for storing the estimated parameters at each iteration
+            vector<vector<vector<double>>> resP(parameter_.maxIt - parameter_.burnAlgo,
+                                                vector<vector<double>>(d_, vector<double>(g_)));
             vector<vector<double>> resProp(parameter_.maxIt - parameter_.burnAlgo, (vector<double>(g_)));
             vector<vector<int>> resZ(parameter_.maxIt - parameter_.burnAlgo, vector<int>(n_));
             vector<vector<vector<Rank>>> resMu(parameter_.maxIt - parameter_.burnAlgo, mu_);
             vector<vector<vector<Rank>>> resDonneesPartiel(parameter_.maxIt - parameter_.burnAlgo, output_.initialPartialRank);
 
-            //algorithm
-            //if(parameter_.verbose)
             for (int iter(0); iter < parameter_.maxIt; iter++)
             {
-                //if(parameter_.verbose)
-                //cout<<"*";
+                // if(parameter_.verbose)
+                //    cout << "*";
 
-                //t2=clock();
+                // t2 = clock();
                 SEstep();
-                //t3=clock();
-                //tSE+=t3-t2;
+                // t3 = clock();
+                // tSE += t3-t2;
 
-                //t2=clock();
+                // t2 = clock();
                 Mstep();
-                //t3=clock();
-                //tM+=t3-t2;
+                // t3 = clock();
+                // tM += t3-t2;
 
-                //we store the estimated parameters
+                // we store the estimated parameters
                 if (iter >= parameter_.burnAlgo)
                 {
+                    storeParameters(iter, resProp, resP, resMu, resZ, resDonneesPartiel);
+                }
+            }
 
-                    for (int l(0); l < d_; l++)
-                    {
-                        for (int k(0); k < g_; k++)
-                        {
-                            if (p_[l][k] < 0.5)
-                            {
-                                p_[l][k] = 1 - p_[l][k];
-                                invertRank(mu_[l][k]);
-                            }
-                        }
-                    }
+            // t2 = clock();
+            // if (parameter_.verbose)
+            // {
+            //     cout << endl << endl << "Log-likelihood estimation" << endl;
 
-                    for (int k(0); k < g_; k++)
-                        indrang[k] = rank2index(mu_[0][k], tab_factorial(m_[0]));
+            //     cout << "Computing time for SE step: " << (double)tSE / CLOCKS_PER_SEC << "s ( "
+            //          << (double)tSE / CLOCKS_PER_SEC / parameter_.maxIt << "s per step)." << endl;
+            //     cout << "Computing time for M step: " << (double)tM / CLOCKS_PER_SEC << "s ( "
+            //          << (double)tM / CLOCKS_PER_SEC / parameter_.maxIt << "s per step )." << endl;
+            // }
 
-                    //the first cluster must be the cluster with the more little index of mu
-                    tri_insertionMulti(indrang, proportion_, p_, mu_, z_, g_, d_, n_); //tri selon les mu pour que 2 3=3 2
-
-                    //store parameters
-                    resP[iter - parameter_.burnAlgo] = p_;
-                    resProp[iter - parameter_.burnAlgo] = proportion_;
-                    resMu[iter - parameter_.burnAlgo] = mu_;
-                    resZ[iter - parameter_.burnAlgo] = z_;
-
-                    for (int dim(0); dim < d_; dim++)
-                    {
-                        int compteur(0);
-                        for (vector<int>::iterator it = indexPartialData_[dim].begin(); it != indexPartialData_[dim].end(); it++)
-                        {
-                            resDonneesPartiel[iter - parameter_.burnAlgo][dim][compteur] = data_[dim][*it].x;
-                            compteur++;
-                        }
-                    }
-
-                } //end storage
-            }     //end SEM
-
-            //if(parameter_.verbose)
-            //cout<<endl<<endl<<"Loglikelihood estimation"<<endl;
-            //t2=clock();
-            //if(parameter_.verbose)
-            //{
-            //cout<<"Computing time for SE step: "<<(double) tSE/CLOCKS_PER_SEC<<"s ( "<<(double) tSE/CLOCKS_PER_SEC/parameter_.maxIt<<"s per step)."<<endl;
-            //cout<<"Computing time for M step: "<<(double) tM/CLOCKS_PER_SEC<<"s ( "<<(double) tM/CLOCKS_PER_SEC/parameter_.maxIt<<"s per step )."<<endl;
-            //}
-
-            //compute loglikelihood and choice of the best parameters
+            // compute log-likelihood and choice of the best parameters
             selectBestParameters(resMu, resP, resProp);
             //t3=clock();
 
-            //compute the partition associated to the best result
+            // compute the partition associated to the best result
             computePartition();
 
-            //compute distance between estimated parameters at each iteration
+            // compute distance between estimated parameters at each iteration
             computeDistance(resProp, resP, resMu, resZ, resDonneesPartiel);
 
-            //compute criterion
+            // compute criterion
             output_.bic = BIC(output_.L, n_, 2 * g_ * d_ + g_ - 1);
 
             output_.icl = output_.bic;
@@ -1315,12 +1322,12 @@ void RankCluster::run()
                 output_.icl += 2 * output_.entropy(i);
             }
 
-            //if(parameter_.verbose)
-            //{
-            //cout<<"Total computing time : "<<(double) (t3-t0)/CLOCKS_PER_SEC<<"s"<<endl;
-            //}
+            // if (parameter_.verbose)
+            // {
+            //     cout << "Total computing time : " << (double)(t3 - t0) / CLOCKS_PER_SEC << "s" << endl;
+            // }
 
-            //if the p<0.5, we invert the associate mu and put p=1-p
+            // if p < 0.5, we invert the associate mu and put p=1-p
             for (int j = 0; j < d_; j++)
                 for (int k = 0; k < g_; k++)
                 {
@@ -1333,7 +1340,7 @@ void RankCluster::run()
 
             convergence_ = true;
 
-        } //end try
+        } // end try
         catch (string const &chaine)
         {
             convergence_ = false;

@@ -260,6 +260,13 @@ class RankCluster
         /** compute the final partition (z_) */
         void computePartition();
 
+        /** Store the parameters */
+        void storeParameters(int const iterNumber, std::vector<std::vector<double>> &resProp,
+                             std::vector<std::vector<std::vector<double>>> &resP,
+                             std::vector<std::vector<std::vector<Rank>>> &resMu,
+                             std::vector<std::vector<int>> &resZ,
+                             std::vector<std::vector<std::vector<Rank>>> &resPartialData);
+
         /** compute distance between final parameters and each iteration parameters */
         void computeDistance(std::vector<std::vector<double>> const &resProp,
                             std::vector<std::vector<std::vector<double>>> const &resP,
