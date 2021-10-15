@@ -7,7 +7,7 @@
 #' @param mu1,mu2 matrices of size K*sum(m), containing the modal ranks. Each row contains the modal rank for a cluster. In the case of multivariate ranks, the reference rank for each dimension are set successively on the same row.
 #' @param m a vector containing the size of ranks for each dimension.
 #' 
-#' @return a real, the Kullback-Leibler divergence.
+#' @return the Kullback-Leibler divergence.
 #' 
 #' @references
 #' http://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence
@@ -16,9 +16,11 @@
 #' proportion1 <- c(0.4, 0.6)
 #' pi1 <- matrix(c(0.8, 0.75), nrow = 2)
 #' mu1 <- matrix(c(1, 2, 3, 4, 4, 2, 1, 3), nrow = 2, byrow = TRUE)
+#' 
 #' proportion2 <- c(0.43, 0.57)
 #' pi2 <- matrix(c(0.82, 0.7), nrow = 2)
 #' mu2 <- matrix(c(1, 2, 3, 4, 4, 2, 1, 3), nrow = 2, byrow = TRUE)
+#' 
 #' dK <- kullback(proportion1, pi1, mu1, proportion2, pi2, mu2, 4)
 #' 
 #' @author Quentin Grimonprez
@@ -83,7 +85,7 @@ checkKullback <- function(proportion1, pi1, mu1, proportion2, pi2, mu2, m)
 #' 
 #' @param data a matrix in which each row is a rank of size m.
 #' @param proportion a vector (which sums to 1) containing the K mixture proportion.
-#' @param pi a vector of size K, where K is the number of clusters, containing the probabilities of a good paired comparaison of the model (dispersion parameters).
+#' @param pi a vector of size K, where K is the number of clusters, containing the probabilities of a good paired comparison of the model (dispersion parameters).
 #' @param mu a matrix of size K*m, where m is the size of a rank, containing the modal rankings of the model (position parameters).
 #' @param nBoot number of bootstrap iterations used to estimate the khi2 adequation test p-value.
 #' 
@@ -95,7 +97,7 @@ checkKullback <- function(proportion1, pi1, mu1, proportion2, pi2, mu2, m)
 #' mu <- matrix(c(1, 2, 3, 4, 4, 2, 1, 3), nrow = 2, byrow = TRUE)
 #' # simulate a data set with declared parameters.
 #' data <- rbind(simulISR(proportion[1] * 100, pi[1], mu[1, ]),
-#' simulISR(proportion[2] * 100, pi[2], mu[2, ]))
+#'               simulISR(proportion[2] * 100, pi[2], mu[2, ]))
 #' pval <- khi2(data, proportion, mu, pi)
 #' 
 #' @author Quentin Grimonprez
@@ -103,7 +105,6 @@ checkKullback <- function(proportion1, pi1, mu1, proportion2, pi2, mu2, m)
 #' @export
 khi2 <- function(data, proportion, mu, pi, nBoot = 1000)
 {
-
   checkKhi2(data, proportion, mu, pi, nBoot)
   
   pval = .Call("adkhi2partial", data, pi, proportion, mu, nBoot, PACKAGE = "Rankcluster")
