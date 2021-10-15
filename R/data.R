@@ -1,6 +1,5 @@
 # DOCUMENTATION FOR DATA SET
 
-
 #' @title Rank data: APA
 #' @docType data
 #' @aliases APA
