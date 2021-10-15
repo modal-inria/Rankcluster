@@ -6,7 +6,6 @@
 
 The code was originally on an [R-forge repository](https://r-forge.r-project.org/projects/rankclust/).
 
-
 This package proposes a model-based clustering algorithm for ranking data. 
 Multivariate rankings as well as partial rankings are taken into account.
 This algorithm is based on an extension of the Insertion Sorting Rank (ISR) model for ranking data, which is a meaningful
