@@ -1001,7 +1001,7 @@ double RankCluster::computeLikelihood(vector<vector<Rank>> const &mu, vector<vec
 
                             alea = (double)runif(0., p1x + p2x);
 
-                            if (alea < p2) //acceptation du changement
+                            if (alea < p2x) //acceptation du changement
                             {
                                 x[J] = x2;
                                 p1x = p2x;
