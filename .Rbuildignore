@@ -3,3 +3,5 @@
 README.md
 ^\.github$
 .vscode
+src/.vscode
+CITATION.bib
