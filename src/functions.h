@@ -25,10 +25,10 @@ int randWrapper(const int n);
 template <class RandomAccessIterator>
 void Rshuffle(RandomAccessIterator first, RandomAccessIterator last)
 {
-    for (auto i = (last - first) - 1; i > 0; --i)
-    {
-        std::swap(first[i], first[randWrapper(i + 1)]);
-    }
+  for (auto i = (last - first) - 1; i > 0; --i)
+  {
+    std::swap(first[i], first[randWrapper(i + 1)]);
+  }
 }
 
 /** Initialize a rank as 1 2 ... m */
