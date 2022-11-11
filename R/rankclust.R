@@ -1,35 +1,40 @@
 #' @title Model-based clustering for multivariate partial ranking
-#' 
-#' @description This functions estimates a clustering of ranking data, potentially multivariate, partial and containing tied, based on a mixture of multivariate ISR model [2].
+#'
+#' @description This functions estimates a clustering of ranking data, potentially multivariate, partial and containing tied,
+#' based on a mixture of multivariate ISR model [2].
 #' By specifying only one cluster, the function performs a modelling of the ranking data using the multivariate ISR model.
 #' The estimation is performed thanks to a SEM-Gibbs algorithm.
 #'
-#' 
+#'
 #' @param data a matrix in which each row is a ranking (partial or not; for partial ranking,
-#' missing elements must be 0 or NA. Tied are replaced by the lowest position they share). For multivariate rankings, the rankings of each dimension are
-#' placed end to end in each row. The data must be in ranking notation (see Details or
+#' missing elements must be 0 or NA. Tied are replaced by the lowest position they share). For multivariate rankings,
+#' the rankings of each dimension are placed end to end in each row. The data must be in ranking notation (see Details or
 #' \link{convertRank} functions).
-#' @param m a vector composed of the sizes of the rankings of each dimension (default value is the number of column of the matrix data).
+#' @param m a vector composed of the sizes of the rankings of each dimension (default value is the number of column of the
+#' matrix data).
 #' @param K an integer or a vector of integer with the number of clusters.
 #' @param criterion criterion "bic" or "icl", criterion to minimize for selecting the number of clusters.
 #' @param Qsem the total number of iterations for the SEM algorithm (default value=40).
 #' @param Bsem burn-in period for SEM algorithm (default value=10).
 #' @param RjSE a vector containing, for each dimension, the number of iterations of the Gibbs sampler
 #' used both in the SE step for partial rankings and for the presentation orders generation (default value=mj(mj-1)/2).
-#' @param RjM a vector containing, for each dimension, the number of iterations of the Gibbs sampler used in the  M step (default value=mj(mj-1)/2)
+#' @param RjM a vector containing, for each dimension, the number of iterations of the Gibbs sampler used in the  M step
+#' (default value=mj(mj-1)/2)
 #' @param Ql number of iterations of the Gibbs sampler
 #' for estimation of log-likelihood (default value=100).
 #' @param Bl burn-in period for estimation of log-likelihood (default value=50).
 #' @param maxTry maximum number of restarts of the SEM-Gibbs algorithm in the case of non convergence (default value=3).
 #' @param run number of runs of the algorithm for each value of K.
-#' @param detail boolean, if TRUE, time and others informations will be print during the process (default value FALSE).
+#' @param detail boolean, if TRUE, time and others information will be print during the process (default value FALSE).
 #'
 #' @return An object of class Rankclust (See \code{\link{Output-class}} and \code{\link{Rankclust-class}}).
-#' If the output object is named \code{res}. You can access the result by res[number of groups]@@slotName where \code{slotName} is an element of the class Output.
+#' If the output object is named \code{res}. You can access the result by res[number of groups]@@slotName where
+#' \code{slotName} is an element of the class Output.
 #'
-#' 
+#'
 #' @details
-#' The ranks have to be given to the package in the ranking notation (see \link{convertRank} function), with the following convention:
+#' The ranks have to be given to the package in the ranking notation (see \link{convertRank} function), with the following
+#' convention:
 #'
 #' - missing positions are replaced by 0
 #'
@@ -55,18 +60,19 @@
 #'
 #'
 #' @references
-#' [1] C.Biernacki and J.Jacques (2013), A generative model for rank data based on sorting algorithm, Computational Statistics and Data Analysis, 58, 162-176.
+#' [1] C.Biernacki and J.Jacques (2013), A generative model for rank data based on sorting algorithm,
+#' Computational Statistics and Data Analysis, 58, 162-176.
 #'
-#' [2] J.Jacques and C.Biernacki (2012), Model-based clustering for multivariate partial ranking data, Inria Research Report n 8113.
+#' [2] J.Jacques and C.Biernacki (2012), Model-based clustering for multivariate partial ranking data,
+#' Inria Research Report n 8113.
 #'
 #' @examples
 #' data(big4)
 #' result <- rankclust(big4$data, K = 2, m = big4$m, Ql = 200, Bl = 100, maxTry = 2)
-#' 
-#' if(result@@convergence)
-#' { 
+#'
+#' if(result@@convergence) {
 #'   summary(result)
-#' 
+#'
 #'   partition <- result[2]@@partition
 #'   tik <- result[2]@@tik
 #' }
@@ -77,55 +83,48 @@
 #'
 #' @export
 #'
-rankclust <- function(data, m = ncol(data), K = 1, criterion = "bic", Qsem = 100, Bsem = 20, 
+rankclust <- function(data, m = ncol(data), K = 1, criterion = "bic", Qsem = 100, Bsem = 20,
                       RjSE = m * (m - 1) / 2, RjM = m * (m - 1) / 2, Ql = 500, Bl = 100,
-                      maxTry = 3, run = 1, detail = FALSE)
-{
-
+                      maxTry = 3, run = 1, detail = FALSE) {
   .checkArgRankclust(data, m, K, criterion, Qsem, Bsem, RjSE, RjM, Ql, Bl, detail, maxTry, run)
 
   # change NA in data
-  data[is.na(data)] = 0
+  data[is.na(data)] <- 0
 
   # output container
-  result = c()
+  result <- c()
   # number of clusters for which the algorithm converges
-  G = c()
+  G <- c()
 
   # loop over the different number of cluster
-  for (k in K)
-  {
-    if (detail)
+  for (k in K) {
+    if (detail) {
       cat("K=", k, "\n")
-    ## first run
-    res = mixtureSEM(data, k, m, Qsem, Bsem, Ql, Bl, RjSE, RjM, maxTry, run, detail)
-    if (res@convergence)
-    {
-      G = c(G, k)
-      result = c(result, list(res))
     }
-    else
-    {
+    ## first run
+    res <- mixtureSEM(data, k, m, Qsem, Bsem, Ql, Bl, RjSE, RjM, maxTry, run, detail)
+    if (res@convergence) {
+      G <- c(G, k)
+      result <- c(result, list(res))
+    } else {
       cat("\n for K=", k, "clusters, the algorithm has not converged (a proportion was equal to 0 during the process), please retry\n")
     }
   } # end for K number of cluster
 
 
 
-  if (length(G) == 0)
-  {
-    resultat = new("Rankclust", convergence = FALSE)
+  if (length(G) == 0) {
+    resultat <- new("Rankclust", convergence = FALSE)
     cat("No convergence for all values of K (a proportion was equal to 0 during the process). Please retry\n")
-  }
-  else
-  {
-    colnom = c()
-    for (i in 1:length(m))
-      colnom = c(colnom, paste0("dim", i), rep("", m[i] - 1))
+  } else {
+    colnom <- c()
+    for (i in seq_along(m)) {
+      colnom <- c(colnom, paste0("dim", i), rep("", m[i] - 1))
+    }
 
-    colnames(data) = colnom
+    colnames(data) <- colnom
 
-    resultat = new("Rankclust", K = G, criterion = criterion, results = result, data = data, convergence = TRUE)
+    resultat <- new("Rankclust", K = G, criterion = criterion, results = result, data = data, convergence = TRUE)
   }
 
 
@@ -133,80 +132,101 @@ rankclust <- function(data, m = ncol(data), K = 1, criterion = "bic", Qsem = 100
 }
 
 
-.checkArgRankclust = function(data, m, K, criterion, Qsem, Bsem, RjSE, RjM, Ql, Bl, detail, maxTry, run)
-{
+.checkArgRankclust <- function(data, m, K, criterion, Qsem, Bsem, RjSE, RjM, Ql, Bl, detail, maxTry, run) {
   ################## check the arguments
   # data
   checkData(data)
 
   # m
   checkM(m)
-  if (sum(m) != ncol(data))
+  if (sum(m) != ncol(data)) {
     stop("The number of column of data and m don't match.")
+  }
 
 
   # K
-  if (!is.vector(K, mode = "numeric"))
+  if (!is.vector(K, mode = "numeric")) {
     stop("K must be a (vector of) integer strictly greater than 0")
-  if (length(K) != length(K[K > 0]))
+  }
+  if (length(K) != length(K[K > 0])) {
     stop("K must be a (vector of) integer strictly greater than 0")
-  if (!min(K == round(K)))
+  }
+  if (!min(K == round(K))) {
     stop("K must be a (vector of) integer strictly greater than 0")
+  }
 
 
   # criterion
-  if (criterion != "bic" && criterion != "icl")
+  if (criterion != "bic" && criterion != "icl") {
     stop("criterion must be \"bic\" or \"icl\" ")
+  }
 
   # Qsem
-  if (!is.numeric(Qsem) || (length(Qsem) > 1))
+  if (!is.numeric(Qsem) || (length(Qsem) > 1)) {
     stop("Qsem must be a strictly positive integer")
-  if ((Qsem != round(Qsem)) || (Qsem <= 0))
+  }
+  if ((Qsem != round(Qsem)) || (Qsem <= 0)) {
     stop("Qsem must be a strictly positive integer")
+  }
 
   # Bsem
-  if (!is.numeric(Bsem) || (length(Bsem) > 1))
+  if (!is.numeric(Bsem) || (length(Bsem) > 1)) {
     stop("Bsem must be a strictly positive integer lower than Qsem")
-  if ((Bsem != round(Bsem)) || (Bsem <= 0) || (Bsem >= Qsem))
+  }
+  if ((Bsem != round(Bsem)) || (Bsem <= 0) || (Bsem >= Qsem)) {
     stop("Bsem must be a strictly positive integer lower than Qsem")
+  }
 
   # RjM
-  if (!is.numeric(RjM) || (length(RjM) != length(m)))
+  if (!is.numeric(RjM) || (length(RjM) != length(m))) {
     stop("RjM must be a vector of strictly positive integer")
-  if (any((RjM != round(RjM)) | (RjM <= 0)))
+  }
+  if (any((RjM != round(RjM)) | (RjM <= 0))) {
     stop("RjM must be a vector of strictly positive integer")
+  }
 
   # RjSE
-  if (!is.numeric(RjSE) || (length(RjSE) != length(m)))
+  if (!is.numeric(RjSE) || (length(RjSE) != length(m))) {
     stop("RjSE must be a vector of strictly positive integer")
-  if (any((RjSE != round(RjSE)) | (RjSE <= 0)))
+  }
+  if (any((RjSE != round(RjSE)) | (RjSE <= 0))) {
     stop("RjSE must be a vector of strictly positive integer")
+  }
 
   # Ql
-  if (!is.numeric(Ql) || (length(Ql) > 1))
+  if (!is.numeric(Ql) || (length(Ql) > 1)) {
     stop("Ql must be a strictly positive integer")
-  if ((Ql != round(Ql)) || (Ql <= 0))
+  }
+  if ((Ql != round(Ql)) || (Ql <= 0)) {
     stop("Ql must be a strictly positive integer")
+  }
 
   # Bl
-  if (!is.numeric(Bl) || (length(Bl) > 1))
+  if (!is.numeric(Bl) || (length(Bl) > 1)) {
     stop("Bl must be a strictly positive integer lower than Ql")
-  if ((Bl != round(Bl)) || (Bl <= 0) || (Bl >= Ql))
+  }
+  if ((Bl != round(Bl)) || (Bl <= 0) || (Bl >= Ql)) {
     stop("Bl must be a strictly positive integer lower than Ql")
+  }
 
   # maxTry
-  if (!is.numeric(maxTry) || (length(maxTry) != 1))
+  if (!is.numeric(maxTry) || (length(maxTry) != 1)) {
     stop("maxTry must be a positive integer")
-  if ((maxTry != round(maxTry)) || (maxTry <= 0))
+  }
+  if ((maxTry != round(maxTry)) || (maxTry <= 0)) {
     stop("maxTry must be a positive integer")
+  }
 
   # run
-  if (!is.numeric(run) || (length(run) != 1))
+  if (!is.numeric(run) || (length(run) != 1)) {
     stop("run must be a positive integer")
-  if ((run != round(run)) || (run <= 0))
+  }
+  if ((run != round(run)) || (run <= 0)) {
     stop("run must be a positive integer")
+  }
 
   # detail
-  if (!is.logical(detail))
+  if (!is.logical(detail)) {
     stop("detail must be a logical.")
+  }
 }

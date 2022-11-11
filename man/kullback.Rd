@@ -9,9 +9,11 @@ kullback(proportion1, pi1, mu1, proportion2, pi2, mu2, m)
 \arguments{
 \item{proportion1, proportion2}{vectors (which sums to 1) containing the K mixture proportions.}
 
-\item{pi1, pi2}{matrices of size K*p, where K is the number of clusters and p the number of dimension, containing the probabilities of a good comparison of the model (dispersion parameters).}
+\item{pi1, pi2}{matrices of size K*p, where K is the number of clusters and p the number of dimension,
+containing the probabilities of a good comparison of the model (dispersion parameters).}
 
-\item{mu1, mu2}{matrices of size K*sum(m), containing the modal ranks. Each row contains the modal rank for a cluster. In the case of multivariate ranks, the reference rank for each dimension are set successively on the same row.}
+\item{mu1, mu2}{matrices of size K*sum(m), containing the modal ranks. Each row contains the modal rank for a cluster.
+In the case of multivariate ranks, the reference rank for each dimension are set successively on the same row.}
 
 \item{m}{a vector containing the size of ranks for each dimension.}
 }
@@ -19,7 +21,7 @@ kullback(proportion1, pi1, mu1, proportion2, pi2, mu2, m)
 the Kullback-Leibler divergence.
 }
 \description{
-This function computes the Kullback-Leibler divergence between two mixtures of multidimensional ISR distributions.
+It computes the Kullback-Leibler divergence between two mixtures of multidimensional ISR distributions.
 }
 \examples{
 proportion1 <- c(0.4, 0.6)

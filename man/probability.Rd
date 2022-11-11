@@ -7,13 +7,15 @@
 probability(x, mu, pi, m = length(mu))
 }
 \arguments{
-\item{x}{a vector or a matrix containing the rankings in ranking notation (see Details or \link{convertRank} function). 
+\item{x}{a vector or a matrix containing the rankings in ranking notation (see Details or \link{convertRank} function).
 The rankings of each dimension are placed end to end. \code{x} must contain only full ranking (no partial or tied).}
 
-\item{mu}{a vector of length \code{sum(m)} containing the modal ranks in ranking notation (see Details or \link{convertRank} function). 
+\item{mu}{a vector of length \code{sum(m)} containing the modal ranks in ranking notation (see Details or
+\link{convertRank} function).
 The rankings of each dimension are placed end to end. \code{mu} must contain only full ranking (no partial or tied).}
 
-\item{pi}{a vector of size \code{p=length(m)}, where \code{p} is the number of dimension, containing the probabilities of a good comparison of the model (dispersion parameters).}
+\item{pi}{a vector of size \code{p=length(m)}, where \code{p} is the number of dimension, containing the probabilities of
+a good comparison of the model (dispersion parameters).}
 
 \item{m}{a vector containing the size of ranks for each dimension.}
 }
@@ -24,7 +26,8 @@ the probability of \code{x} according to a ISR(mu, pi).
 It computes the probability of a (multivariate) rank x according to a ISR(mu, pi).
 }
 \details{
-The ranks have to be given to the package in the ranking notation (see \link{convertRank} function), with the following convention:
+The ranks have to be given to the package in the ranking notation (see \link{convertRank} function),
+with the following convention:
 
 - missing positions are replaced by 0
 
@@ -48,11 +51,11 @@ result is r = (2, 3, 1).
 }
 \examples{
 m <- c(4, 5)
-x = mu <- matrix(nrow = 1, ncol = 9)
-x[1:4] = c(1, 4, 2, 3)
-x[5:9] = c(3, 5, 2, 4, 1)
-mu[1:4] = 1:4
-mu[5:9] = c(3, 5, 4, 2, 1)
+x <- mu <- matrix(nrow = 1, ncol = 9)
+x[1:4] <- c(1, 4, 2, 3)
+x[5:9] <- c(3, 5, 2, 4, 1)
+mu[1:4] <- 1:4
+mu[5:9] <- c(3, 5, 4, 2, 1)
 pi <- c(0.75, 0.82)
 
 prob <- probability(x, mu, pi, m)

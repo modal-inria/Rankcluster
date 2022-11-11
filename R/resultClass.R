@@ -29,13 +29,13 @@
 #' @slot partialRankScore confidence score in estimated partial rank
 #' @slot distanceProp Distances (MSE) between the final estimation and the current
 #' value at each iteration of the SEM-Gibbs algorithm (except the burn-in phase) for proportions. A list of Qsem-Bsem elements,
-#' each element being a K*p-matrix. 
-#' @slot distancePi Distances (MSE) between the final estimation and the current
-#' value at each iteration of the SEM-Gibbs algorithm (except the burn-in phase) for scale parameters. A list of Qsem-Bsem elements,
 #' each element being a K*p-matrix.
-#' @slot distanceMu Distances (Kendall distance) between the final estimation and the current
-#' value at each iteration of the SEM-Gibbs algorithm (except the burn-in phase) for proportions. A list of Qsem-Bsem elements,
+#' @slot distancePi Distances (MSE) between the final estimation and the current value at each iteration of the
+#' SEM-Gibbs algorithm (except the burn-in phase) for scale parameters. A list of Qsem-Bsem elements,
 #' each element being a K*p-matrix.
+#' @slot distanceMu Distances (Kendall distance) between the final estimation and the current value at each iteration of the
+#' SEM-Gibbs algorithm (except the burn-in phase) for proportions. A list of Qsem-Bsem elements,
+#'  each element being a K*p-matrix.
 #' @slot distanceZ a vector of size Qsem-Bsem containing the rand index between the final
 #' estimated partition and the current value at each iteration of the SEM-Gibbs algorithm (except
 #' the burn-in phase). Let precise that the rand index is not affected by label switching.
@@ -48,7 +48,6 @@
 #' @slot piInitial a matrix containing the initialization of the probabilities of good paired comparison in the algorithm.
 #' @slot muInitial a matrix containing the initialization of modal rankings in the algorithm.
 #' @slot partialRankInitial a matrix containing the initialization of the partial rankings in the algorithm.
-#' 
 #'
 #'
 #' @name Output-class
@@ -123,14 +122,15 @@ setClass(
 #' any number of clusters).
 #' @slot results a list of \link{Output-class}, containing the results for each number of clusters (one
 #' element of the list is associated to one number of clusters).
-#' 
+#'
 #'
 #'
 #' @details
-#' If \code{res} is the result of \link{rankclust} function, each slot of results can be reached by \code{res[k]@@slotname}, where
-#' \code{k} is the number of clusters and \code{slotname} is the name of the slot we want to reach (see \link{Output-class}).
-#' For the slots, \code{ll}, \code{bic}, \code{icl}, \code{res["slotname"]} returns a vector of size \code{k} containing the values of the
-#' slot for each number of clusters.
+#' If \code{res} is the result of \link{rankclust} function, each slot of results can be reached by \code{res[k]@@slotname},
+#' where \code{k} is the number of clusters and \code{slotname} is the name of the slot we want to reach
+#' (see \link{Output-class}).
+#' For the slots, \code{ll}, \code{bic}, \code{icl}, \code{res["slotname"]} returns a vector of size \code{k} containing
+#' the values of the slot for each number of clusters.
 #'
 #' @name Rankclust-class
 #' @rdname Rankclust-class
@@ -152,11 +152,10 @@ setClass(
     criterion = "bic",
     convergence = logical(0)
   )
-
 )
 
 #' @name [,Rankclust-method
-#' 
+#'
 #' @title Getter method for rankclust output
 #'
 #' @description Extract values of various
@@ -164,62 +163,48 @@ setClass(
 #'
 #' @param x object from which to extract element(s) or in which to replace element(s).
 #' @param i the number of cluster of the element we want to extract or "bic", "icl", "ll"
-#' @param j,drop not used 
-#' 
+#' @param j,drop not used
+#' @usage \S4method{[}{Rankclust}(x, i, j, drop)
 #' @export
 setMethod(
   f = "[",
   signature = signature(x = "Rankclust"),
   definition = function(x, i, j, drop) {
-    if (x@convergence)
-    {
-      if (is.numeric(i))
-      {
-        if (i %in% x@K)
-        {
+    if (x@convergence) {
+      if (is.numeric(i)) {
+        if (i %in% x@K) {
           return(x@results[[which(x@K == i)]])
-        }
-        else
+        } else {
           stop("Invalid number of cluster.")
-      }
-      else
-      {
-        if (i == "bic")
-        {
-          bic = rep(NA, length(x@K))
-          for (iter in 1:length(x@K))
-          {
-            if (x@results[[iter]]@convergence)
-              bic[iter] = x@results[[iter]]@bic
+        }
+      } else {
+        if (i == "bic") {
+          bic <- rep(NA, length(x@K))
+          for (iter in seq_along(bic)) {
+            if (x@results[[iter]]@convergence) {
+              bic[iter] <- x@results[[iter]]@bic
+            }
           }
           return(bic)
-        }
-        else
-        {
-          if (i == "icl")
-          {
-            icl = rep(NA, length(x@K))
-            for (iter in 1:length(x@K))
-            {
-              if (x@results[[iter]]@convergence)
-                icl[iter] = x@results[[iter]]@icl
+        } else {
+          if (i == "icl") {
+            icl <- rep(NA, length(x@K))
+            for (iter in seq_along(x@K)) {
+              if (x@results[[iter]]@convergence) {
+                icl[iter] <- x@results[[iter]]@icl
+              }
             }
             return(icl)
-          }
-          else
-          {
-            if (i == "ll")
-            {
-              ll = rep(NA, length(x@K))
-              for (iter in 1:length(x@K))
-              {
-                if (x@results[[iter]]@convergence)
-                  ll[iter] = x@results[[iter]]@ll
+          } else {
+            if (i == "ll") {
+              ll <- rep(NA, length(x@K))
+              for (iter in seq_along(x@K)) {
+                if (x@results[[iter]]@convergence) {
+                  ll[iter] <- x@results[[iter]]@ll
+                }
               }
               return(ll)
-            }
-            else
-            {
+            } else {
               stop("Invalid Name.")
             }
           }
@@ -240,34 +225,28 @@ setMethod(
   f = "summary",
   signature = "Rankclust",
   definition = function(object, ...) {
-    if (object@convergence)
-    {
-      if (object@criterion == "bic")
-      {
-        BIC = c()
-        for (i in object@K)
-        {
-          BIC = c(BIC, object@results[[which(object@K == i)]]@bic)
+    if (object@convergence) {
+      if (object@criterion == "bic") {
+        BIC <- c()
+        for (i in object@K) {
+          BIC <- c(BIC, object@results[[which(object@K == i)]]@bic)
         }
-        index = which(BIC == min(BIC))
-      }
-      else
-      {
-        ICL = c()
-        for (i in object@K)
-        {
-          ICL = c(ICL, object@results[[which(object@K == i)]]@icl)
+        index <- which(BIC == min(BIC))
+      } else {
+        ICL <- c()
+        for (i in object@K) {
+          ICL <- c(ICL, object@results[[which(object@K == i)]]@icl)
         }
-        index = which(ICL == min(ICL))
-
+        index <- which(ICL == min(ICL))
       }
 
       cat("******************************************************************\n")
       cat("NUMBER OF CLUSTERS: ", object@K[index], "\n")
-      if (object@criterion == "bic")
+      if (object@criterion == "bic") {
         cat(object@criterion, "=", object[object@K[index]]@bic)
-      else
+      } else {
         cat(object@criterion, "=", object[object@K[index]]@icl)
+      }
       cat("\nLoglikelihood =", object[object@K[index]]@ll)
       cat("\n\n************************ PARAMETERS ******************************\n")
       cat("Proportion:", object[object@K[index]]@proportion)
@@ -277,13 +256,12 @@ setMethod(
       print(object[object@K[index]]@pi)
       cat("\n************************ CLUSTERING ******************************\n")
       cat("Ranks with the highest entropy for each cluster:\n")
-      for (i in 1:object@K[index])
-      {
+      for (i in 1:object@K[index]) {
         # classe=object[object@K[index]]@entropy[object[object@K[index]]@entropy[,2]==i,]
-        classe = which(object[object@K[index]]@entropy[, 2] == i)
-        if (length(classe) != 0)
-        {
-          classe = classe[order(object[object@K[index]]@entropy[classe, 1], decreasing = TRUE)][1:min(5, length(classe))]
+        classe <- which(object[object@K[index]]@entropy[, 2] == i)
+        if (length(classe) != 0) {
+          classe <- classe[order(object[object@K[index]]@entropy[classe, 1], decreasing = TRUE)][
+            seq_len(min(5, length(classe)))]
           # if(object@algorithm=="SEM")
           print(cbind(object@data[classe, ], object[object@K[index]]@entropy[classe, ]))
           # else
@@ -299,17 +277,15 @@ setMethod(
           # 	print(cbind(object@data[best5[,1],-ncol(object@data)],best5[,2:3]))
           # }
         }
-
       }
       # rm(best5)
       cat("Ranks with the highest probability for each cluster:\n")
-      for (i in 1:object@K[index])
-      {
+      for (i in 1:object@K[index]) {
         # classe=object[object@K[index]]@probability[object[object@K[index]]@probability[,2]==i,]
-        classe = which(object[object@K[index]]@probability[, 2] == i)
-        if (length(classe) != 0)
-        {
-          classe = classe[order(object[object@K[index]]@probability[classe, 1], decreasing = TRUE)][1:min(5, length(classe))]
+        classe <- which(object[object@K[index]]@probability[, 2] == i)
+        if (length(classe) != 0) {
+          classe <- classe[order(object[object@K[index]]@probability[classe, 1], decreasing = TRUE)][
+            seq_len(min(5, length(classe)))]
           # if(object@algorithm=="SEM")
           print(cbind(object@data[classe, ], object[object@K[index]]@probability[classe, ]))
           # else
@@ -324,24 +300,22 @@ setMethod(
           # 	best5=classe[order(classe[,2],decreasing=TRUE),][1:min(5,nrow(classe)),]
           # 	print(cbind(object@data[best5[,1],-ncol(object@data)],best5[,2:3]))
           # }
-
         }
       }
       rm(classe)
       # rm(best5)
-      if (object[object@K[index]]@partial)
-      {
+      if (object[object@K[index]]@partial) {
         cat("\n************************ PARTIAL RANK ****************************\n")
-        if (min(50, nrow(object[object@K[index]]@partialRank)) == 50)
+        if (min(50, nrow(object[object@K[index]]@partialRank)) == 50) {
           cat("\nOnly the first 50 are printed, total length:", nrow(object[object@K[index]]@partialRank), "\n")
-        print(object[object@K[index]]@partialRank[1:min(50, nrow(object[object@K[index]]@partialRank)), ])
+        }
+        print(object[object@K[index]]@partialRank[seq_len(min(50, nrow(object[object@K[index]]@partialRank))), ])
       }
 
       cat("\n******************************************************************\n")
-    }
-    else
+    } else {
       cat("No convergence. Please retry\n")
-
+    }
   }
 )
 
@@ -368,13 +342,15 @@ setMethod(
     cat("\npi:\n")
     print(object@pi)
     cat("\npartition:\n")
-    print(object@partition[1:min(50, length(object@partition))])
-    if (min(50, length(object@partition)) == 50)
+    print(object@partition[seq_len(min(50, length(object@partition)))])
+    if (min(50, length(object@partition)) == 50) {
       cat("\nOnly the first 50 are printed, total length:", length(object@partition))
+    }
     cat("\ntik:\n")
-    print(object@tik[1:min(50, nrow(object@tik)), ])
-    if (min(50, nrow(object@tik)) == 50)
+    print(object@tik[seq_len(min(50, nrow(object@tik))), ])
+    if (min(50, nrow(object@tik)) == 50) {
       cat("\nOnly the first 50 rows are printed, total rows:", nrow(object@tik))
+    }
   }
 )
 
@@ -386,20 +362,16 @@ setMethod(
   f = "show",
   signature = "Rankclust",
   definition = function(object) {
-    if(object@convergence)
-    {
-      for (i in object@K)
-      {
+    if (object@convergence) {
+      for (i in object@K) {
         cat("\n******************************************************************\n")
         cat("Number of clusters:", i)
         cat("\n******************************************************************\n")
         show(object@results[[which(object@K == i)]])
         cat("\n******************************************************************\n")
-        
       }
-    }else{
+    } else {
       cat("Algorithm did not converge.\n")
     }
-
   }
 )

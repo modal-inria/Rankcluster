@@ -9,7 +9,7 @@ simulISR(n, pi, mu)
 \arguments{
 \item{n}{size of the sample.}
 
-\item{pi}{dispersion parameter: probability of correct paired comparaison according to mu.}
+\item{pi}{dispersion parameter: probability of correct paired comparison according to mu.}
 
 \item{mu}{position parameter: modal ranking in ordering representation.}
 }
@@ -42,7 +42,8 @@ x <- simulISR(30, 0.8, 1:4)
 
 }
 \references{
-[1] C.Biernacki and J.Jacques (2013), A generative model for rank data based on sorting algorithm, Computational Statistics and Data Analysis, 58, 162-176.
+[1] C.Biernacki and J.Jacques (2013), A generative model for rank data based on sorting algorithm,
+Computational Statistics and Data Analysis, 58, 162-176.
 }
 \author{
 Julien Jacques

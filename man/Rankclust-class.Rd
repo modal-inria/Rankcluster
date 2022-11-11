@@ -8,10 +8,11 @@
 This class contains results of \link{rankclust} function.
 }
 \details{
-If \code{res} is the result of \link{rankclust} function, each slot of results can be reached by \code{res[k]@slotname}, where
-\code{k} is the number of clusters and \code{slotname} is the name of the slot we want to reach (see \link{Output-class}).
-For the slots, \code{ll}, \code{bic}, \code{icl}, \code{res["slotname"]} returns a vector of size \code{k} containing the values of the
-slot for each number of clusters.
+If \code{res} is the result of \link{rankclust} function, each slot of results can be reached by \code{res[k]@slotname},
+where \code{k} is the number of clusters and \code{slotname} is the name of the slot we want to reach
+(see \link{Output-class}).
+For the slots, \code{ll}, \code{bic}, \code{icl}, \code{res["slotname"]} returns a vector of size \code{k} containing
+the values of the slot for each number of clusters.
 }
 \section{Slots}{
 

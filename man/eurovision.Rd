@@ -3,20 +3,23 @@
 \docType{data}
 \name{eurovision}
 \alias{eurovision}
-\title{Multidimensionnal partial rank data: eurovision}
+\title{Multidimensional partial rank data: eurovision}
 \format{
 A list containing:
 \describe{
-  \item{data}{ A matrix of size 34*48. Each row corresponds to the ranking representation of a multidimensionnal ranking.
+  \item{data}{ A matrix of size 34*48. Each row corresponds to the ranking representation of a multidimensional ranking.
                Columns 1 to 8 correspond to the 2007 contest, columns 9 to 18 to the 2008 contest, etc...
 
-               The ranking representation r=(r_1,...,r_m) contains the  ranks assigned to the objects, and means that the ith object is in r_ith position.
+               The ranking representation r=(r_1,...,r_m) contains the  ranks assigned to the objects, and means that
+the ith object is in r_ith position.
 
-               For example, if the ranking representation of a rank is (4,3,1,2,5), it means that judge ranks the first object in 4th position, second object in 3rd position, ...
+               For example, if the ranking representation of a rank is (4,3,1,2,5), it means that judge ranks the first
+object in 4th position, second object in 3rd position, ...
 
   }
 
-  \item{frequency}{A matrix of size 34*49 containing the differents multidimensionnal rankings. The 48 first columns are the same as in data, and the last column contains the frequency (1 for all ranks).}
+  \item{frequency}{A matrix of size 34*49 containing the different multidimensional rankings. The 48 first columns are
+the same as in data, and the last column contains the frequency (1 for all ranks).}
 
   \item{m}{ a vector with the sizes of ranks for each dimension.}
 }
@@ -29,9 +32,11 @@ This dataset contains the ranking of the 8 common finalists of the Eurovision so
 
 A: France, B:Germany, C:Greece, D:Romania, E:Russia, F:Spain, G:Ukraine, H:United Kingdom.
 
-The number of rankings is 33, corresponding to the 33 European countries having participated to this six editions of the contest.
+The number of rankings is 33, corresponding to the 33 European countries having participated to those
+six editions of the contest.
 
-All the rankings are partial since none country has ranked this 8 countries in its 10 preferences. Missing ranking elements are zeros.
+All the rankings are partial since none country has ranked this 8 countries in its 10 preferences. Missing ranking
+elements are zeros.
 }
 \examples{
 data(eurovision)

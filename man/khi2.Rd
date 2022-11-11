@@ -11,9 +11,11 @@ khi2(data, proportion, mu, pi, nBoot = 1000)
 
 \item{proportion}{a vector (which sums to 1) containing the K mixture proportion.}
 
-\item{mu}{a matrix of size K*m, where m is the size of a rank, containing the modal rankings of the model (position parameters).}
+\item{mu}{a matrix of size K*m, where m is the size of a rank, containing the modal rankings of the model
+(position parameters).}
 
-\item{pi}{a vector of size K, where K is the number of clusters, containing the probabilities of a good paired comparison of the model (dispersion parameters).}
+\item{pi}{a vector of size K, where K is the number of clusters, containing the probabilities of a good paired comparison
+of the model (dispersion parameters).}
 
 \item{nBoot}{number of bootstrap iterations used to estimate the p-value.}
 }
@@ -28,8 +30,10 @@ proportion <- c(0.4, 0.6)
 pi <- c(0.8, 0.75)
 mu <- matrix(c(1, 2, 3, 4, 4, 2, 1, 3), nrow = 2, byrow = TRUE)
 # simulate a data set with declared parameters.
-data <- rbind(simulISR(proportion[1] * 100, pi[1], mu[1, ]),
-              simulISR(proportion[2] * 100, pi[2], mu[2, ]))
+data <- rbind(
+  simulISR(proportion[1] * 100, pi[1], mu[1, ]),
+  simulISR(proportion[2] * 100, pi[2], mu[2, ])
+)
 pval <- khi2(data, proportion, mu, pi)
 
 }
