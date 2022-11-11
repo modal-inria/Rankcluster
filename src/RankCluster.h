@@ -17,58 +17,6 @@
 #include "Typedef.h"
 
 
-struct SEMparameters
-{
-    // number of iteration in the gibbs of SE step for each dimension of rank
-    std::vector<int> nGibbsSE;
-    // number of iteration in the gibbs of M step for each dimension of rank
-    std::vector<int> nGibbsM;
-    // maximum number of iteration of the SEM algorithm
-    int maxIt;
-    // burn-in period of SEM algorithm
-    int burnAlgo;
-    // number of iteration in the gibbs of the likelihood computation
-    int nGibbsL;
-    // burn-in period of the likelihood computation
-    int burnL;
-    // maximum number of try of the SEM
-    int maxTry;
-    // if true print details
-    bool verbose;
-};
-
-struct OutParameters
-{
-    // loglikelihood
-    double L;
-    // bic criterion
-    double bic;
-    // icl criterion
-    double icl;
-    //
-    Eigen::ArrayXXd tik;
-    //
-    Eigen::ArrayXd entropy;
-    //
-    Eigen::ArrayXXd probabilities;
-    // percentage of confidence in final estimation of missing data
-    std::vector<std::vector<std::vector<double>>> partialRankScore;
-
-    // algorithm initialization
-    std::vector<std::vector<Rank>> initialPartialRank;
-    std::vector<std::vector<double>> initialP;
-    std::vector<int> initialZ;
-    std::vector<double> initialProportion;
-    std::vector<std::vector<Rank>> initialMu;
-
-    // distance between parameters
-    std::vector<std::vector<double>> distProp;
-    std::vector<std::vector<std::vector<double>>> distP;
-    std::vector<std::vector<std::vector<int>>> distMu;
-    std::vector<double> distZ;
-    std::vector<std::vector<std::vector<int>>> distPartialRank;
-};
-
 class RankCluster
 {
 public:
