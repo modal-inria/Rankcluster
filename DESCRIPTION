@@ -1,11 +1,11 @@
 Package: Rankcluster
 Type: Package
 Title: Model-Based Clustering for Multivariate Partial Ranking Data
-Version: 0.94.5
-Date: 2021-01-26
+Version: 0.98.0
+Date: 2022-11-11
 Authors@R: c(person("Quentin", "Grimonprez", role = c("aut", "cre"), email = "quentingrim@yahoo.fr"),
-              person("Julien", "Jacques", role = "aut"),
-              person("Christophe", "Biernacki", role = "aut"))
+             person("Julien", "Jacques", role = "aut", email = "julien.jacques@univ-lyon2.fr"),
+             person("Christophe", "Biernacki", role = "aut", email = "christophe.biernacki@inria.fr"))
 Description: Implementation of a model-based clustering algorithm for
     ranking data (C. Biernacki, J. Jacques (2013) <doi:10.1016/j.csda.2012.08.008>). 
     Multivariate rankings as well as partial rankings are taken

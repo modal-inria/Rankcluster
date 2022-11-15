@@ -1,7 +1,9 @@
-# 
+# v0.98.0 - 2022-11-11
 - add unit tests
-- improve numerical stability of probability computation
-- refactor C++ code
+- improve numerical stability of probability computation (WIP)
+- refactor C++ code (WIP)
+- fix c++ warnings
+- lint R code
 
 # v0.94.5 - 2021-01-26
 - replace random_shuffle in C++
