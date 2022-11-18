@@ -5,13 +5,13 @@ context("Rank Manipulation")
 test_that("convertSingleRank converts rank from ordering to ranking and vice-versa", {
   out <- convertSingleRank(1:4)
   expect_equal(out, 1:4)
-  
+
   out <- convertSingleRank(c(2, 1, 4, 3))
   expect_equal(out, c(2, 1, 4, 3))
-  
+
   out <- convertSingleRank(c(3, 1, 4, 2))
   expect_equal(out, c(2, 4, 1, 3))
-  
+
   out <- convertSingleRank(c(2, 4, 1, 3))
   expect_equal(out, c(3, 1, 4, 2))
 })
@@ -19,27 +19,31 @@ test_that("convertSingleRank converts rank from ordering to ranking and vice-ver
 test_that("convertRank converts rank in vector", {
   out <- convertRank(1:4)
   expect_equal(out, 1:4)
-  
+
   out <- convertRank(c(2, 1, 4, 3))
   expect_equal(out, c(2, 1, 4, 3))
-  
+
   out <- convertRank(c(3, 1, 4, 2))
   expect_equal(out, c(2, 4, 1, 3))
-  
+
   out <- convertRank(c(2, 4, 1, 3))
   expect_equal(out, c(3, 1, 4, 2))
 })
 
 
 test_that("convertRank converts rank in matrix", {
-  x <- matrix(c(1, 2, 3, 4,
-                2, 1, 4, 3, 
-                3, 1, 4, 2, 
-                2, 4, 1, 3), ncol = 4, byrow = TRUE)
+  x <- matrix(c(
+    1, 2, 3, 4,
+    2, 1, 4, 3,
+    3, 1, 4, 2,
+    2, 4, 1, 3
+  ), ncol = 4, byrow = TRUE)
 
   out <- convertRank(x)
-  expectedOut <- matrix(c(1:4, c(2, 1, 4, 3), 
-                        c(2, 4, 1, 3), c(3, 1, 4, 2)), ncol = 4, byrow = TRUE) 
+  expectedOut <- matrix(c(
+    1:4, c(2, 1, 4, 3),
+    c(2, 4, 1, 3), c(3, 1, 4, 2)
+  ), ncol = 4, byrow = TRUE)
   expect_equal(out, expectedOut)
 })
 
@@ -84,23 +88,31 @@ test_that("completeRank compeltes the rank when only 1 element is missing", {
 
 
 test_that("frequence works", {
-  X <- matrix(c(rep(1:4, 5),
-                rep(4:1, 3)), ncol = 4, byrow = TRUE)
+  X <- matrix(c(
+    rep(1:4, 5),
+    rep(4:1, 3)
+  ), ncol = 4, byrow = TRUE)
   out <- frequence(X)
-  
-  expectedOut <- matrix(c(1:4, 5,
-                          4:1, 3), ncol = 5, byrow = TRUE)
+
+  expectedOut <- matrix(c(
+    1:4, 5,
+    4:1, 3
+  ), ncol = 5, byrow = TRUE)
   expect_equal(out, expectedOut)
 })
 
 
 test_that("unfrequence works", {
-  X <- matrix(c(1:4, 5,
-                4:1, 3), ncol = 5, byrow = TRUE)
+  X <- matrix(c(
+    1:4, 5,
+    4:1, 3
+  ), ncol = 5, byrow = TRUE)
   out <- unfrequence(X)
-  
-  expectedOut <- matrix(c(rep(1:4, 5),
-                          rep(4:1, 3)), ncol = 4, byrow = TRUE)
-  
+
+  expectedOut <- matrix(c(
+    rep(1:4, 5),
+    rep(4:1, 3)
+  ), ncol = 4, byrow = TRUE)
+
   expect_equal(out, expectedOut)
 })

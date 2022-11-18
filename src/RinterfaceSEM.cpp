@@ -1,10 +1,10 @@
-#include "run.h"
+#include "RinterfaceSEM.h"
 
 using namespace Rcpp;
 using namespace std;
 using namespace Eigen;
 
-RcppExport SEXP semR(SEXP X, SEXP m, SEXP K, SEXP Qsem, SEXP Bsem, SEXP Ql, SEXP Bl, SEXP RjSE, SEXP RjM, SEXP maxTry, SEXP run, SEXP detail)
+RcppExport SEXP semR(SEXP X, SEXP m, SEXP K, SEXP Qsem, SEXP Bsem, SEXP Ql, SEXP Bl, SEXP RjSE, SEXP RjM, SEXP maxTry, SEXP run, SEXP verbose)
 {
     int g = as<int>(K), runC(as<int>(run));
     vector<int> mC = as<vector<int>>(m);
@@ -16,7 +16,7 @@ RcppExport SEXP semR(SEXP X, SEXP m, SEXP K, SEXP Qsem, SEXP Bsem, SEXP Ql, SEXP
     param.nGibbsL = as<int>(Ql);
     param.burnL = as<int>(Bl);
     param.maxTry = as<int>(maxTry);
-    param.detail = as<bool>(detail);
+    param.verbose = as<bool>(verbose);
 
     NumericMatrix XR(X);
     int n(XR.nrow()), col(XR.ncol());

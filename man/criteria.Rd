@@ -7,13 +7,16 @@
 criteria(data, proportion, pi, mu, m, Ql = 500, Bl = 100, IC = 1, nb_cpus = 1)
 }
 \arguments{
-\item{data}{a matrix in which each row is a rank (partial or not; for partial rank, missing elements of a rank are put to 0 ).}
+\item{data}{a matrix in which each row is a rank (partial or not; for partial rank,
+missing elements of a rank are put to 0).}
 
 \item{proportion}{a vector (which sums to 1) containing the K mixture proportions.}
 
-\item{pi}{a matrix of size K*p, where K is the number of clusters and p the number of dimension, containing the probabilities of a good comparaison of the model (dispersion parameters).}
+\item{pi}{a matrix of size K*p, where K is the number of clusters and p the number of dimension, containing the
+probabilities of a good comparison of the model (dispersion parameters).}
 
-\item{mu}{a matrix of size K*sum(m), containing the modal ranks. Each row contains the modal rank for a cluster. In the case of multivariate ranks, the reference rank for each dimension are set successively on the same row.}
+\item{mu}{a matrix of size K*sum(m), containing the modal ranks. Each row contains the modal rank for a cluster.
+In the case of multivariate ranks, the reference rank for each dimension are set successively on the same row.}
 
 \item{m}{a vector containing the size of ranks for each dimension.}
 
@@ -32,15 +35,17 @@ a list containing:
   \item{icl}{the estimated ICL criterion.}
 }
 \description{
-This function estimates the loglikelihood of a mixture of multidimensional ISR model, as well as the BIC and ICL model selection criteria.
+This function estimates the loglikelihood of a mixture of multidimensional ISR model, as well as the
+BIC and ICL model selection criteria.
 }
 \examples{
 data(big4)
-res = rankclust(big4$data, m = big4$m, K = 2, Ql = 100, Bl = 50, maxTry = 2)
-if (res@convergence)
-  crit = criteria(big4$data, res[2]@proportion, res[2]@pi, res[2]@mu,
+res <- rankclust(big4$data, m = big4$m, K = 2, Ql = 100, Bl = 50, maxTry = 2)
+if (res@convergence) {
+  crit <- criteria(big4$data, res[2]@proportion, res[2]@pi, res[2]@mu,
                   big4$m, Ql = 200, Bl = 100)
-                  
+}
+
 }
 \author{
 Quentin Grimonprez

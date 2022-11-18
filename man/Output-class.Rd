@@ -53,13 +53,13 @@ observed ranking. Available only in presence of at least one partial ranking.}
 value at each iteration of the SEM-Gibbs algorithm (except the burn-in phase) for proportions. A list of Qsem-Bsem elements,
 each element being a K*p-matrix.}
 
-\item{\code{distancePi}}{Distances (MSE) between the final estimation and the current
-value at each iteration of the SEM-Gibbs algorithm (except the burn-in phase) for scale parameters. A list of Qsem-Bsem elements,
+\item{\code{distancePi}}{Distances (MSE) between the final estimation and the current value at each iteration of the
+SEM-Gibbs algorithm (except the burn-in phase) for scale parameters. A list of Qsem-Bsem elements,
 each element being a K*p-matrix.}
 
-\item{\code{distanceMu}}{Distances (Kendall distance) between the final estimation and the current
-value at each iteration of the SEM-Gibbs algorithm (except the burn-in phase) for proportions. A list of Qsem-Bsem elements,
-each element being a K*p-matrix.}
+\item{\code{distanceMu}}{Distances (Kendall distance) between the final estimation and the current value at each iteration of the
+SEM-Gibbs algorithm (except the burn-in phase) for proportions. A list of Qsem-Bsem elements,
+ each element being a K*p-matrix.}
 
 \item{\code{distanceZ}}{a vector of size Qsem-Bsem containing the rand index between the final
 estimated partition and the current value at each iteration of the SEM-Gibbs algorithm (except

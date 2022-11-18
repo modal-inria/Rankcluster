@@ -2,30 +2,40 @@
  * functions.h
  *
  *  Created on: 1 mars 2013
- *      Author: grimonprez
+ *      Author: Quentin Grimonprez
  */
 
 #ifndef FUNCTIONS_H_
 #define FUNCTIONS_H_
 
+#include <Eigen/Dense>
 #include <vector>
 #include <utility>
 #include <Rmath.h>
+
+#include "Typedef.h"
+
 
 /**r random number generator, code from : http://gallery.rcpp.org/articles/r-function-from-c++/
  * generate an integer between 0 and n - 1
  */
 int randWrapper(const int n);
 
-/** equivalent of std::shuffle with an R generator
- */
+/** equivalent of std::shuffle with an R generator */
 template <class RandomAccessIterator>
 void Rshuffle(RandomAccessIterator first, RandomAccessIterator last)
 {
-  for (auto i = (last-first) - 1;  i > 0; --i) {
-    std::swap (first[i], first[randWrapper(i + 1)]);
+  for (auto i = (last - first) - 1; i > 0; --i)
+  {
+    std::swap(first[i], first[randWrapper(i + 1)]);
   }
 }
+
+/** Initialize a rank as 1 2 ... m */
+void initializeRank(Rank &rank);
+
+/** Initialize a rank as a random rank */
+void randomRank(Rank &rank);
 
 /**
  * search the position of i in x
@@ -33,30 +43,7 @@ void Rshuffle(RandomAccessIterator first, RandomAccessIterator last)
  * @param i integer which we want the position in x
  * @return the position of i in x
  */
-int positionRank(std::vector<int> const &x, int const &i);
-
-/**
- * compute  A(x,y) and G(x,y,mu)
- * @param x rank
- * @param y order of presentation of x
- * @param mu order of reference
- * @return a vector of 2 elements (A(x,y),G(x,y,mu))
- *
- * A(x,y)=total number of comparaison in the insertion sorting algorithm
- * G(x,y,mu)= total number of good comparaison according to mu in the insertion sorting algorithm
- *
- */
-std::vector<int> comparaison(std::vector<int> const &x, std::vector<int> const &y, std::vector<int> const &mu);
-
-/**
- * compute the conditional probability  p(x|y;mu,p)
- * @param x rank
- * @param y order of presentation of x
- * @param mu order of reference
- * @param p probability of making a good comparaison
- * @return p(x|y;mu,p)
- */
-double probaCond(std::vector<int> const &x, std::vector<int> const &y, std::vector<int> const &mu, double const &p);
+int positionRank(Rank const &x, int const &i);
 
 /**
  * factorial function (recursive)
@@ -73,37 +60,37 @@ int factorial(int const &nombre);
 std::vector<int> tab_factorial(int const &m);
 
 /**
- *-----------rang->index------------
+ *-----------rank->index------------
  * convert a rank into an integer
  * @param rang rank
  * @param  tabFactorial \see tab_factorial
  * @return index
  */
-int rank2index(std::vector<int> const &rang, std::vector<int> const &tabFactorial);
+int rank2index(Rank const &rank, std::vector<int> const &tabFactorial);
 
 /**
- *-----------rang->index------------
+ *-----------rank->index------------
  * @see rank2index for a vector of rank
- * @param listeRang vector of rank
+ * @param rankList vector of rank
  * @param  tabFactorial @see tab_factorial
  * @return vector of index
  */
-std::vector<int> rank2index(std::vector<std::vector<int>> const &listeRang, std::vector<int> const &tabFact);
+std::vector<int> rank2index(std::vector<Rank> const &rankList, std::vector<int> const &tabFact);
 
 /**
  * conversion index->rank
  * @param index index of the rank
  * @param m size of the rank
  * @param tabFactorial vector containing 1! to m! (@see tab_factorial)(optional)
- * @return le rang correspondant à l'index
- * index=rank
- * 0=1 2 ... m
+ * @return the rank corresponding to the index
+ * index | rank
+ * 0 | 1 2 ... m
  *
- * m!= m m-1 .. 1
+ * m! | m m-1 ... 1
  */
-std::vector<int> index2rank(int index, int const &m, std::vector<int> const &tabFactorial);
-std::vector<int> index2rankb(int index, int const &m, std::vector<int> const &tabFactorial);
-std::vector<int> index2rank(int index, int const &m);
+Rank index2rank(int index, int const &m, std::vector<int> const &tabFactorial);
+Rank index2rankNoCheck(int index, int const &m, std::vector<int> const &tabFactorial);
+Rank index2rank(int index, int const &m);
 
 /**
  * Return a vector containing the index of order of presentation y for which we have to compute probability
@@ -114,50 +101,51 @@ std::vector<int> index2rank(int index, int const &m);
  * p(x|y;mu,p) doesn't change if the 2 first element of y are inverted
  * So we compute probabilities for the half of y
  */
-std::vector<int> listeSigma(int const &m, std::vector<int> const &tabFactorial);
+std::vector<int> listIndexOrderOfPresentation(int const &m, std::vector<int> const &tabFactorial);
 
 /**
  * invert a rank (1 2 3 become 3 2 1)
- * @param rang rank to invert
- * @param m size of the rank
+ * @param rank rank to invert
  */
-void inverseRang(std::vector<int> &rang);
-void inverseRang(std::vector<int> &rang, int const &m);
+void invertRank(Rank &rank);
 
 /**
  * Compute the BIC
- * @param loglikelihood the loglikelihhod of the data
+ * @param loglikelihood the loglikelihood of the data
  * @param nbDonnees total number of data
  * @return BIC
  */
 double BIC(double loglikelihood, int nbDonnees, int nbParam);
 
 /**
- * compute the Rand index of 2 partitions
+ * Compute the Rand index between 2 partitions
  * @param z1 partition
  * @param z2 partition
  * @return a double, the Rand index
  */
-double indiceRand(std::vector<int> const &z1, std::vector<int> const &z2);
+double computeRandIndex(std::vector<int> const &z1, std::vector<int> const &z2);
 
 /**
- * conversion from ordering representation to ranking representation
+ * Conversion from ordering representation to ranking representation
+ *
  * @param x a rank
- * @param m size of the rank
- * @return a rank : the ranking representation of x
+ * @return a rank: the ranking representation of x
  */
-std::vector<int> order2rank(std::vector<int> const &x, int const &m);
+Rank ordering2ranking(Rank const &x);
 
 /**
  *  Compute the Kendall's distance between 2 ranks (in ordering representation)
+ *
+ * https://en.wikipedia.org/wiki/Kendall_tau_distance
+ *
  * @param x a rank in ordering representation
  * @param y a rank in ordering representation of the same size than x
  * @return an integer, the kendall distance between x and y
  */
-int distanceKendall(std::vector<int> const &x, std::vector<int> const &y);
+int distanceKendall(Rank const &x, Rank const &y);
 
 /**
- * sort the parameters in order that the first cluster is the cluster with the more little ndex of mu
+ * Sort the parameters such that the first cluster is the cluster with the more little index of mu
  * @param mu index of the rank of the first dimension of listeMu
  * @param p parameter of the ISR
  * @param prop proportion of the mixture model
@@ -166,37 +154,57 @@ int distanceKendall(std::vector<int> const &x, std::vector<int> const &y);
  * @param g number of cluster
  * @param d number of dimension
  * @param n number of individual
- * listeMu, p, prop and z are modify if necessary
+ *
+ * listeMu, p, prop and z are modified if necessary
  *
  */
-void tri_insertionMulti(std::vector<int> &mu, std::vector<double> &prop, std::vector<std::vector<double>> &p,
-                        std::vector<std::vector<std::vector<int>>> &listeMu, std::vector<int> &z, int const &g, int const &d, int const &n);
+void tri_insertionMulti(Rank &mu, std::vector<double> &prop, std::vector<std::vector<double>> &p,
+                        std::vector<std::vector<Rank>> &listeMu, std::vector<int> &z, int const &g,
+                        int const &d, int const &n);
 
 /**
- * simulation of a n-sample of ISR(mu,p)
- * @param n size of the sample
- * @param m size of the rank
- * @param mu rank
- * @param p probability of a good comapraison
- * @return a n-sample of ISR(mu,p)
+ * compute frequency of a data set
+ * @param rankList data
+ * @return a pair with the unique rank and the frequency of each unique rank
  */
-std::vector<std::vector<int>> simulISR(int const &n, int const &m, std::vector<int> const &mu, double const &p);
+std::pair<std::vector<std::vector<Rank>>, std::vector<int>> freqMulti(std::vector<std::vector<Rank>> const &rankList);
+
 
 /**
- * compute frequence of a data set
- * @param listeRang data
- * @return a pair with the unique rank and the frequence of each unique rank
+ * accept or not a change in a gibbs sampler
+ *
+ * Sample x~U(0, 1), accept the change if x < p2/(p1 + p2)
+ *
+ * @param logP1 log-probability of the current element
+ * @param logP2 log-probability of the candidate
+ * @return true if the change is accepted
  */
-std::pair<std::vector<std::vector<std::vector<int>>>, std::vector<int>>
-freqMulti(std::vector<std::vector<std::vector<int>>> const &listeRang);
+bool acceptChange(double const logP1, double const logP2);
+
+/** LogSumExp function
+ * https://en.wikipedia.org/wiki/LogSumExp
+ *
+ * LSE(x1, x2, ..., xn) = (max xi) + log(exp(x1 - (max xi)) + ... + exp(xn - (max xi)))
+ * LSE(x1, x2, ..., xn) = log(exp(x1) + ... + exp(xn))
+ *
+ * Application for proba: LSE(log(p1), ..., log(pn)) = log(p1 + ... + pn)
+ */
+double LSE(Eigen::ArrayXd &logProba);
 
 /**
- * compute probability of x according to multivariate ISR
- * @param x rank for each dimension for compute probability
- * @param mu reference rank for each dimension
- * @param pi dispersion parameter for each dimension
- * @return p(x;mu,pi)
+ * LSE trick to normalize a vector of log probabilities
+ * Given (log(p1), ..., log(pn)), it returns (p1/sum(pi), ..., pn/sum(pi))
+ *
+ * Useful to compute tik
  */
-double proba(std::vector<std::vector<int>> const &x, std::vector<std::vector<int>> const &mu, std::vector<double> const &pi);
+Eigen::ArrayXd normalizeLogProba(Eigen::ArrayXd &logProba);
+void normalizeLogProbaInPlace(Eigen::ArrayXd &logProba);
+
+/**
+ * Sample according to a multinomial with given probabilities
+ *
+ * @param proba vector of probabilities of each element
+ */
+int sampleMultinomial(Eigen::ArrayXd const &proba);
 
 #endif /* FUNCTIONS_H_ */

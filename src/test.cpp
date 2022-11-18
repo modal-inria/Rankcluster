@@ -6,81 +6,26 @@
 #include <Rmath.h>
 
 #include "test.h"
+#include "functions.h"
+#include "ISRfunctions.h"
 
 using namespace std;
 
-//fonction pour simuler un N-échantillon d'ISR(mu,p)
-void simulMixtureISR(vector<vector<int>> &simul, int const &n, int const &m, vector<vector<int>> const &mu,
-                     vector<double> const &p, vector<double> const &prop)
-{
-    vector<int> s(m), rgTemp(m);
-    int l, classe(0);
-    double correct, alea(0);
-    bool compar, avance;
 
-    vector<double> limite(prop.size() + 1, 0);
-    for (int i(1); i < (int)limite.size(); i++)
-        limite[i] = limite[i - 1] + prop[i - 1];
-
-    for (int i(0); i < m; i++)
-        rgTemp[i] = i + 1;
-
-    for (int i(0); i < n; i++)
-    {
-        //tirage aléatoire de la classe
-        alea = (double)runif(0., 1.);
-        for (int j(0); j < (int)prop.size(); j++)
-        {
-            if ((alea > limite[j]) & (alea < limite[j + 1]))
-            {
-                classe = j;
-                break;
-            }
-        }
-
-        //simulation d'un rang aléatoire: permutation du vecteur 1 2..m
-        s = rgTemp;
-        Rshuffle(s.begin(), s.end());
-
-        simul[i][0] = s[0];
-        for (int j(1); j < m; j++)
-        {
-            l = 0;
-            avance = true;
-            while (avance && l < j)
-            {
-                correct = (double)runif(0., 1.);
-                compar = (positionRank(mu[classe], s[j]) < positionRank(mu[classe], simul[i][l]));
-                if ((compar && correct < p[classe]) || (!compar && correct > p[classe]))
-                {
-                    for (int k(j - 1); k >= l; k--)
-                        simul[i][k + 1] = simul[i][k];
-
-                    simul[i][l] = s[j];
-                    avance = false;
-                }
-                else
-                    l++;
-            }
-            if (l == j)
-                simul[i][l] = s[j];
-        }
-    }
-}
-
-double khi2(vector<vector<int>> const &data, vector<double> const &p, vector<double> const &prop, vector<vector<int>> const &mu, int const &nBoot)
+double khi2(vector<vector<int>> const &data, vector<double> const &p, vector<double> const &prop,
+            vector<vector<int>> const &mu, int const &nBoot)
 {
     int const g(prop.size()), m(data[0].size()), n(data.size());
     int factM(factorial(m));
     double dkhi2(0), pvalue(0), mult((double)2 / factM), prob(0);
 
-    //************** cacul des effectifs theoriques
+    //************** calcul des effectifs theoriques
     vector<double> effTheo(factM, 0);
     vector<vector<int>> x(factM, vector<int>(m));
 
     //generation of the index of y
     vector<int> tabFact(tab_factorial(m)), listeY;
-    listeY = listeSigma(m, tabFact);
+    listeY = listIndexOrderOfPresentation(m, tabFact);
 
     //generation of all the rank for the dim
     for (int i(0); i < factM; i++)
@@ -120,7 +65,7 @@ double khi2(vector<vector<int>> const &data, vector<double> const &p, vector<dou
     for (int iter(0); iter < nBoot; iter++)
     {
         vector<double> effSim(factM, 0);
-        simulMixtureISR(simulation, n, m, mu, p, prop);
+        simulMixtureISR(simulation, mu, p, prop);
         for (int i(0); i < n; i++)
         {
             indexData = rank2index(simulation[i], tabFact);
@@ -140,19 +85,20 @@ double khi2(vector<vector<int>> const &data, vector<double> const &p, vector<dou
     return pvalue;
 }
 
-double khi2partial(vector<Rank> &data, vector<double> const &p, vector<double> const &prop, vector<vector<int>> const &mu, int const &nBoot)
+double khi2partial(vector<RankStruct> &data, vector<double> const &p, vector<double> const &prop,
+                   vector<vector<int>> const &mu, int const &nBoot)
 {
     int const g(prop.size()), m(data[0].rank.size()), n(data.size());
     int factM(factorial(m));
     double dkhi2(0), pvalue(0), mult((double)2 / factM), prob(0);
 
-    //************** cacul des effectifs theoriques
+    //************** calcul des effectifs theoriques
     vector<double> effTheo(factM, 0);
     vector<vector<int>> x(factM, vector<int>(m));
 
     //generation of the index of y
     vector<int> tabFact(tab_factorial(m)), listeY;
-    listeY = listeSigma(m, tabFact);
+    listeY = listIndexOrderOfPresentation(m, tabFact);
 
     //generation of all the rank for the dim
     for (int i(0); i < factM; i++)
@@ -173,7 +119,7 @@ double khi2partial(vector<Rank> &data, vector<double> const &p, vector<double> c
         //cout<<x[ind]<<"     "<<effTheo[ind]<<endl;
     }
 
-    //************** cacul des effectifs empiriques
+    //************** calcul des effectifs empiriques
     vector<double> effEmp(factM, 0);
     vector<vector<int>> freq;
     int indexData;
@@ -248,7 +194,7 @@ double khi2partial(vector<Rank> &data, vector<double> const &p, vector<double> c
     for (int iter(0); iter < nBoot; iter++)
     {
         vector<double> effSim(factM, 0);
-        simulMixtureISR(simulation, n, m, mu, p, prop);
+        simulMixtureISR(simulation, mu, p, prop);
         for (int i(0); i < n; i++)
         {
             //on réintroduit des 0 dans la simulation au même endroit
@@ -313,7 +259,8 @@ double khi2partial(vector<Rank> &data, vector<double> const &p, vector<double> c
 }
 
 //---------------------------- divergence de kullback
-void updateD(double &divKL, vector<int> &index, vector<vector<vector<double>>> const &p1, vector<vector<vector<double>>> const &p2, int const &d, int const &g,
+void updateD(double &divKL, vector<int> &index, vector<vector<vector<double>>> const &p1,
+             vector<vector<vector<double>>> const &p2, int const &d, int const &g,
              vector<double> const &proportion1, vector<double> const &proportion2)
 {
     double p1b(0), p2b(0);
@@ -349,8 +296,9 @@ void updateIndex(vector<int> &index, int i, vector<int> const &factm, bool &stop
     }
 }
 
-void computePQ(vector<vector<vector<double>>> &p, vector<vector<vector<double>>> &q, vector<vector<vector<int>>> const &mu1,
-               vector<vector<vector<int>>> const &mu2, vector<vector<double>> const &p1, vector<vector<double>> const &p2, vector<int> const &m, int d, int g)
+void computePQ(vector<vector<vector<double>>> &p, vector<vector<vector<double>>> &q,
+               vector<vector<vector<int>>> const &mu1, vector<vector<vector<int>>> const &mu2,
+               vector<vector<double>> const &p1, vector<vector<double>> const &p2, vector<int> const &m, int d, int g)
 {
     bool isDimDiff(true);
     int n = factorial(m[0]);
@@ -365,7 +313,7 @@ void computePQ(vector<vector<vector<double>>> &p, vector<vector<vector<double>>>
             x = vector<vector<int>>(n, vector<int>(m[0]));
             //generation of the index of y
             vector<int> tabFact(tab_factorial(m[dim]));
-            listeY = listeSigma(m[dim], tabFact);
+            listeY = listIndexOrderOfPresentation(m[dim], tabFact);
 
             //generation of all the rank for the dim
             for (int i(0); i < n; i++)
@@ -400,7 +348,8 @@ void computePQ(vector<vector<vector<double>>> &p, vector<vector<vector<double>>>
 }
 
 double divKL(vector<int> const &m, vector<vector<vector<int>>> const &mu1, vector<vector<vector<int>>> const &mu2,
-             vector<vector<double>> const &p1, vector<vector<double>> const &p2, vector<double> const &proportion1, vector<double> const &proportion2)
+             vector<vector<double>> const &p1, vector<vector<double>> const &p2,
+             vector<double> const &proportion1, vector<double> const &proportion2)
 {
     double divKL(0);
     int const d = m.size();

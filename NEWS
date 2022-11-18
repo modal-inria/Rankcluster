@@ -1,5 +1,9 @@
-# 
+# v0.98.0 - 2022-11-11
 - add unit tests
+- improve numerical stability of probability computation (WIP)
+- refactor C++ code (WIP)
+- fix c++ warnings
+- lint R code
 
 # v0.94.5 - 2021-01-26
 - replace random_shuffle in C++
@@ -18,7 +22,49 @@
 - factorization
 - correct roxygen S4 tag
 
+# v0.94.1 - 2019-08-28
+- beautify R code
+- update Makevars
+- add src/Rankcluster_init.c file
+
+# v0.94 - 2016-07-29
+- fix bug in gibbs for ties and partial ranks
+
+# v0.93.1 - 2016-01-12
+- update documentation url
+- use r random number generator 
+
+# v0.92.9 - 2014-07-25
+- data and package documentation in their own files
+- parallelization with OPENMP
+- update doc
+
 # v0.92 - 2014-02-12
-- ranks have to be given to the package in the ranking notation (see convertRank function), with the following convention:
-  - missing positions are replaced by 0
-  - tied are replaced by the lowest position they share
+- remove Eigen and use RcppEigen
+- add probability function
+- ranks have to be given to the package in the ranking notation (to manage ties)
+- update doc
+
+# v0.91.6 - 2013-12-19
+- update doc
+- eigen licence/copyright
+
+# v0.91.5 - 2013-12-05
+- update eigen
+- add eigen copyright
+
+# v0.91 - 2013-11-03
+- correct c++ warnings: comparison between unsigned and signed int
+- correction in khi2 for partial data
+
+# v0.90.3 - 2013-09-13
+- add vignettes
+
+# v0.90.2 - 2013-09-05
+- fix error in examples due to randomness
+  
+# v0.90.1 - 2013-08-30
+- correct limited development formula
+
+# v0.89 - 2013-08-28
+- on CRAN, now

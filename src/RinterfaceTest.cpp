@@ -1,5 +1,5 @@
-#include "runTest.h"
-#include "runFunctions.h"
+#include "RinterfaceTest.h"
+#include "RinterfaceFunctions.h"
 
 using namespace Rcpp;
 using namespace std;
@@ -28,11 +28,11 @@ vector<vector<int>> convertToVVi(SEXP const &rMatrix)
     return output;
 }
 
-vector<Rank> downUniVariateRank(NumericMatrix XR)
+vector<RankStruct> downUniVariateRank(NumericMatrix XR)
 {
     int const n(XR.nrow());
     int const m(XR.ncol());
-    vector<Rank> donnees(n);
+    vector<RankStruct> donnees(n);
     set<int> element;
 
     for (int i(1); i < m + 1; i++)
@@ -110,7 +110,7 @@ RcppExport SEXP adkhi2partial(SEXP donnees, SEXP p, SEXP proportion, SEXP mu, SE
     vector<double> pC = as<vector<double>>(p);
     vector<vector<int>> muC = convertToVVi(mu);
     NumericMatrix donneesR(donnees);
-    vector<Rank> data = downUniVariateRank(donneesR);
+    vector<RankStruct> data = downUniVariateRank(donneesR);
 
     //
     double pval(0);

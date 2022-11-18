@@ -1,8 +1,8 @@
 /* @file RankCluster.cpp
  * @brief Implementation of methods of the class @c RankCluster
+ * See https://hal.archives-ouvertes.fr/hal-00441209v3/document and
+ * https://hal.inria.fr/hal-00743384/document for mathematical background
  */
-
-#include "RankCluster.h"
 
 #include <cstdlib>
 #include <algorithm>
@@ -14,852 +14,875 @@
 #include <ctime>
 #include <Rmath.h>
 
+#include "RankCluster.h"
+
 using namespace std;
 using namespace Eigen;
 //using namespace Rcpp;
 
-//constructor
+
+/**********************************************************************************************
+ *
+ * CONSTRUCTORS, DESTRUCTOR
+ *
+ **********************************************************************************************/
+
 RankCluster::RankCluster()
 {
 }
 
-//constructor
-RankCluster::RankCluster(std::vector<std::vector<int>> const &X, int g, vector<int> const &m, SEMparameters const &param)
-    : m_(m), n_(X.size()), d_(m.size()), g_(g),
-      data_(d_, vector<PartialRank>(n_)),
-      z_(n_),
-      mu_(d_, vector<vector<int>>(g_)),
-      p_(d_, vector<double>(g_)),
-      proportion_(g),
-      parameter_(param),
-      partial_(false),
-      dataOk_(true),
-      indexPb_(m.size())
+RankCluster::RankCluster(std::vector<std::vector<int>> const &X, int g,
+                         vector<int> const &m, SEMparameters const &param)
+  : m_(m), n_(X.size()), d_(m.size()), g_(g),
+    data_(d_, vector<PartialRank>(n_)),
+    z_(n_),
+    mu_(d_, vector<Rank>(g_)),
+    p_(d_, vector<double>(g_)),
+    proportion_(g),
+    parameter_(param),
+    partial_(false),
+    dataOk_(true),
+    indexPb_(m.size())
 {
-    //  try
-    //  {
-    // convert data in the good notation and create information about missing and partial
-    conversion2data(X);
-    //  }
-    //  catch(string const& chaine)
-    //    {dataOk_=false;}
+  //  try
+  //  {
+  // convert data in the good notation and create information about missing and partial
+  conversion2data(X);
+  //  }
+  //  catch(string const& errorString)
+  //    {dataOk_=false;}
 }
 
-//constructor
 RankCluster::RankCluster(vector<vector<int>> const &X, vector<int> const &m, SEMparameters const &param,
-                         vector<double> const &proportion, vector<vector<double>> const &p, vector<vector<vector<int>>> const &mu)
-    : m_(m), n_(X.size()), d_(m.size()), g_(proportion.size()),
-      data_(d_, vector<PartialRank>(n_)),
-      z_(n_), mu_(mu), p_(p),
-      proportion_(proportion),
-      parameter_(param),
-      partial_(false),
-      dataOk_(true),
-      indexPb_(m.size())
+                         vector<double> const &proportion, vector<vector<double>> const &p,
+                         vector<vector<Rank>> const &mu)
+  : m_(m), n_(X.size()), d_(m.size()), g_(proportion.size()),
+    data_(d_, vector<PartialRank>(n_)),
+    z_(n_), mu_(mu), p_(p),
+    proportion_(proportion),
+    parameter_(param),
+    partial_(false),
+    dataOk_(true),
+    indexPb_(m.size())
 {
-    //  try
-    //  {
-    // convert data in the good notation and create information about missing and partial
-    conversion2data(X);
-    //  }
-    //  catch(string const& chaine)
-    //    {dataOk_=false;}
+  //  try
+  //  {
+  // convert data in the good notation and create information about missing and partial
+  conversion2data(X);
+  //  }
+  //  catch(string const& errorString)
+  //    {dataOk_=false;}
 }
 
-//copy constructor
+// copy constructor
 RankCluster::RankCluster(RankCluster &rankClusterObject)
-    : m_(rankClusterObject.m()),
-      n_(rankClusterObject.n()),
-      d_(rankClusterObject.d()),
-      g_(rankClusterObject.g()),
-      data_(rankClusterObject.data()),
-      mu_(rankClusterObject.mu()),
-      p_(rankClusterObject.p()),
-      proportion_(rankClusterObject.proportion()),
-      parameter_(rankClusterObject.parameter()),
-      partial_(rankClusterObject.partial()),
-      dataOk_(rankClusterObject.dataOk())
+  : m_(rankClusterObject.m()),
+    n_(rankClusterObject.n()),
+    d_(rankClusterObject.d()),
+    g_(rankClusterObject.g()),
+    data_(rankClusterObject.data()),
+    mu_(rankClusterObject.mu()),
+    p_(rankClusterObject.p()),
+    proportion_(rankClusterObject.proportion()),
+    parameter_(rankClusterObject.parameter()),
+    partial_(rankClusterObject.partial()),
+    dataOk_(rankClusterObject.dataOk())
 {
-    //nothing to do
+  // nothing to do
 }
 
-//destructor
+// destructor
 RankCluster::~RankCluster()
 {
-    // nothing
+  // nothing
 }
+
+
+/**********************************************************************************************
+ *
+ * READ DATA
+ *
+ **********************************************************************************************/
 
 void RankCluster::readRankingRank(vector<vector<int>> const &X, int const &dim, int const &j, vector<int> const &indM)
 {
-    //initialization
-    int indiceElement = 0;
-    data_[dim][j].isNotFull = false;
+  //initialization
+  int indiceElement = 0;
+  data_[dim][j].isPartial = false;
 
-    //multi dim rank temporary
-    vector<vector<int>> temp(m_[dim] + 1);
+  //multi dim rank temporary
+  vector<vector<int>> temp(m_[dim] + 1);
 
-    for (int i = indM[dim]; i < indM[dim + 1]; i++)
+  for (int i = indM[dim]; i < indM[dim + 1]; i++)
+  {
+    temp[X[j][i]].push_back(indiceElement + 1);
+    indiceElement++;
+  }
+
+  //vector containing index of partial element
+  vector<int> partialIndex;
+
+  int skip = 0;
+  //index 0 is for missing, we don't manage in this loop
+  for (int i = 1; i < (int)temp.size(); i++)
+  {
+    if (skip)
     {
-        temp[X[j][i]].push_back(indiceElement + 1);
-        indiceElement++;
-    }
-
-    //vector containing index of partial element
-    vector<int> partialIndex;
-
-    int skip = 0;
-    //index 0 is for missing, we don't manage in this loop
-    for (int i = 1; i < (int)temp.size(); i++)
-    {
-        if (skip)
-        {
-            if (temp[i].size() != 0)
-            {
-                dataOk_ = false;
-                indexPb_[dim].push_back(j + 1);
-                //throw string("Problem with data.");
-            }
-
-            skip--;
-        }
-        else
-        {
-            //tied case
-            if (temp[i].size() > 1)
-            {
-                data_[dim][j].isNotFull = true;
-                partial_ = true;
-                skip = temp[i].size() - 1;
-                data_[dim][j].missingData.push_back(temp[i]);
-
-                vector<int> missingIndex(temp[i].size());
-
-                for (int ii = 0; ii < (int)temp[i].size(); ii++)
-                    missingIndex[ii] = i + ii - 1;
-
-                data_[dim][j].missingIndex.push_back(missingIndex);
-            }
-            else
-            {
-                //normal case
-                if (temp[i].size() == 1)
-                    data_[dim][j].rank[i - 1] = temp[i][0];
-                else //temp[i].size=0//partial case
-                    partialIndex.push_back(i - 1);
-            }
-        }
-    }
-
-    //problem with the data : index of 0 et element at missing position don't match
-    if (temp[0].size() != partialIndex.size())
-    {
+      if (temp[i].size() != 0)
+      {
         dataOk_ = false;
         indexPb_[dim].push_back(j + 1);
         //throw string("Problem with data.");
-    }
+      }
 
-    //add partial
-    if (temp[0].size() != 0)
-    {
-        data_[dim][j].isNotFull = true;
-        partial_ = true;
-        data_[dim][j].missingData.push_back(temp[0]);
-        data_[dim][j].missingIndex.push_back(partialIndex);
+      skip--;
     }
+    else
+    {
+      //tied case
+      if (temp[i].size() > 1)
+      {
+        data_[dim][j].isPartial = true;
+        partial_ = true;
+        skip = temp[i].size() - 1;
+        data_[dim][j].missingData.push_back(temp[i]);
+
+        vector<int> missingIndex(temp[i].size());
+
+        for (int ii = 0; ii < (int)temp[i].size(); ii++)
+          missingIndex[ii] = i + ii - 1;
+
+        data_[dim][j].missingIndex.push_back(missingIndex);
+      }
+      else
+      {
+        //normal case
+        if (temp[i].size() == 1)
+          data_[dim][j].x[i - 1] = temp[i][0];
+        else //temp[i].size=0//partial case
+          partialIndex.push_back(i - 1);
+      }
+    }
+  }
+
+  //problem with the data : index of 0 et element at missing position don't match
+  if (temp[0].size() != partialIndex.size())
+  {
+    dataOk_ = false;
+    indexPb_[dim].push_back(j + 1);
+    //throw string("Problem with data.");
+  }
+
+  //add partial
+  if (temp[0].size() != 0)
+  {
+    data_[dim][j].isPartial = true;
+    partial_ = true;
+    data_[dim][j].missingData.push_back(temp[0]);
+    data_[dim][j].missingIndex.push_back(partialIndex);
+  }
 }
 
 void RankCluster::conversion2data(vector<vector<int>> const &X)
 {
-    //size of a row of X
-    vector<int> indM(d_ + 1, 0);
-    for (int i = 0; i < d_; i++)
-        indM[i + 1] = indM[i] + m_[i];
+  //size of a row of X
+  vector<int> indM(d_ + 1, 0);
+  for (int i = 0; i < d_; i++)
+    indM[i + 1] = indM[i] + m_[i];
 
-    //resize data
-    for (int i = 0; i < d_; i++)
-        for (int j = 0; j < n_; j++)
-            data_[i][j].rank.resize(m_[i]);
-
-    //begin the read of the data row by row
+  //resize data
+  for (int i = 0; i < d_; i++)
     for (int j = 0; j < n_; j++)
+      data_[i][j].x.resize(m_[i]);
+
+  //begin the read of the data row by row
+  for (int j = 0; j < n_; j++)
+  {
+    //dim by dim
+    for (int dim(0); dim < d_; dim++)
     {
-        //dim by dim
-        for (int dim(0); dim < d_; dim++)
-        {
-            //read rank j of dim dim
-            readRankingRank(X, dim, j, indM);
-        }
+      //read rank j of dim dim
+      readRankingRank(X, dim, j, indM);
     }
+  }
 }
 
+
+/**********************************************************************************************
+ *
+ * INITIALIZATION METHODS
+ *
+ **********************************************************************************************/
 void RankCluster::initialization()
 {
-    double alea;
+  // t0 = clock();
+  initializeZ();
+  initializeP();
+  initializeMu();
+  estimateProportion();
+  initializePartialRank();
+  fillIndexPartialData();
+  saveInitialization();
+  // t1 = clock();
 
-    //zik initialization with multinomial of equal proba
-    if (g_ != 1)
-    {
-        for (int i = 0; i < n_; i++)
-        {
-            alea = runif(0., 1.);
-            for (int j = 0; j < g_; j++)
-                if ((alea > (double)j / g_) & (alea < (double)(j + 1) / g_))
-                {
-                    z_[i] = j;
-                    break;
-                }
-        }
-    }
-    else
-    {
-        for (int i(0); i < n_; i++)
-            z_[i] = 0;
-    }
-
-    //mu & p  initialization
-    for (int k = 0; k < d_; k++)
-    {
-        for (int i = 0; i < g_; i++)
-        {
-            //initialization of p_ with double between 0.5 and 1
-            alea = (double)runif(0.5, 1.);
-            p_[k][i] = alea;
-            //initialization of mu_ with alea rank of size m_
-            mu_[k][i].resize(m_[k]);
-            for (int j = 0; j < m_[k]; j++)
-                mu_[k][i][j] = j + 1;
-            Rshuffle(mu_[k][i].begin(), mu_[k][i].end());
-        }
-    }
-
-    //proportion initialization
-    for (int i = 0; i < n_; i++)
-        proportion_[z_[i]]++;
-
-    for (int i = 0; i < g_; i++)
-        proportion_[i] /= (double)n_;
-
-    //partial data and order of presentation initialization
-    for (int dim = 0; dim < d_; dim++)
-    {
-        vector<int> rankTemp(m_[dim]);
-        for (int i = 0; i < m_[dim]; i++)
-            rankTemp[i] = i + 1;
-        for (int ind = 0; ind < n_; ind++)
-        {
-            //initialization of y
-            Rshuffle(rankTemp.begin(), rankTemp.end());
-            data_[dim][ind].y = rankTemp;
-
-            if (data_[dim][ind].isNotFull)
-            {
-                for (int ii = 0; ii < (int)data_[dim][ind].missingIndex.size(); ii++)
-                {
-                    //initialization of Partial Rank
-                    vector<int> rankTemp2(data_[dim][ind].missingIndex[ii]);
-                    Rshuffle(rankTemp2.begin(), rankTemp2.end());
-
-                    for (int iii = 0; iii < (int)data_[dim][ind].missingData[ii].size(); iii++)
-                        data_[dim][ind].rank[rankTemp2[iii]] = data_[dim][ind].missingData[ii][iii];
-                }
-            }
-        }
-    }
-
-    indexPartialData_ = vector<vector<int>>(d_);
-    for (int dim = 0; dim < d_; dim++)
-    {
-        for (int ind = 0; ind < n_; ind++)
-        {
-            if (data_[dim][ind].isNotFull)
-                indexPartialData_[dim].push_back(ind);
-        }
-    }
-
-    vector<vector<vector<int>>> donneesPartiel(d_);
-    for (int dim = 0; dim < d_; dim++)
-        for (vector<int>::iterator it = indexPartialData_[dim].begin(); it != indexPartialData_[dim].end(); it++)
-            donneesPartiel[dim].push_back(data_[dim][*it].rank);
-
-    //sauvegarde initialisation
-    output_.initialPartialRank = donneesPartiel;
-    output_.initialP = p_;
-    output_.initialZ = z_;
-    output_.initialMu = mu_;
-    output_.initialProportion = proportion_;
+  // if(parameter_.verbose)
+  //     cout << "Initialization completed in " <<(double) (t1-t0)/CLOCKS_PER_SEC << "s." << endl;
 }
+
+// random initialization of z_: multinomial law of size g_
+void RankCluster::initializeZ()
+{
+  for (int i = 0; i < n_; i++)
+    z_[i] = randWrapper(g_);
+}
+
+// initialization of p_ with double between 0.5 and 1
+void RankCluster::initializeP()
+{
+  for (int k = 0; k < d_; k++)
+  {
+    for (int i = 0; i < g_; i++)
+    {
+      p_[k][i] = (double) runif(0.5, 1.);
+    }
+  }
+}
+
+// random initialization of mu_ with random rank of size m_
+void RankCluster::initializeMu()
+{
+  for (int k = 0; k < d_; k++)
+  {
+    for (int i = 0; i < g_; i++)
+    {
+      mu_[k][i].resize(m_[k]);
+      randomRank(mu_[k][i]);
+    }
+  }
+}
+
+// estimate proportion using z_: proportion of each class among z_
+void RankCluster::estimateProportion()
+{
+  for (int k = 0; k < g_; k++)
+    proportion_[k] = 0;
+
+  for (int i = 0; i < n_; i++)
+    proportion_[z_[i]]++;
+
+  for (int k = 0; k < g_; k++)
+    proportion_[k] /= (double)n_;
+}
+
+// order of presentation random initialization
+void RankCluster::initializeY()
+{
+  for (int dim = 0; dim < d_; dim++)
+  {
+    vector<int> rankTemp(m_[dim]);
+    initializeRank(rankTemp);
+    for (int ind = 0; ind < n_; ind++)
+    {
+      Rshuffle(rankTemp.begin(), rankTemp.end());
+      data_[dim][ind].y = rankTemp;
+    }
+  }
+}
+
+// order of partial rank: random initialization with missing index
+void RankCluster::initializePartialRank()
+{
+  for (int dim = 0; dim < d_; dim++)
+  {
+    for (int ind = 0; ind < n_; ind++)
+    {
+      if (data_[dim][ind].isPartial)
+      {
+        for (int ii = 0; ii < (int)data_[dim][ind].missingIndex.size(); ii++)
+        {
+          Rank rankTemp(data_[dim][ind].missingIndex[ii]);
+          Rshuffle(rankTemp.begin(), rankTemp.end());
+
+          for (int iii = 0; iii < (int)data_[dim][ind].missingData[ii].size(); iii++)
+            data_[dim][ind].x[rankTemp[iii]] = data_[dim][ind].missingData[ii][iii];
+        }
+      }
+    }
+  }
+}
+
+
+void RankCluster::fillIndexPartialData()
+{
+  indexPartialData_ = vector<vector<int>>(d_);
+  for (int dim = 0; dim < d_; dim++)
+  {
+    for (int ind = 0; ind < n_; ind++)
+    {
+      if (data_[dim][ind].isPartial)
+        indexPartialData_[dim].push_back(ind);
+    }
+  }
+}
+
+// save initialization in output_ member
+void RankCluster::saveInitialization()
+{
+  vector<vector<Rank>> partialRankData(d_);
+  for (int dim = 0; dim < d_; dim++)
+    for (vector<int>::iterator it = indexPartialData_[dim].begin(); it != indexPartialData_[dim].end(); it++)
+      partialRankData[dim].push_back(data_[dim][*it].x);
+
+  output_.initialPartialRank = partialRankData;
+  output_.initialP = p_;
+  output_.initialZ = z_;
+  output_.initialMu = mu_;
+  output_.initialProportion = proportion_;
+}
+
+
+
+/**********************************************************************************************
+ *
+ * SE STEP METHODS
+ *
+ **********************************************************************************************/
 
 void RankCluster::SEstep()
 {
-    //simulation of order of presentation for each dimension
-    for (int dim = 0; dim < d_; dim++)
-        gibbsY(dim);
+  // simulation of order of presentation for each dimension
+  for (int dim = 0; dim < d_; dim++)
+    gibbsY(dim);
 
-    //simulation of z
-    zSimulation();
+  sampleZ();
 
-    //simulation of partial rank for each dimension
-    for (int dim = 0; dim < d_; dim++)
-        gibbsX(dim);
+  // simulation of partial rank for each dimension
+  for (int dim = 0; dim < d_; dim++)
+    gibbsX(dim);
 }
 
 void RankCluster::gibbsY(int indexDim)
 {
-    double p1(0), p2(0), alea(0);
-    set<int>::iterator itset;
+  double logPcurrent(0), logPcandidate(0);
+  set<int>::iterator itset;
 
-    //rank 1 2..m
-    vector<int> yTemp(m_[indexDim]);
-    for (int j = 0; j < m_[indexDim]; j++)
-        yTemp[j] = j + 1;
+  //rank 1 2..m
+  // Rank yTemp(m_[indexDim]);
+  // initializeRank(yTemp);
 
-    for (int ind = 0; ind < n_; ind++)
+  for (int ind = 0; ind < n_; ind++)
+  {
+    //Gibbs sampling
+    Rank y(m_[indexDim]), yCandidate(m_[indexDim]), yCurrent(m_[indexDim]);
+
+    //initialization of p1 and y1
+    randomRank(y);
+    yCurrent = y;
+    logPcurrent = lnProbaCond(data_[indexDim][ind].x, yCurrent, mu_[indexDim][z_[ind]], p_[indexDim][z_[ind]]);
+
+    //start of iteration
+    for (int iter(0); iter < parameter_.nGibbsSE[indexDim]; iter++)
     {
-        //Gibbs sampling
-        vector<int> y(m_[indexDim]), y2(m_[indexDim]), y1(m_[indexDim]);
+      for (int i(0); i < m_[indexDim] - 1; i++)
+      {
+        // new y to test (old y with inversion of 2 adjacent elements)
+        yCandidate = y;
+        yCandidate[i] = y[i + 1];
+        yCandidate[i + 1] = y[i];
 
-        //initialization of p1 and y1
-        y = yTemp;
-        Rshuffle(y.begin(), y.end()); //simulation of alea rank
-        y1 = y;
-        p1 = probaCond(data_[indexDim][ind].rank, y1, mu_[indexDim][z_[ind]], p_[indexDim][z_[ind]]);
+        // compute the probability of accept the change of y
+        logPcandidate = lnProbaCond(data_[indexDim][ind].x, yCandidate,
+                                    mu_[indexDim][z_[ind]], p_[indexDim][z_[ind]]);
 
-        //start of iteration
-        for (int iter(0); iter < parameter_.nGibbsSE[indexDim]; iter++)
+        bool changeAccepted = acceptChange(logPcurrent, logPcandidate);
+        if (changeAccepted) //change acceptation
         {
-            for (int k(0); k < m_[indexDim] - 1; k++)
-            {
-                //new y to test (old y with inversion of 2 adjacents elements)
-                y2 = y;
-                y2[k] = y[k + 1];
-                y2[k + 1] = y[k];
-
-                //compute the probability of accept the changement of y
-                p2 = probaCond(data_[indexDim][ind].rank, y2, mu_[indexDim][z_[ind]], p_[indexDim][z_[ind]]);
-
-                alea = (double)runif(0, (p1 + p2));
-
-                if (alea < p2) //changement acceptation
-                {
-                    y = y2;
-                    p1 = p2;
-                    y1 = y;
-                }
-                else
-                    y = y1;
-            }
+          y = yCandidate;
+          logPcurrent = logPcandidate;
+          yCurrent = y;
         }
-        data_[indexDim][ind].y = y;
+        else
+          y = yCurrent;
+      }
     }
+    data_[indexDim][ind].y = y;
+  }
 }
 
-void RankCluster::zSimulation()
+
+Eigen::ArrayXd RankCluster::computeTik(int const ind)
 {
+  Eigen::ArrayXd tik = ArrayXd::Zero(g_);
 
-    if (g_ != 1)
+  for (int k(0); k < g_; k++)
+  {
+    for (int l(0); l < d_; l++)
+      tik(k) += lnProbaCond(data_[l][ind].x, data_[l][ind].y, mu_[l][k], p_[l][k]);
+
+    tik[k] += log(proportion_[k]);
+  }
+  normalizeLogProbaInPlace(tik);
+
+  return tik;
+}
+
+/* z follow a multinomial law of parameter tik */
+void RankCluster::sampleZ()
+{
+  if (g_ != 1)
+  {
+    Eigen::ArrayXd tik(g_);
+
+    for (int ind(0); ind < n_; ind++)
     {
-        double alea(0), sumTik(0);
-        vector<double> lim(g_ + 1, 0), tik(g_);
+      // computation of the probability to belong to each cluster
+      tik = computeTik(ind);
 
-        for (int ind(0); ind < n_; ind++)
-        {
-            //computation of the probability to belong to each cluster
-            for (int k(0); k < g_; k++)
-                tik[k] = 1;
-
-            sumTik = 0;
-            for (int k(0); k < g_; k++)
-            {
-                for (int l(0); l < d_; l++)
-                    tik[k] *= probaCond(data_[l][ind].rank, data_[l][ind].y, mu_[l][k], p_[l][k]);
-                tik[k] *= proportion_[k];
-                sumTik += tik[k];
-            }
-
-            for (int i(0); i < g_; i++)
-                tik[i] /= sumTik;
-
-            //z follow a multinomial law of parameter tik
-            for (int k(1); k < g_ + 1; k++)
-                lim[k] = lim[k - 1] + tik[k - 1];
-
-            alea = (double)runif(0., 1.);
-
-            for (int j(0); j < g_; j++)
-                if ((lim[j] <= alea) && (alea <= lim[j + 1]))
-                {
-                    z_[ind] = j;
-                    break;
-                }
-        }
+      z_[ind] = sampleMultinomial(tik);
     }
-    else
-    {
-        for (int i = 0; i < (int)z_.size(); i++)
-            z_[i] = 0;
-    }
+  }
+  else
+  {
+    for (int ind(0); ind < n_; ind++)
+      z_[ind] = 0;
+  }
 }
 
 void RankCluster::gibbsX(int indexDim)
 {
-    double p1(0), p2(0), alea(0);
+  double logPcurrent(0), logPcandidate(0);
 
-    for (int ind = 0; ind < n_; ind++)
+  for (int ind = 0; ind < n_; ind++)
+  {
+    if (data_[indexDim][ind].isPartial)
     {
-        if (data_[indexDim][ind].isNotFull)
+      // Gibbs algorithm
+      Rank x(m_[indexDim]), xCurrent(m_[indexDim]), xCandidate(m_[indexDim]);
+
+      // mu and log-probability initialization
+      x = data_[indexDim][ind].x;
+      xCurrent = x;
+      logPcurrent = lnProbaCond(xCurrent, data_[indexDim][ind].y, mu_[indexDim][z_[ind]], p_[indexDim][z_[ind]]);
+
+      for (int iter = 0; iter < parameter_.nGibbsSE[indexDim]; iter++)
+      {
+        for (int ii = 0; ii < (int)data_[indexDim][ind].missingIndex.size(); ii++)
         {
-            //Algorithme de Gibbs
-            vector<int> x(m_[indexDim]), x2(m_[indexDim]), x1(m_[indexDim]);
+          for (int i = 0; i < (int)data_[indexDim][ind].missingIndex[ii].size() - 1; i++)
+          {
+            // new rank to test: old rank where 2 partial elements are exchanged
+            xCandidate = x;
+            xCandidate[data_[indexDim][ind].missingIndex[ii][i]] = x[data_[indexDim][ind].missingIndex[ii][i + 1]];
+            xCandidate[data_[indexDim][ind].missingIndex[ii][i + 1]] = x[data_[indexDim][ind].missingIndex[ii][i]];
 
-            //initialisation de mu et p pour Gibbs
-            x = data_[indexDim][ind].rank;
-            x1 = x;
-            p1 = probaCond(x1, data_[indexDim][ind].y, mu_[indexDim][z_[ind]], p_[indexDim][z_[ind]]);
+            logPcandidate = lnProbaCond(xCandidate, data_[indexDim][ind].y, mu_[indexDim][z_[ind]],
+                                        p_[indexDim][z_[ind]]);
 
-            for (int iter = 0; iter < parameter_.nGibbsSE[indexDim]; iter++)
+            bool changeAccepted = acceptChange(logPcurrent, logPcandidate);
+            if (changeAccepted)
             {
-                for (int ii = 0; ii < (int)data_[indexDim][ind].missingIndex.size(); ii++)
-                {
-                    for (int i = 0; i < (int)data_[indexDim][ind].missingIndex[ii].size() - 1; i++)
-                    {
-                        //nouveau x à tester, ancien x auquel on inverse 2 éléments partiels
-                        x2 = x;
-                        x2[data_[indexDim][ind].missingIndex[ii][i]] = x[data_[indexDim][ind].missingIndex[ii][i + 1]];
-                        x2[data_[indexDim][ind].missingIndex[ii][i + 1]] = x[data_[indexDim][ind].missingIndex[ii][i]];
-
-                        p2 = probaCond(x2, data_[indexDim][ind].y, mu_[indexDim][z_[ind]], p_[indexDim][z_[ind]]);
-
-                        alea = (double)runif(0., p1 + p2);
-
-                        if (alea < p2) //acceptation du changement
-                        {
-                            x = x2;
-                            p1 = p2;
-                            x1 = x;
-                        }
-                        else
-                            x = x1;
-                    }
-                }
+              x = xCandidate;
+              logPcurrent = logPcandidate;
+              xCurrent = x;
             }
-            data_[indexDim][ind].rank = x;
+            else
+              x = xCurrent;
+          }
         }
+      }
+      data_[indexDim][ind].x = x;
     }
+  }
 }
+
+
+/**********************************************************************************************
+ *
+ * M STEP METHODS
+ *
+ **********************************************************************************************/
 
 void RankCluster::Mstep()
 {
-    //MAJ proportion
-    for (int k(0); k < g_; k++)
-    {
-        proportion_[k] = 0;
-        for (int ind(0); ind < n_; ind++)
-        {
-            if (z_[ind] == k)
-                proportion_[k]++;
-        }
-        proportion_[k] /= (double)n_;
-        if (proportion_[k] == 0)
-            throw string("NON CONVERGENCE DE L'ALGORITHME : a proportion is equal to 0");
-    }
+  // update proportion
+  estimateProportion();
 
-    //simulation of mu for ezach dim and cluster
-    for (int dim(0); dim < d_; dim++)
-    {
-        for (int numCl(0); numCl < g_; numCl++)
-            simuM(dim, numCl);
-    }
+  for (int k(0); k < g_; k++)
+  {
+    if (proportion_[k] == 0)
+      throw string("Algorithm did not converge: a proportion is equal to 0");
+  }
+
+  // simulation of mu for each dim and cluster
+  for (int dim(0); dim < d_; dim++)
+  {
+    for (int classNumber(0); classNumber < g_; classNumber++)
+      estimateMuP(dim, classNumber);
+  }
 }
 
-void RankCluster::simuM(int indexDim, int indCl)
+
+
+void RankCluster::estimateMuP(int indexDim, int classNumber)
 {
-    long double p1(0), p2(0), alea(0), lnp1(0), lnp2(0), lnp1Plusp2(0);
-    double s1(0), lim(-numeric_limits<double>::max());
-    vector<int> tabFact(m_[indexDim]), comp(2);
+  vector<int> tabFact = tab_factorial(m_[indexDim]);
 
-    tabFact = tab_factorial(m_[indexDim]);
+  // vector to store results of each iteration
+  vector<Rank> MU(parameter_.nGibbsM[indexDim]);
+  vector<double> P(parameter_.nGibbsM[indexDim], 0.), L(parameter_.nGibbsM[indexDim], 0.);
 
-    vector<vector<int>> MU(parameter_.nGibbsM[indexDim]);
-    vector<double> P(parameter_.nGibbsM[indexDim], 0), L(parameter_.nGibbsM[indexDim], 0);
-    int indMu, compteur(0);
-    int tailleComposante(0);
+  // elements will be grouped per mu. If the new mu is the same, we do not recompute P and likelihood
+  map<int, vector<double>> resPerMu;
+  map<int, vector<double>>::iterator iteratorResPerMu;
+  int indMu;
 
-    for (int i(0); i < n_; i++)
-        if (z_[i] == indCl)
-            tailleComposante++;
+  // initialization of mu
+  Rank mu = mu_[indexDim][classNumber];
 
-    vector<double> G(tailleComposante), A_G(tailleComposante);
+  // initial completed log-likelihood
+  double logPcurrent = 0.;
+  int sizeCluster = 0.;
+  for (int ind(0); ind < n_; ind++)
+  {
+    if (z_[ind] == classNumber)
+    {
+      logPcurrent += lnProbaCond(data_[indexDim][ind].x, data_[indexDim][ind].y, mu, p_[indexDim][classNumber]);
+      sizeCluster++;
+    }
+  }
 
-    map<int, vector<double>> muTeste;
-    map<int, vector<double>>::iterator itmapmu;
+  // Gibbs algorithm
+  for (int iter(0); iter < parameter_.nGibbsM[indexDim]; iter++)
+  {
+    simulateCandidateMuKJ(indexDim, classNumber, mu, logPcurrent);
+    MU[iter] = mu;
 
-    //Algorithme de Gibbs
-    vector<int> mu(m_[indexDim]), mu2(m_[indexDim]), mu1(m_[indexDim]);
+    indMu = rank2index(MU[iter], tabFact);
+    iteratorResPerMu = resPerMu.find(indMu);
 
-    //initialization of mu  and p
-    mu = mu_[indexDim][indCl];
-    mu1 = mu;
-    lnp1 = 0;
+    if (iteratorResPerMu == resPerMu.end()) //if we have already tested this mu, we do not redo computation
+    {
+      double sumG(0.), sumA_G(0.);
+      vector<double> vecTemp(2);
 
-    //initial proba
+      P[iter] = updatePKJ(indexDim, classNumber, sizeCluster, mu, sumG, sumA_G);
+
+      L[iter] = computeCompletedLoglikehoodKJ(P[iter], sumG, sumA_G);
+
+      vecTemp[0] = P[iter];
+      vecTemp[1] = L[iter];
+      resPerMu[indMu] = vecTemp;
+    }
+    else
+    {
+      P[iter] = (iteratorResPerMu->second)[0];
+      L[iter] = (iteratorResPerMu->second)[1];
+    }
+
+    p_[indexDim][classNumber] = P[iter];
+  }
+
+  // find the best (mu, p) according to completed log-likelihood
+  int indice(max_element(L.begin(), L.end()) - L.begin());
+  p_[indexDim][classNumber] = P[indice];
+  mu_[indexDim][classNumber] = MU[indice];
+}
+
+
+void RankCluster::simulateCandidateMuKJ(int indexDim, int classNumber, Rank &mu, double &logPcurrent)
+{
+  Rank muCandidate, muCurrent(mu);  // ? is muCurrent necessary ?
+  double logPcandidate;
+
+  // new mu
+  for (int k(0); k < m_[indexDim] - 1; k++)
+  {
+    // new mu to test
+    muCandidate = mu;
+    muCandidate[k] = mu[k + 1];
+    muCandidate[k + 1] = mu[k];
+
+    logPcandidate = 0.;
+
+    // new probability
     for (int ind(0); ind < n_; ind++)
     {
-        if (z_[ind] == indCl)
-        {
-            p1 = probaCond(data_[indexDim][ind].rank, data_[indexDim][ind].y, mu1, p_[indexDim][indCl]);
-            lnp1 += log(p1);
-        }
+      if (z_[ind] == classNumber)
+      {
+        logPcandidate += lnProbaCond(data_[indexDim][ind].x, data_[indexDim][ind].y,
+                                     muCandidate, p_[indexDim][classNumber]);
+      }
     }
 
-    for (int iter(0); iter < parameter_.nGibbsM[indexDim]; iter++)
+    // acceptation of change or not
+    bool changeAccepted = acceptChange(logPcurrent, logPcandidate);
+    if  (changeAccepted)
     {
-        //new mu
-        for (int k(0); k < m_[indexDim] - 1; k++)
-        {
-            //new mu to test
-            mu2 = mu;
-            mu2[k] = mu[k + 1];
-            mu2[k + 1] = mu[k];
-
-            lnp2 = 0;
-
-            //new proba
-            for (int ind(0); ind < n_; ind++)
-            {
-                if (z_[ind] == indCl)
-                {
-                    p2 = probaCond(data_[indexDim][ind].rank, data_[indexDim][ind].y, mu2, p_[indexDim][indCl]);
-                    lnp2 += log(p2);
-                }
-            }
-
-            //p1+p2
-            //ln(p1+p2)~ln(
-            long double diffln;
-            if (lnp1 > lnp2)
-            {
-                diffln = lnp2 - lnp1;
-                lnp1Plusp2 = lnp1;
-            }
-            else
-            {
-                diffln = lnp1 - lnp2;
-                lnp1Plusp2 = lnp2;
-            }
-
-            //taylor development of order for estiamting lnp1Plusp2
-            for (int ordre(1); ordre < 6; ordre++)
-            {
-                //* (long double) std::pow((int) -1,(int) ordre-1)
-                int sign = 1;
-                if (ordre % 2 == 1)
-                    sign = -1;
-                lnp1Plusp2 += (long double)sign / ordre * exp(diffln * ordre);
-            }
-
-            alea = (long double)runif(0., 1.);
-
-            // acceptaion of change or not
-            if (alea < exp(lnp2 - lnp1Plusp2)) //accept the changement
-            {
-                mu = mu2;
-                lnp1 = lnp2;
-                mu1 = mu;
-            }
-            else
-                mu = mu1;
-
-        } //fin parcours mu
-        MU[iter] = mu;
-
-        //MAJ p
-        indMu = rank2index(MU[iter], tabFact);
-        itmapmu = muTeste.find(indMu);
-
-        if (itmapmu == muTeste.end()) //if we have already tested this mu, we do not redo computation
-        {
-            s1 = 0;
-            compteur = 0;
-            //computation of G and A-G (number of good and bad comparison) for loglikelihood
-            double somG(0), somA_G(0);
-            for (int ind(0); ind < n_; ind++)
-            {
-                if (z_[ind] == indCl)
-                {
-                    comp = comparaison(data_[indexDim][ind].rank, data_[indexDim][ind].y, MU[iter]);
-                    G[compteur] = comp[1];
-                    A_G[compteur] = comp[0] - comp[1];
-                    s1 += comp[0];
-                    somG += G[compteur];
-                    somA_G += A_G[compteur];
-                    compteur++;
-                }
-            }
-
-            P[iter] = somG / s1;
-
-            if ((P[iter] != 0) & (P[iter] != 1))
-            {
-                //L[iter]+=(G[i]*log(P[iter])+A_G[i]*log(1-P[iter]));
-                L[iter] = somG * log(P[iter]) + somA_G * log(1 - P[iter]);
-            }
-            else
-            {
-                if ((P[iter] == 0) & (somG == 0))
-                    L[iter] = 0;
-                else
-                {
-                    if ((P[iter] == 1) & (somA_G == 0))
-                        L[iter] = 0;
-                    else
-                        L[iter] = lim;
-                }
-            }
-            /*vector<double> stock(3);
-       stock[0]=somG;
-       stock[1]=somA_G;
-       stock[2]=s1;*/
-            vector<double> stock(2);
-            stock[0] = P[iter];
-            stock[1] = L[iter];
-            muTeste[indMu] = stock; //MAJ des mu test�
-        }
-        else
-        {
-            L[iter] = (itmapmu->second)[1];
-            P[iter] = (itmapmu->second)[0];
-        }
-
-        p_[indexDim][indCl] = P[iter];
+      mu = muCandidate;
+      logPcurrent = logPcandidate;
+      muCurrent = mu;
     }
+    else
+      mu = muCurrent;
+  }
 
-    int indice(max_element(L.begin(), L.end()) - L.begin());
-    p_[indexDim][indCl] = P[indice];
-    mu_[indexDim][indCl] = MU[indice];
 }
 
-typedef struct ListeMu ListeMu;
-void RankCluster::likelihood(vector<vector<vector<vector<int>>>> &listeMu, vector<vector<vector<double>>> &resP, vector<vector<double>> &resProp)
+/*
+ * sumG and sumA_G are modified to be used in computeCompletedLoglikehoodKJ function
+ */
+double RankCluster::updatePKJ(int indexDim, int classNumber, int nObsClass, Rank const& mu,
+                              double &sumG, double &sumA_G)
 {
-    //we put the same mu together and make the mean of their parameters
-    //double t1,t2,tL(0);
+  double s1 = 0.;
+  vector<int> comp(2);
 
-    //t1=clock();
-    struct ListeMu;
-    struct ListeMu
+  // computation of G and A-G (number of good and bad comparison) for log-likelihood
+  sumG = 0.;
+  sumA_G = 0.;
+
+  for (int ind(0); ind < n_; ind++)
+  {
+    if (z_[ind] == classNumber)
     {
-        double compteur; //number of same mu
-        std::vector<std::vector<std::vector<int>>> rangComplet;
-        std::vector<std::vector<double>> p;
-        std::vector<double> prop;
-        ListeMu *suivant;
-    };
+      comp = comparaison(data_[indexDim][ind].x, data_[indexDim][ind].y, mu);
 
-    bool continuer(true), egaliteRang;
-
-    ListeMu *headMu = new ListeMu;
-    ListeMu *currMu = headMu;
-    ListeMu *next = 0;
-    currMu->compteur = 1;
-    currMu->suivant = 0;
-    currMu->rangComplet = listeMu[0];
-    currMu->p = resP[0];
-    currMu->prop = resProp[0];
-
-    int nbMu(1);
-
-    for (int j(1); j < parameter_.maxIt - parameter_.burnAlgo; j++) //we see all the mu
-    {
-        continuer = true;
-        currMu = headMu;
-        while (continuer)
-        {
-            egaliteRang = true;
-            //look if the j-th mu is the same that the current mu
-            for (int J(0); J < d_; J++)
-                for (int k(0); k < g_; k++)
-                {
-                    for (int i(0); i < m_[J]; i++)
-                        if (currMu->rangComplet[J][k][i] != listeMu[j][J][k][i])
-                        {
-                            egaliteRang = false;
-                            break;
-                        }
-                }
-
-            if (egaliteRang)
-            {
-                //same mu
-                currMu->compteur++;
-                //we sum the proportion and p
-                for (int compt1(0); compt1 < g_; compt1++)
-                {
-                    currMu->prop[compt1] += resProp[j][compt1];
-                    for (int compt2(0); compt2 < d_; compt2++)
-                        currMu->p[compt2][compt1] += resP[j][compt2][compt1];
-                }
-                continuer = false; //no need to check other mu of the struct
-            }
-            else
-            {
-                //not the same mu
-                if (currMu->suivant == 0)
-                { //if the current mu is the last, we add thz j-th mu in the struct
-                    nbMu++;
-                    continuer = false;
-                    next = new ListeMu;
-                    currMu->suivant = next;
-                    currMu = next;
-                    currMu->compteur = 1;
-                    currMu->suivant = 0;
-                    currMu->rangComplet = listeMu[j];
-                    currMu->prop = resProp[j];
-                    currMu->p = resP[j];
-                }
-                else
-                    currMu = currMu->suivant; //we will test the next mu
-            }
-        }
+      s1 += comp[0];
+      sumG += comp[1];
+      sumA_G += (comp[0] - comp[1]);
     }
+  }
 
-    //t2=clock();
-    //cout<<"Temps regroupement mu: "<<(double) (t2-t1)/CLOCKS_PER_SEC<<"s"<<endl;
-    int compteur(0);
+  return sumG / s1;
+}
 
-    //calcul logvraisemblance
-    //if(parameter_.detail)
-    //cout<<"Number of reference rank which must compute the log-likelihood: "<<nbMu<<endl;
-
-    double Llast(-numeric_limits<double>::max()), L;
-
-    vector<vector<vector<int>>> Y(d_, vector<vector<int>>(n_)), xPartialTemp(output_.initialPartialRank);
-    vector<vector<vector<double>>> scoreTemp(output_.initialPartialRank.size());
-    for (int ii = 0; ii < (int)scoreTemp.size(); ii++)
+/*
+ * Compute the completed log-likelihood to choose the best couple (mu_k^j, p_k^j).
+ *
+ * Maximizing the completed log-likelihood for a new couple (mu_k^j, p_k^j)
+ * (dimension j = indexDim, cluster k = classNumber)
+ * is equivalent to maximizing
+ * \sum_{individuals i of class k} P(x_i^k | y_i^k; mu_k^j, p_k^j) =
+ * \sum_{individuals i of class k} G_i^j log(p_k^j) + \sum_{individuals i of class k} A_i^j - G_i^j) log(1 - p_k^j)
+ */
+double RankCluster::computeCompletedLoglikehoodKJ(double p, double sumG, double sumA_G)
+{
+  double loglikelihood = 0.;
+  if ((p != 0) && (p != 1))
+  {
+    loglikelihood = sumG * log(p) + sumA_G * log(1 - p);
+  }
+  else
+  {
+    if ((p == 0) && (sumG == 0))
+      loglikelihood = 0.;
+    else
     {
-        scoreTemp[ii].resize(output_.initialPartialRank[ii].size());
-        for (int iii = 0; iii < (int)scoreTemp[ii].size(); iii++)
-        {
-            scoreTemp[ii][iii].resize(output_.initialPartialRank[ii][iii].size());
-        }
+      if ((p == 1) && (sumA_G == 0))
+        loglikelihood = 0.;
+      else
+        loglikelihood = -numeric_limits<double>::max();
     }
+  }
 
-    //Now, we have the list of all the different Mu
-    currMu = headMu;
-    ArrayXXd tik(n_, g_);
-    ArrayXXd probabilities(n_, g_); //estimate probability for an individual to belong to each cluster
+  return loglikelihood;
+}
 
-    //for each mu, we will compute the associate log likelihood
-    while (currMu->suivant != 0)
+/**********************************************************************************************
+ *
+ * LIKELIHOOD, CRITERIA AND OTHER OUTPUTS METHODS
+ *
+ **********************************************************************************************/
+void RankCluster::selectBestParameters(vector<vector<vector<Rank>>> &resMu,
+                                       vector<vector<vector<double>>> &resP,
+                                       vector<vector<double>> &resProp)
+{
+  // double t1, t2, tL(0);
+
+  // t1 = clock();
+
+  MuList *headMu = findDifferentMu(resMu, resP, resProp);
+  MuList *currMu = headMu;
+  MuList *next = 0;
+
+  // t2 = clock();
+  // cout << "Temps regroupement mu: " << (double) (t2-t1)/CLOCKS_PER_SEC << "s" << endl;
+
+  // compute log-likelihood
+  // if(parameter_.verbose)
+  //     cout << "Number of reference rank which must compute the log-likelihood: " << nbMu << endl;
+
+  double Llast(-numeric_limits<double>::max()), L;
+
+  vector<vector<Rank>> Y(d_, vector<Rank>(n_)), xPartialTemp(output_.initialPartialRank);
+
+  vector<vector<vector<double>>> scoreTemp(output_.initialPartialRank.size());
+  for (int ii = 0; ii < (int)scoreTemp.size(); ii++)
+  {
+    scoreTemp[ii].resize(output_.initialPartialRank[ii].size());
+    for (int iii = 0; iii < (int)scoreTemp[ii].size(); iii++)
     {
-        //if(parameter_.detail)
-        //cout<<"*";
-
-        //mean of the parameter
-        for (int compt1(0); compt1 < g_; compt1++)
-        {
-            currMu->prop[compt1] /= currMu->compteur;
-            for (int compt2(0); compt2 < d_; compt2++)
-                currMu->p[compt2][compt1] /= currMu->compteur;
-        }
-
-        //compute the log likelihood
-        //t1=clock();
-        L = computeLikelihood(currMu->rangComplet, currMu->p, currMu->prop, tik, Y, xPartialTemp, probabilities, scoreTemp);
-        //t2=clock();
-        //tL+=t2-t1;
-
-        if (L > Llast)
-        {
-            //the current mu has a better loglikelihood, we save the parameter
-            Llast = L;
-            mu_ = currMu->rangComplet;
-            p_ = currMu->p;
-            proportion_ = currMu->prop;
-            output_.tik = tik;
-            output_.L = L;
-            output_.probabilities = probabilities;
-            output_.partialRankScore = scoreTemp;
-            for (int dim = 0; dim < d_; dim++)
-            {
-                for (int ind = 0; ind < n_; ind++)
-                    data_[dim][ind].y = Y[dim][ind];
-
-                int compteur(0);
-                for (vector<int>::iterator it = indexPartialData_[dim].begin(); it != indexPartialData_[dim].end(); it++)
-                {
-                    data_[dim][*it].rank = xPartialTemp[dim][compteur];
-                    compteur++;
-                }
-            }
-        }
-
-        next = currMu->suivant;
-        delete currMu; //delete the mu
-        currMu = next;
-        compteur++;
+      scoreTemp[ii][iii].resize(output_.initialPartialRank[ii][iii].size());
     }
+  }
 
-    //the last mu of the struct
-    //mean of the parameter
-    for (int compt1 = 0; compt1 < g_; compt1++)
-    {
-        currMu->prop[compt1] /= currMu->compteur;
-        for (int compt2 = 0; compt2 < d_; compt2++)
-            currMu->p[compt2][compt1] /= currMu->compteur;
-    }
+  // Now, we have the list of all the different Mu
+  currMu = headMu;
+  ArrayXXd tik(n_, g_);
+  ArrayXXd probabilities(n_, g_); // estimate probability for an individual to belong to each cluster
+  bool hasNextElement;
 
-    //if(parameter_.detail)
-    //cout<<"*"<<endl;
+  // for each mu, we will compute the associated log likelihood
+  do
+  {
+    // if(parameter_.verbose)
+    //     cout<<"*";
 
-    //compute log likelihood
-    //t1=clock();
-    L = computeLikelihood(currMu->rangComplet, currMu->p, currMu->prop, tik, Y, xPartialTemp, probabilities, scoreTemp);
+    meanParameters(currMu);
 
-    //t2=clock();
-    //tL+=t2-t1;
-    compteur++;
+    // compute the log likelihood
+    // t1 = clock();
+    L = computeLogLikelihood(currMu->fullRank, currMu->p, currMu->prop, tik, Y, xPartialTemp, probabilities, scoreTemp);
+    // t2 = clock();
+    // tL += t2-t1;
 
     if (L > Llast)
     {
-        //the current mu has a better loglikelihood, we save the parameter
-        Llast = L;
-        mu_ = currMu->rangComplet;
-        p_ = currMu->p;
-        proportion_ = currMu->prop;
-        output_.tik = tik;
-        output_.L = L;
-        output_.probabilities = probabilities;
-        output_.partialRankScore = scoreTemp;
-        vector<int> compteurPartiel(d_, 0);
+      // the current mu has a better log-likelihood, we save the parameter
+      Llast = L;
+      mu_ = currMu->fullRank;
+      p_ = currMu->p;
+      proportion_ = currMu->prop;
+      output_.tik = tik;
+      output_.L = L;
+      output_.probabilities = probabilities;
+      output_.partialRankScore = scoreTemp;
+      for (int dim = 0; dim < d_; dim++)
+      {
+        for (int ind = 0; ind < n_; ind++)
+          data_[dim][ind].y = Y[dim][ind];
 
-        for (int dim = 0; dim < d_; dim++)
+        int compteur(0);
+        for (vector<int>::iterator it = indexPartialData_[dim].begin(); it != indexPartialData_[dim].end(); it++)
         {
-            for (int ind = 0; ind < n_; ind++)
-                data_[dim][ind].y = Y[dim][ind];
-
-            int compteur(0);
-            for (vector<int>::iterator it = indexPartialData_[dim].begin(); it != indexPartialData_[dim].end(); it++)
-            {
-                data_[dim][*it].rank = xPartialTemp[dim][compteur];
-                compteur++;
-            }
+          data_[dim][*it].x = xPartialTemp[dim][compteur];
+          compteur++;
         }
+      }
     }
-    delete currMu; //delete the last mu
 
-    //if(parameter_.detail)
-    //cout<<"Computing time for log-likelihood approximation: "<<(double) tL/CLOCKS_PER_SEC<<"s ("<<(double) tL/CLOCKS_PER_SEC/compteur<<"s per mu)."<<endl;
+    next = currMu->nextMu;
+    hasNextElement = (currMu->nextMu != 0);
+    delete currMu; // delete the mu
+    currMu = next;
+  }
+  while(hasNextElement);
+
+
+  // if(parameter_.verbose)
+  // {
+  //     cout << "Computing time for log-likelihood approximation: " << (double)tL / CLOCKS_PER_SEC
+  //          << "s (" << (double)tL / CLOCKS_PER_SEC / compteur << "s per mu)." << endl;
+  // }
+
 }
 
-//LL gibbs
-double RankCluster::computeLikelihood(vector<vector<vector<int>>> const &mu, vector<vector<double>> const &p,
-                                      vector<double> const &proportion, ArrayXXd &tik, vector<vector<vector<int>>> &Y, vector<vector<vector<int>>> &xTemp, ArrayXXd &probabilities,
-                                      vector<vector<vector<double>>> &score)
+
+MuList * RankCluster::findDifferentMu(vector<vector<vector<Rank>>> &resMu, vector<vector<vector<double>>> &resP,
+                                      vector<vector<double>> &resProp)
+{
+  bool notFound(true), equalRank;
+
+  MuList *headMu = new MuList;
+  MuList *currMu = headMu;
+  currMu->freq = 1;
+  currMu->nextMu = 0;
+  currMu->fullRank = resMu[0];
+  currMu->p = resP[0];
+  currMu->prop = resProp[0];
+
+  int nbMu(1);
+
+  for (int it(1); it < (parameter_.maxIt - parameter_.burnAlgo); it++) //we see all the mu
+  {
+    notFound = true;
+    currMu = headMu;
+    while (notFound)
+    {
+      equalRank = true;
+      // look if the j-th mu is the same that the current mu
+      for (int j(0); j < d_; j++)
+      {
+        for (int k(0); k < g_; k++)
+        {
+          for (int i(0); i < m_[j]; i++)
+            if (currMu->fullRank[j][k][i] != resMu[it][j][k][i])
+            {
+              equalRank = false;
+              break;
+            }
+        }
+      }
+
+      if (equalRank)
+      {
+        currMu->freq++;
+        // we sum the proportion and p
+        for (int k(0); k < g_; k++)
+        {
+          currMu->prop[k] += resProp[it][k];
+          for (int j(0); j < d_; j++)
+            currMu->p[j][k] += resP[it][j][k];
+        }
+        notFound = false; // no need to check other mu of the struct
+      }
+      else
+      {
+        // if the current mu is the last, we add the j-th mu in the struct
+        if (currMu->nextMu == 0)
+        {
+          nbMu++;
+          notFound = false;
+          currMu->nextMu = new MuList;
+          currMu = currMu->nextMu;
+          currMu->freq = 1;
+          currMu->nextMu = 0;
+          currMu->fullRank = resMu[it];
+          currMu->prop = resProp[it];
+          currMu->p = resP[it];
+        }
+        else
+          currMu = currMu->nextMu; // we will test the next mu
+      }
+    }
+  }
+
+  return headMu;
+}
+
+
+void RankCluster::meanParameters(MuList * currMu)
+{
+  for (int k(0); k < g_; k++)
+  {
+    currMu->prop[k] /= (double) currMu->freq;
+    for (int j(0); j < d_; j++)
+      currMu->p[j][k] /= (double) currMu->freq;
+  }
+}
+
+
+// LL gibbs
+double RankCluster::computeLogLikelihood(vector<vector<Rank>> const &mu, vector<vector<double>> const &p,
+                                         vector<double> const &proportion, ArrayXXd &tik,
+                                         vector<vector<Rank>> &Y, vector<vector<Rank>> &xTemp,
+                                         ArrayXXd &probabilities,
+                                         vector<vector<vector<double>>> &score)
 {
     long double p1(0), p2(0), p1x(0), p2x(0), alea(0), l(0), li(0);
     double div((double)(parameter_.nGibbsL - parameter_.burnL));
     vector<int> compteur(d_, 0);
-    vector<int> x1, x2;
+    Rank x1, x2;
 
     //objet pour stockage de calcul pour éviter répétition
     ArrayXXd proba1(d_, g_), proba2(d_, g_);
@@ -872,7 +895,7 @@ double RankCluster::computeLikelihood(vector<vector<vector<int>>> const &mu, vec
     ArrayXXd propb(1, g_);
     propb = prop.transpose();
 
-    vector<vector<int>> yTemp(d_), x(d_);
+    vector<Rank> yTemp(d_), x(d_);
     vector<vector<vector<int>>> scoreCount(d_);
     for (int j = 0; j < d_; j++)
     {
@@ -889,9 +912,9 @@ double RankCluster::computeLikelihood(vector<vector<vector<int>>> const &mu, vec
     for (int ind = 0; ind < n_; ind++)
     {
         //cout<<"ind "<<ind<<endl;
-        vector<vector<int>> y(d_), y2(d_), y1(d_);
+        vector<Rank> y(d_), y2(d_), y1(d_);
         li = 0;
-        //algorithme de Gibbs pour simuler yi
+        //Gibbs Algorithm to sample yi
 
         //initialisation de y et p pour Gibbs
         y = yTemp;
@@ -902,7 +925,7 @@ double RankCluster::computeLikelihood(vector<vector<vector<int>>> const &mu, vec
                     scoreCount[j][jj][jjj] = 0;
 
             Rshuffle(y[j].begin(), y[j].end()); //permutation de 1 2 3 ..m
-            x[j] = data_[j][ind].rank;
+            x[j] = data_[j][ind].x;
         }
 
         y1 = y;
@@ -931,7 +954,8 @@ double RankCluster::computeLikelihood(vector<vector<vector<int>>> const &mu, vec
                     y2[J][K] = y[J][K + 1];
                     y2[J][K + 1] = y[J][K];
 
-                    for (int k = 0; k < g_; k++) //tester un stockage des proba calcul� pour �viter r�p�tition de calculs dans la boucle
+                    //tester un stockage des proba calculées pour éviter répétition de calculs dans la boucle
+                    for (int k = 0; k < g_; k++)
                         proba2(J, k) = probaCond(x[J], y2[J], mu[J][k], p[J][k]);
 
                     p2 = (long double)(propb * proba2.colwise().prod()).sum();
@@ -957,7 +981,7 @@ double RankCluster::computeLikelihood(vector<vector<vector<int>>> const &mu, vec
             /*simulation des x_i^j qui sont partiels*/
             for (int J = 0; J < d_; J++)
             {
-                if (data_[J][ind].isNotFull) //simulation de xi si partiel
+                if (data_[J][ind].isPartial) //simulation de xi si partiel
                 {
                     x1 = x[J];
                     proba1X = proba1.row(J);
@@ -1015,7 +1039,7 @@ double RankCluster::computeLikelihood(vector<vector<vector<int>>> const &mu, vec
                 //compute score partial rank
                 for (int dim = 0; dim < d_; dim++)
                 {
-                    if (data_[dim][ind].isNotFull)
+                    if (data_[dim][ind].isPartial)
                     {
                         for (int indElem = 0; indElem < m_[dim]; indElem++)
                             scoreCount[dim][indElem][x[dim][indElem] - 1]++;
@@ -1035,7 +1059,7 @@ double RankCluster::computeLikelihood(vector<vector<vector<int>>> const &mu, vec
         for (int j(0); j < d_; j++)
         {
             Y[j][ind] = y[j];
-            if (data_[j][ind].isNotFull)
+            if (data_[j][ind].isPartial)
             {
                 xTemp[j][compteur[j]] = x[j];
                 for (int elem = 0; elem < m_[j]; elem++)
@@ -1050,481 +1074,494 @@ double RankCluster::computeLikelihood(vector<vector<vector<int>>> const &mu, vec
     return l;
 }
 
-//compute the final partition
+/** compute the final partition
+ * The final partition is the argmax per row of tik
+ */
 void RankCluster::computePartition()
 {
-    if (g_ > 1)
-    { //calcul partition
-        double max;
-        for (int ind(0); ind < n_; ind++)
-        {
-            max = output_.tik(ind, 0);
-            z_[ind] = 0;
-            for (int k(1); k < g_; k++)
-            {
-                if (output_.tik(ind, k) > max)
-                {
-                    max = output_.tik(ind, k);
-                    z_[ind] = k;
-                }
-            }
-            //cout<<z_[ind]<<" "<< output_.tik(ind,z_[ind])<<endl;
-        }
-    }
-}
+  // TODO can be done directly with Eigen
+  // see https://stackoverflow.com/questions/11430588/find-rowwise-maxcoeff-and-index-of-maxcoeff-in-eigen
 
-//return probability to belong to the final cluster
-ArrayXd RankCluster::probability() const
-{
-    ArrayXd probability(n_);
+  if (g_ > 1)
+  {
+    double max;
     for (int ind(0); ind < n_; ind++)
-        probability(ind) = output_.probabilities(ind, z_[ind]);
-
-    return probability;
+    {
+      max = output_.tik(ind, 0);
+      z_[ind] = 0;
+      for (int k(1); k < g_; k++)
+      {
+        if (output_.tik(ind, k) > max)
+        {
+          max = output_.tik(ind, k);
+          z_[ind] = k;
+        }
+      }
+    }
+  }
 }
+
 
 void RankCluster::computeDistance(vector<vector<double>> const &resProp, vector<vector<vector<double>>> const &resP,
-                                  vector<vector<vector<vector<int>>>> const &resMu, vector<vector<int>> const &resZ,
-                                  vector<vector<vector<vector<int>>>> const &resDonneesPartiel)
+                                  vector<vector<vector<Rank>>> const &resMu, vector<vector<int>> const &resZ,
+                                  vector<vector<vector<Rank>>> const &resDonneesPartiel)
 {
-    int const iterTotal(parameter_.maxIt - parameter_.burnAlgo);
+  int const iterTotal(parameter_.maxIt - parameter_.burnAlgo);
 
-    //initialization of container
-    output_.distProp = vector<vector<double>>(iterTotal, vector<double>(g_));
-    output_.distP = vector<vector<vector<double>>>(iterTotal, vector<vector<double>>(d_, vector<double>(g_)));
-    output_.distMu = vector<vector<vector<int>>>(iterTotal, vector<vector<int>>(d_, vector<int>(g_)));
-    output_.distZ = vector<double>(iterTotal);
+  //initialization of container
+  output_.distProp = vector<vector<double>>(iterTotal, vector<double>(g_));
+  output_.distP = vector<vector<vector<double>>>(iterTotal, vector<vector<double>>(d_, vector<double>(g_)));
+  output_.distMu = vector<vector<vector<int>>>(iterTotal, vector<vector<int>>(d_, vector<int>(g_)));
+  output_.distZ = vector<double>(iterTotal);
 
-    //compute the distance between the output parameters and parameters from each iteration
+  //compute the distance between the output parameters and parameters from each iteration
+  for (int i(0); i < iterTotal; i++)
+  {
+    //distance between partition
+    output_.distZ[i] = computeRandIndex(z_, resZ[i]);
+
+    for (int cl(0); cl < g_; cl++)
+    {
+      //distance between proportion
+      output_.distProp[i][cl] = pow(resProp[i][cl] - proportion_[cl], 2);
+
+      for (int dim(0); dim < d_; dim++)
+      {
+        //distance between p
+        output_.distP[i][dim][cl] = pow(resP[i][dim][cl] - p_[dim][cl], 2);
+
+        //distance between mu
+        output_.distMu[i][dim][cl] = distanceKendall(mu_[dim][cl], resMu[i][dim][cl]);
+      }
+    }
+  }
+
+  //distance between partial rank
+  vector<vector<vector<int>>> distRangPartiel(iterTotal, vector<vector<int>>(d_));
+  if (partial_)
+  {
     for (int i(0); i < iterTotal; i++)
     {
-        //distance between partition
-        output_.distZ[i] = indiceRand(z_, resZ[i]);
-
-        for (int cl(0); cl < g_; cl++)
+      for (int dim(0); dim < d_; dim++)
+      {
+        int compteur(0);
+        //for(int k(0);k<resDonneesPartiel[i][dim].size();k++)
+        for (vector<int>::iterator it = indexPartialData_[dim].begin(); it != indexPartialData_[dim].end(); it++)
         {
-            //distance between proportion
-            output_.distProp[i][cl] = pow(resProp[i][cl] - proportion_[cl], 2);
-
-            for (int dim(0); dim < d_; dim++)
-            {
-                //distance between p
-                output_.distP[i][dim][cl] = pow(resP[i][dim][cl] - p_[dim][cl], 2);
-
-                //distance between mu
-                output_.distMu[i][dim][cl] = distanceKendall(mu_[dim][cl], resMu[i][dim][cl]);
-            }
+          distRangPartiel[i][dim].push_back(distanceKendall(data_[dim][*it].x, resDonneesPartiel[i][dim][compteur]));
+          compteur++;
         }
+      }
     }
+  }
 
-    //distance between partial rank
-    vector<vector<vector<int>>> distRangPartiel(iterTotal, vector<vector<int>>(d_));
-    if (partial_)
+  //changement de format
+  vector<int> compteurElemPartiel(d_, 0);
+  output_.distPartialRank = vector<vector<vector<int>>>(resDonneesPartiel.size());
+  Rank rangTemp(d_);
+
+  for (int iter(0); iter < (int)distRangPartiel.size(); iter++)
+  {
+    for (int dim(0); dim < d_; dim++)
+      compteurElemPartiel[dim] = 0;
+
+    for (int ind(0); ind < n_; ind++)
     {
-        for (int i(0); i < iterTotal; i++)
+      for (int dim(0); dim < d_; dim++)
+      {
+        if (data_[dim][ind].isPartial)
         {
-            for (int dim(0); dim < d_; dim++)
-            {
-                int compteur(0);
-                //for(int k(0);k<resDonneesPartiel[i][dim].size();k++)
-                for (vector<int>::iterator it = indexPartialData_[dim].begin(); it != indexPartialData_[dim].end(); it++)
-                {
-                    distRangPartiel[i][dim].push_back(distanceKendall(data_[dim][*it].rank, resDonneesPartiel[i][dim][compteur]));
-                    compteur++;
-                }
-            }
+          rangTemp[dim] = distRangPartiel[iter][dim][compteurElemPartiel[dim]];
+          compteurElemPartiel[dim]++;
         }
+        else
+          rangTemp[dim] = 0;
+      }
+      output_.distPartialRank[iter].push_back(rangTemp);
     }
+  }
+}
 
-    //changement de format
-    vector<int> compteurElemPartiel(d_, 0);
-    output_.distPartialRank = vector<vector<vector<int>>>(resDonneesPartiel.size());
-    vector<int> rangTemp(d_);
-
-    for (int iter(0); iter < (int)distRangPartiel.size(); iter++)
+void RankCluster::storeParameters(int const iterNumber, vector<vector<double>> &resProp,
+                                  vector<vector<vector<double>>> &resP, vector<vector<vector<Rank>>> &resMu,
+                                  vector<vector<int>> &resZ, vector<vector<vector<Rank>>> &resPartialData)
+{
+  // for identifiability, we must have p >= 0.5. If not, we invert the rank.
+  for (int l(0); l < d_; l++)
+  {
+    for (int k(0); k < g_; k++)
     {
-        for (int dim(0); dim < d_; dim++)
-            compteurElemPartiel[dim] = 0;
-
-        for (int ind(0); ind < n_; ind++)
-        {
-            for (int dim(0); dim < d_; dim++)
-            {
-                if (data_[dim][ind].isNotFull)
-                {
-                    rangTemp[dim] = distRangPartiel[iter][dim][compteurElemPartiel[dim]];
-                    compteurElemPartiel[dim]++;
-                }
-                else
-                    rangTemp[dim] = 0;
-            }
-            output_.distPartialRank[iter].push_back(rangTemp);
-        }
+      if (p_[l][k] < 0.5)
+      {
+        p_[l][k] = 1 - p_[l][k];
+        invertRank(mu_[l][k]);
+      }
     }
+  }
+
+  // the first cluster must be the cluster with the fewer index of mu
+  vector<int> indRank(g_);
+  for (int k(0); k < g_; k++)
+    indRank[k] = rank2index(mu_[0][k], tab_factorial(m_[0]));
+
+  tri_insertionMulti(indRank, proportion_, p_, mu_, z_, g_, d_, n_);
+
+  resP[iterNumber - parameter_.burnAlgo] = p_;
+  resProp[iterNumber - parameter_.burnAlgo] = proportion_;
+  resMu[iterNumber - parameter_.burnAlgo] = mu_;
+  resZ[iterNumber - parameter_.burnAlgo] = z_;
+
+  for (int dim(0); dim < d_; dim++)
+  {
+    int compteur(0);
+    for (vector<int>::iterator it = indexPartialData_[dim].begin(); it != indexPartialData_[dim].end(); it++)
+    {
+      resPartialData[iterNumber - parameter_.burnAlgo][dim][compteur] = data_[dim][*it].x;
+      compteur++;
+    }
+  }
+
 }
 
 void RankCluster::run()
 {
-    convergence_ = false;
-    int nbTry(0);
-    while (!convergence_ && nbTry < parameter_.maxTry)
+  convergence_ = false;
+  int nbTry(0);
+  while (!convergence_ && nbTry < parameter_.maxTry)
+  {
+    try
     {
-        try
+      // double t0, t1, t2, t3, tM(0), tSE(0);
+
+      // if (parameter_.verbose)
+      // {
+      //     cout << "##########################################################" << endl;
+      //     cout << "#  SEM-Gibbs Algorithm for multivariate partial ranking  #" << endl;
+      //     cout << "##########################################################" << endl;
+      // }
+      // t0 = clock();
+      initialization();
+      // t1 = clock();
+
+      // if (parameter_.verbose)
+      //     cout << "Initialization: " << (double)(t1 - t0) / CLOCKS_PER_SEC << "s." << endl;
+
+      // objects for storing the estimated parameters at each iteration
+      vector<vector<vector<double>>> resP(parameter_.maxIt - parameter_.burnAlgo,
+                                          vector<vector<double>>(d_, vector<double>(g_)));
+      vector<vector<double>> resProp(parameter_.maxIt - parameter_.burnAlgo, (vector<double>(g_)));
+      vector<vector<int>> resZ(parameter_.maxIt - parameter_.burnAlgo, vector<int>(n_));
+      vector<vector<vector<Rank>>> resMu(parameter_.maxIt - parameter_.burnAlgo, mu_);
+      vector<vector<vector<Rank>>> resDonneesPartiel(parameter_.maxIt - parameter_.burnAlgo, output_.initialPartialRank);
+
+      for (int iter(0); iter < parameter_.maxIt; iter++)
+      {
+        // if(parameter_.verbose)
+        //    cout << "*";
+
+        // t2 = clock();
+        SEstep();
+        // t3 = clock();
+        // tSE += t3-t2;
+
+        // t2 = clock();
+        Mstep();
+        // t3 = clock();
+        // tM += t3-t2;
+
+        // we store the estimated parameters
+        if (iter >= parameter_.burnAlgo)
         {
-            //double t0,t1,t2,t3,tM(0),tSE(0);
-
-            //if(parameter_.detail)
-            //{
-            //cout<<"##########################################################"<<endl;
-            //cout<<"#  SEM-Gibbs Algorithm for multivariate partial ranking  #"<<endl;
-            //cout<<"##########################################################"<<endl;
-            //}
-            //t0=clock();
-            initialization();
-            //t1=clock();
-
-            //if(parameter_.detail)
-            //cout<<"Initialization: "<<(double) (t1-t0)/CLOCKS_PER_SEC<<"s."<<endl;
-
-            //objects for storing the estimated parameters at each iteration
-            vector<int> indrang(g_);
-            vector<vector<vector<double>>> resP(parameter_.maxIt - parameter_.burnAlgo, vector<vector<double>>(d_, vector<double>(g_)));
-            vector<vector<double>> resProp(parameter_.maxIt - parameter_.burnAlgo, (vector<double>(g_)));
-            vector<vector<int>> resZ(parameter_.maxIt - parameter_.burnAlgo, vector<int>(n_));
-            vector<vector<vector<vector<int>>>> resMu(parameter_.maxIt - parameter_.burnAlgo, mu_);
-            vector<vector<vector<vector<int>>>> resDonneesPartiel(parameter_.maxIt - parameter_.burnAlgo, output_.initialPartialRank);
-
-            //algorithm
-            //if(parameter_.detail)
-            for (int iter(0); iter < parameter_.maxIt; iter++)
-            {
-                //if(parameter_.detail)
-                //cout<<"*";
-
-                //t2=clock();
-                SEstep();
-                //t3=clock();
-                //tSE+=t3-t2;
-
-                //t2=clock();
-                Mstep();
-                //t3=clock();
-                //tM+=t3-t2;
-
-                //we store the estimated parameters
-                if (iter >= parameter_.burnAlgo)
-                {
-
-                    for (int l(0); l < d_; l++)
-                    {
-                        for (int k(0); k < g_; k++)
-                        {
-                            if (p_[l][k] < 0.5)
-                            {
-                                p_[l][k] = 1 - p_[l][k];
-                                inverseRang(mu_[l][k]);
-                            }
-                        }
-                    }
-
-                    for (int k(0); k < g_; k++)
-                        indrang[k] = rank2index(mu_[0][k], tab_factorial(m_[0]));
-
-                    //the first cluster must be the cluster with the more little index of mu
-                    tri_insertionMulti(indrang, proportion_, p_, mu_, z_, g_, d_, n_); //tri selon les mu pour que 2 3=3 2
-
-                    //store parameters
-                    resP[iter - parameter_.burnAlgo] = p_;
-                    resProp[iter - parameter_.burnAlgo] = proportion_;
-                    resMu[iter - parameter_.burnAlgo] = mu_;
-                    resZ[iter - parameter_.burnAlgo] = z_;
-
-                    for (int dim(0); dim < d_; dim++)
-                    {
-                        int compteur(0);
-                        for (vector<int>::iterator it = indexPartialData_[dim].begin(); it != indexPartialData_[dim].end(); it++)
-                        {
-                            resDonneesPartiel[iter - parameter_.burnAlgo][dim][compteur] = data_[dim][*it].rank;
-                            compteur++;
-                        }
-                    }
-
-                } //end storage
-            }     //end SEM
-
-            //if(parameter_.detail)
-            //cout<<endl<<endl<<"Loglikelihood estimation"<<endl;
-            //t2=clock();
-            //if(parameter_.detail)
-            //{
-            //cout<<"Computing time for SE step: "<<(double) tSE/CLOCKS_PER_SEC<<"s ( "<<(double) tSE/CLOCKS_PER_SEC/parameter_.maxIt<<"s per step)."<<endl;
-            //cout<<"Computing time for M step: "<<(double) tM/CLOCKS_PER_SEC<<"s ( "<<(double) tM/CLOCKS_PER_SEC/parameter_.maxIt<<"s per step )."<<endl;
-            //}
-
-            //compute loglikelihood and choice of the best parameters
-            likelihood(resMu, resP, resProp);
-            //t3=clock();
-
-            //compute the partition associated to the best result
-            computePartition();
-
-            //compute distance between estimated parameters at each iteration
-            computeDistance(resProp, resP, resMu, resZ, resDonneesPartiel);
-
-            //compute criterion
-            output_.bic = BIC(output_.L, n_, 2 * g_ * d_ + g_ - 1);
-
-            output_.icl = output_.bic;
-
-            output_.entropy = ArrayXd(n_);
-            for (int i = 0; i < n_; i++)
-            {
-                output_.entropy(i) = 0;
-                for (int j = 0; j < g_; j++)
-                {
-                    if (output_.tik(i, j) != 0)
-                        output_.entropy(i) -= output_.tik(i, j) * std::log(output_.tik(i, j));
-                }
-                output_.icl += 2 * output_.entropy(i);
-            }
-
-            //if(parameter_.detail)
-            //{
-            //cout<<"Total computing time : "<<(double) (t3-t0)/CLOCKS_PER_SEC<<"s"<<endl;
-            //}
-
-            //if the p<0.5, we invert the associate mu and put p=1-p
-            for (int j = 0; j < d_; j++)
-                for (int k = 0; k < g_; k++)
-                {
-                    if (p_[j][k] < 0.5)
-                    {
-                        p_[j][k] = 1 - p_[j][k];
-                        inverseRang(mu_[j][k]);
-                    }
-                }
-
-            convergence_ = true;
-
-        } //end try
-        catch (string const &chaine)
-        {
-            convergence_ = false;
+          storeParameters(iter, resProp, resP, resMu, resZ, resDonneesPartiel);
         }
-        nbTry++;
+      }
+
+      // t2 = clock();
+      // if (parameter_.verbose)
+      // {
+      //     cout << endl << endl << "Log-likelihood estimation" << endl;
+
+      //     cout << "Computing time for SE step: " << (double)tSE / CLOCKS_PER_SEC << "s ( "
+      //          << (double)tSE / CLOCKS_PER_SEC / parameter_.maxIt << "s per step)." << endl;
+      //     cout << "Computing time for M step: " << (double)tM / CLOCKS_PER_SEC << "s ( "
+      //          << (double)tM / CLOCKS_PER_SEC / parameter_.maxIt << "s per step )." << endl;
+      // }
+
+      // compute log-likelihood and choice of the best parameters
+      selectBestParameters(resMu, resP, resProp);
+      //t3=clock();
+
+      // compute the partition associated to the best result
+      computePartition();
+
+      // compute distance between estimated parameters at each iteration
+      computeDistance(resProp, resP, resMu, resZ, resDonneesPartiel);
+
+      // compute criterion
+      output_.bic = BIC(output_.L, n_, 2 * g_ * d_ + g_ - 1);
+
+      output_.icl = output_.bic;
+
+      output_.entropy = ArrayXd(n_);
+      for (int i = 0; i < n_; i++)
+      {
+        output_.entropy(i) = 0;
+        for (int j = 0; j < g_; j++)
+        {
+          if (output_.tik(i, j) != 0)
+            output_.entropy(i) -= output_.tik(i, j) * std::log(output_.tik(i, j));
+        }
+        output_.icl += 2 * output_.entropy(i);
+      }
+
+      // if (parameter_.verbose)
+      // {
+      //     cout << "Total computing time : " << (double)(t3 - t0) / CLOCKS_PER_SEC << "s" << endl;
+      // }
+
+      // if p < 0.5, we invert the associate mu and put p=1-p
+      for (int j = 0; j < d_; j++)
+        for (int k = 0; k < g_; k++)
+        {
+          if (p_[j][k] < 0.5)
+          {
+            p_[j][k] = 1 - p_[j][k];
+            invertRank(mu_[j][k]);
+          }
+        }
+
+        convergence_ = true;
+
+    } // end try
+    catch (string const &chaine)
+    {
+      convergence_ = false;
     }
+    nbTry++;
+  }
 }
 
+// ! not use in run but for interface with R
+//return probability to belong to the final cluster
+ArrayXd RankCluster::probability() const
+{
+  ArrayXd probability(n_);
+  for (int ind(0); ind < n_; ind++)
+    probability(ind) = output_.probabilities(ind, z_[ind]);
+
+  return probability;
+}
+
+// ! not use in run but for interface with R
 //LL gibbs
 void RankCluster::estimateCriterion(double &L, double &bic, double &icl)
 {
 
-    /*initialisation partial rank and order of presentation*/
-    //partial data and order of presentation initialization
-    for (int dim(0); dim < d_; dim++)
-    {
-        vector<int> rankTemp(m_[dim]);
-        for (int i(0); i < m_[dim]; i++)
-            rankTemp[i] = i + 1;
-        for (int ind(0); ind < n_; ind++)
-        {
-            //initialization of y
-            Rshuffle(rankTemp.begin(), rankTemp.end());
-            data_[dim][ind].y = rankTemp;
-
-            if (data_[dim][ind].isNotFull)
-            {
-                for (int i = 0; i < (int)data_[dim][ind].missingData.size(); i++)
-                {
-                    //initialization of Partial Rank
-                    vector<int> rankTemp2(data_[dim][ind].missingIndex[i]);
-                    Rshuffle(rankTemp2.begin(), rankTemp2.end());
-
-                    for (int ii = 0; ii < (int)data_[dim][ind].missingData[i].size(); ii++)
-                        data_[dim][ind].rank[rankTemp2[ii]] = data_[dim][ind].missingData[i][ii];
-                }
-            }
-        }
-    }
-
-    /*log likelihood computation*/
-    ArrayXXd tik(n_, g_);
-    long double p1(0), p2(0), p1x(0), p2x(0), alea(0), li(0);
-    double div((double)(parameter_.nGibbsL - parameter_.burnL));
-    vector<int> compteur(d_, 0);
-    vector<int> x1, x2;
-
-    //objet pour stockage de calcul pour éviter répétition
-    ArrayXXd proba1(d_, g_), proba2(d_, g_);
-    ArrayXd proba1X(g_), proba2X(g_);
-
-    ArrayXd prop(g_);
-    for (int i(0); i < g_; i++)
-        prop(i) = proportion_[i];
-    ArrayXXd propb(1, g_);
-    propb = prop.transpose();
-
-    //génération rang 1 2 3 ..m par dimension
-    vector<vector<int>> yTemp(d_), x(d_);
-    for (int j(0); j < d_; j++)
-    {
-        yTemp[j].resize(m_[j]);
-        for (int i(0); i < m_[j]; i++)
-            yTemp[j][i] = i + 1;
-    }
-
-    vector<double> logL(parameter_.nGibbsL - parameter_.burnL, 0);
-
-    //simulation de y multi dimensionnel
+  /*initialisation partial rank and order of presentation*/
+  //partial data and order of presentation initialization
+  for (int dim(0); dim < d_; dim++)
+  {
+    Rank rankTemp(m_[dim]);
+    initializeRank(rankTemp);
     for (int ind(0); ind < n_; ind++)
     {
+      //initialization of y
+      Rshuffle(rankTemp.begin(), rankTemp.end());
+      data_[dim][ind].y = rankTemp;
 
-        vector<vector<int>> y(d_), y2(d_), y1(d_);
-        li = 0;
-        //algorithme de Gibbs pour simuler yi
-
-        //initialisation de y et p pour Gibbs
-        y = yTemp;
-        for (int j(0); j < d_; j++)
+      if (data_[dim][ind].isPartial)
+      {
+        for (int i = 0; i < (int)data_[dim][ind].missingData.size(); i++)
         {
-            Rshuffle(y[j].begin(), y[j].end()); //permutation de 1 2 3 ..m
-            x[j] = data_[j][ind].rank;
+          //initialization of Partial Rank
+          Rank rankTemp2(data_[dim][ind].missingIndex[i]);
+          Rshuffle(rankTemp2.begin(), rankTemp2.end());
+
+          for (int ii = 0; ii < (int)data_[dim][ind].missingData[i].size(); ii++)
+            data_[dim][ind].x[rankTemp2[ii]] = data_[dim][ind].missingData[i][ii];
         }
+      }
+    }
+  }
 
-        y1 = y;
+  /*log likelihood computation*/
+  ArrayXXd tik(n_, g_);
+  long double p1(0), p2(0), p1x(0), p2x(0), alea(0), li(0);
+  double div((double)(parameter_.nGibbsL - parameter_.burnL));
+  vector<int> compteur(d_, 0);
+  Rank x1, x2;
 
-        for (int k(0); k < g_; k++)
-        {
-            tik(ind, k) = 0;
-            for (int j(0); j < d_; j++)
-                proba1(j, k) = probaCond(x[j], y1[j], mu_[j][k], p_[j][k]);
-        }
+  //objet pour stockage de calcul pour éviter répétition
+  ArrayXXd proba1(d_, g_), proba2(d_, g_);
+  ArrayXd proba1X(g_), proba2X(g_);
 
-        p1 = (long double)(propb * proba1.colwise().prod()).sum();
-        proba2 = proba1;
+  ArrayXd prop(g_);
+  for (int i(0); i < g_; i++)
+    prop(i) = proportion_[i];
+  ArrayXXd propb(1, g_);
+  propb = prop.transpose();
 
-        for (int iter(0); iter < parameter_.nGibbsL; iter++)
-        {
+  //génération rang 1 2 3 ..m par dimension
+  vector<Rank> yTemp(d_), x(d_);
+  for (int j(0); j < d_; j++)
+  {
+    yTemp[j].resize(m_[j]);
+    initializeRank(yTemp[j]);
+  }
 
-            /*simulation des y*/
-            for (int J(0); J < d_; J++)
-            {
-                for (int K(0); K < m_[J] - 1; K++)
-                {
-                    //"état" à tester (inversion de 2 éléments adjacents)
-                    y2 = y;
-                    y2[J][K] = y[J][K + 1];
-                    y2[J][K + 1] = y[J][K];
+  vector<double> logL(parameter_.nGibbsL - parameter_.burnL, 0);
 
-                    for (int k(0); k < g_; k++) //tester un stockage des proba calcul� pour �viter r�p�tition de calculs dans la boucle
-                        proba2(J, k) = probaCond(x[J], y2[J], mu_[J][k], p_[J][k]);
+  //simulation de y multi dimensionnel
+  for (int ind(0); ind < n_; ind++)
+  {
 
-                    p2 = (long double)(propb * proba2.colwise().prod()).sum();
+    vector<Rank> y(d_), y2(d_), y1(d_);
+    li = 0;
+    //algorithme de Gibbs pour simuler yi
 
-                    alea = (long double)runif(0., p1 + p2); //unif(0,p1+p2)
-
-                    if (alea < p2) //accept changement
-                    {
-                        y[J] = y2[J];
-                        p1 = p2;
-                        proba1.row(J) = proba2.row(J);
-                        y1[J] = y[J];
-                    }
-                    else //do not change y
-                    {
-                        y[J] = y1[J]; //rajout J
-                        proba2.row(J) = proba1.row(J);
-                    }
-                }
-            }
-            //y_i is updated
-
-            /*simulation of partial rank with a gibbs sampler*/
-            for (int J = 0; J < d_; J++)
-            {
-                if (data_[J][ind].isNotFull) //simulation of xi if it is a partial rank
-                {
-                    x1 = x[J];
-                    proba1X = proba1.row(J);
-                    p1x = (proba1X * prop).sum();
-
-                    for (int kk = 0; kk < (int)(data_[J][ind].missingIndex).size() - 1; kk++) //Gibbs sur les x
-                    {
-                        for (int k = 0; k < (int)(data_[J][ind].missingIndex[kk]).size() - 1; k++)
-                        {
-                            //new x to test
-                            x2 = x[J];
-                            x2[data_[J][ind].missingIndex[kk][k]] = x[J][data_[J][ind].missingIndex[kk][k + 1]];
-                            x2[data_[J][ind].missingIndex[kk][k + 1]] = x[J][data_[J][ind].missingIndex[kk][k]];
-
-                            for (int l = 0; l < g_; l++)
-                                proba2X(l) = probaCond(x2, y[J], mu_[J][l], p_[J][l]);
-
-                            p2x = (proba2X * prop).sum();
-
-                            alea = (double)runif(0., p1x + p2x);
-
-                            if (alea < p2) //we accept the changement
-                            {
-                                x[J] = x2;
-                                p1x = p2x;
-                                proba1X = proba2X;
-                                x1 = x[J];
-                            }
-                            else
-                                x[J] = x1;
-                        }
-                    }
-                    proba1.row(J) = proba1X;
-                }
-            }
-
-            if (iter >= parameter_.burnL)
-            {
-                ArrayXd calculInter(g_);
-                for (int cl = 0; cl < g_; cl++)
-                {
-                    calculInter(cl) = 1;
-                    for (int dim = 0; dim < d_; dim++)
-                        calculInter(cl) *= proba1(dim, cl);
-                    calculInter(cl) *= propb(cl);
-                }
-
-                double den = calculInter.sum();
-                tik.row(ind) += (calculInter / den);
-
-                li += (long double)1 / den;
-            }
-
-        } //end gibbs sampling for sample ind
-
-        //L -= log(li*div);
-        L -= log(li);
-
-        tik.row(ind) /= div;
-
-    } //end loop on sample
-
-    L += (double)n_ * log(div);
-
-    output_.L = L;
-
-    output_.bic = BIC(output_.L, n_, 2 * g_ * d_ + g_ - 1);
-
-    output_.icl = output_.bic;
-
-    ArrayXd entropy(n_);
-    for (int i = 0; i < n_; i++)
+    //initialisation de y et p pour Gibbs
+    y = yTemp;
+    for (int j(0); j < d_; j++)
     {
-        entropy(i) = 0;
-        for (int j = 0; j < g_; j++)
-        {
-            if (tik(i, j) != 0)
-                entropy(i) -= tik(i, j) * std::log(tik(i, j));
-        }
-        output_.icl += 2 * entropy(i);
+      Rshuffle(y[j].begin(), y[j].end()); //permutation de 1 2 3 ..m
+      x[j] = data_[j][ind].x;
     }
 
-    bic = output_.bic;
-    icl = output_.icl;
+    y1 = y;
+
+    for (int k(0); k < g_; k++)
+    {
+      tik(ind, k) = 0;
+      for (int j(0); j < d_; j++)
+        proba1(j, k) = probaCond(x[j], y1[j], mu_[j][k], p_[j][k]);
+    }
+
+    p1 = (long double)(propb * proba1.colwise().prod()).sum();
+    proba2 = proba1;
+
+    for (int iter(0); iter < parameter_.nGibbsL; iter++)
+    {
+
+      /*simulation des y*/
+      for (int J(0); J < d_; J++)
+      {
+        for (int K(0); K < m_[J] - 1; K++)
+        {
+          //"état" à tester (inversion de 2 éléments adjacents)
+          y2 = y;
+          y2[J][K] = y[J][K + 1];
+          y2[J][K + 1] = y[J][K];
+
+          //tester un stockage des proba calculées pour éviter répétition de calculs dans la boucle
+          for (int k(0); k < g_; k++)
+            proba2(J, k) = probaCond(x[J], y2[J], mu_[J][k], p_[J][k]);
+
+          p2 = (long double)(propb * proba2.colwise().prod()).sum();
+
+          alea = (long double)runif(0., p1 + p2); //unif(0,p1+p2)
+
+          if (alea < p2) //accept changement
+          {
+            y[J] = y2[J];
+            p1 = p2;
+            proba1.row(J) = proba2.row(J);
+            y1[J] = y[J];
+          }
+          else //do not change y
+          {
+            y[J] = y1[J]; //rajout J
+            proba2.row(J) = proba1.row(J);
+          }
+        }
+      }
+      //y_i is updated
+
+      /*simulation of partial rank with a gibbs sampler*/
+      for (int J = 0; J < d_; J++)
+      {
+        if (data_[J][ind].isPartial) //simulation of xi if it is a partial rank
+        {
+          x1 = x[J];
+          proba1X = proba1.row(J);
+          p1x = (proba1X * prop).sum();
+
+          for (int kk = 0; kk < (int)(data_[J][ind].missingIndex).size() - 1; kk++) //Gibbs sur les x
+          {
+            for (int k = 0; k < (int)(data_[J][ind].missingIndex[kk]).size() - 1; k++)
+            {
+              //new x to test
+              x2 = x[J];
+              x2[data_[J][ind].missingIndex[kk][k]] = x[J][data_[J][ind].missingIndex[kk][k + 1]];
+              x2[data_[J][ind].missingIndex[kk][k + 1]] = x[J][data_[J][ind].missingIndex[kk][k]];
+
+              for (int l = 0; l < g_; l++)
+                proba2X(l) = probaCond(x2, y[J], mu_[J][l], p_[J][l]);
+
+              p2x = (proba2X * prop).sum();
+
+              alea = (double)runif(0., p1x + p2x);
+
+              if (alea < p2) //we accept the changement
+              {
+                x[J] = x2;
+                p1x = p2x;
+                proba1X = proba2X;
+                x1 = x[J];
+              }
+              else
+                x[J] = x1;
+            }
+          }
+          proba1.row(J) = proba1X;
+        }
+      }
+
+      if (iter >= parameter_.burnL)
+      {
+        ArrayXd calculInter(g_);
+        for (int cl = 0; cl < g_; cl++)
+        {
+          calculInter(cl) = 1;
+          for (int dim = 0; dim < d_; dim++)
+            calculInter(cl) *= proba1(dim, cl);
+          calculInter(cl) *= propb(cl);
+        }
+
+        double den = calculInter.sum();
+        tik.row(ind) += (calculInter / den);
+
+        li += (long double)1 / den;
+      }
+
+    } //end gibbs sampling for sample ind
+
+    //L -= log(li*div);
+    L -= log(li);
+
+    tik.row(ind) /= div;
+
+  } //end loop on sample
+
+  L += (double)n_ * log(div);
+
+  output_.L = L;
+
+  output_.bic = BIC(output_.L, n_, 2 * g_ * d_ + g_ - 1);
+
+  output_.icl = output_.bic;
+
+  ArrayXd entropy(n_);
+  for (int i = 0; i < n_; i++)
+  {
+    entropy(i) = 0;
+    for (int j = 0; j < g_; j++)
+    {
+      if (tik(i, j) != 0)
+        entropy(i) -= tik(i, j) * std::log(tik(i, j));
+    }
+    output_.icl += 2 * entropy(i);
+  }
+
+  bic = output_.bic;
+  icl = output_.icl;
 }

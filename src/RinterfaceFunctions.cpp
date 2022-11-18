@@ -1,6 +1,6 @@
 #include "functions.h"
-#include "runFunctions.h"
-#include "runTest.h"
+#include "RinterfaceFunctions.h"
+#include "RinterfaceTest.h"
 #include "RankCluster.h"
 #ifdef _OPENMP
 #include <omp.h>
@@ -128,7 +128,7 @@ RcppExport SEXP loglikelihood(SEXP X, SEXP mu, SEXP p, SEXP proportion, SEXP m, 
     param.nGibbsL = as<int>(iterL);
     param.burnL = as<int>(burnL);
     param.maxTry = 1;
-    param.detail = false;
+    param.verbose = false;
 
     RankCluster estimLog(data, mC, param, prop, pC, muC);
     if (!estimLog.dataOk())
