@@ -69,7 +69,7 @@ simulISR <- function(n, pi, mu) {
 
 
 
-  res <- .Call("simulISRR", n, length(mu), mu, pi, PACKAGE = "Rankcluster")
+  res <- simulISRR(n, length(mu), mu, pi)
 
   return(res)
 }
@@ -151,7 +151,7 @@ probability <- function(x, mu, pi, m = length(mu)) {
 
   proba <- rep(NA, nrow(x))
   for (j in seq_along(proba)) {
-    proba[j] <- .Call("computeProba", x[j, , drop = FALSE], mu, pi, m, PACKAGE = "Rankcluster")
+    proba[j] <- computeProba(x[j, , drop = FALSE], mu, pi, m)
   }
 
   return(proba)

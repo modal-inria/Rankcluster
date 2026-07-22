@@ -37,7 +37,7 @@ criteria <- function(data, proportion, pi, mu, m, Ql = 500, Bl = 100, IC = 1, nb
 
   a <- t(pi)
 
-  LL <- .Call("loglikelihood", data, mu, a, proportion, m, Ql, Bl, IC, nb_cpus, PACKAGE = "Rankcluster")
+  LL <- loglikelihood(data, mu, a, proportion, m, Ql, Bl, IC, nb_cpus)
 
   if (LL$ll[1] == "pb") {
     stop("Data are not correct.")

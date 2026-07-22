@@ -4,32 +4,32 @@ using namespace Rcpp;
 using namespace std;
 using namespace Eigen;
 
-RcppExport SEXP semR(SEXP X, SEXP m, SEXP K, SEXP Qsem, SEXP Bsem, SEXP Ql, SEXP Bl, SEXP RjSE, SEXP RjM, SEXP maxTry, SEXP run, SEXP verbose)
+// [[Rcpp::export]]
+List semR(NumericMatrix X, std::vector<int> m, int K, int Qsem, int Bsem,
+          int Ql, int Bl, std::vector<int> RjSE, std::vector<int> RjM,
+          int maxTry, int run, bool verbose)
 {
-    int g = as<int>(K), runC(as<int>(run));
-    vector<int> mC = as<vector<int>>(m);
     SEMparameters param;
-    param.nGibbsSE = as<vector<int>>(RjSE);
-    param.nGibbsM = as<vector<int>>(RjM);
-    param.maxIt = as<int>(Qsem);
-    param.burnAlgo = as<int>(Bsem);
-    param.nGibbsL = as<int>(Ql);
-    param.burnL = as<int>(Bl);
-    param.maxTry = as<int>(maxTry);
-    param.verbose = as<bool>(verbose);
+    param.nGibbsSE = RjSE;
+    param.nGibbsM = RjM;
+    param.maxIt = Qsem;
+    param.burnAlgo = Bsem;
+    param.nGibbsL = Ql;
+    param.burnL = Bl;
+    param.maxTry = maxTry;
+    param.verbose = verbose;
 
-    NumericMatrix XR(X);
-    int n(XR.nrow()), col(XR.ncol());
+    int n(X.nrow()), col(X.ncol());
     vector<vector<int>> data(n, vector<int>(col));
     for (int i(0); i < n; i++)
     {
         for (int j(0); j < col; j++)
         {
-            data[i][j] = XR[i + j * n];
+            data[i][j] = X[i + j * n];
         }
     }
 
-    RankCluster semgibbs(data, g, mC, param);
+    RankCluster semgibbs(data, K, m, param);
     if (!semgibbs.dataOk())
     {
         vector<double> stock(1, 2);
@@ -39,14 +39,14 @@ RcppExport SEXP semR(SEXP X, SEXP m, SEXP K, SEXP Qsem, SEXP Bsem, SEXP Ql, SEXP
     semgibbs.run();
 
     //multiple run
-    if (runC > 1)
+    if (run > 1)
     {
-        RankCluster semgibbsb(data, g, mC, param);
+        RankCluster semgibbsb(data, K, m, param);
         double L(-numeric_limits<double>::max());
         if (semgibbs.convergence())
             L = semgibbs.L();
 
-        for (int i(1); i < runC; i++)
+        for (int i(1); i < run; i++)
         {
             semgibbsb.run();
             if (semgibbsb.convergence())
@@ -68,21 +68,20 @@ RcppExport SEXP semR(SEXP X, SEXP m, SEXP K, SEXP Qsem, SEXP Bsem, SEXP Ql, SEXP
         stock[2] = semgibbs.L();
         stock[3] = semgibbs.bic();
         stock[4] = semgibbs.icl();
-        int d = mC.size();
-        int n = XR.nrow();
-        vector<vector<vector<int>>> data(d, vector<vector<int>>(n));
+        int d = m.size();
+        vector<vector<vector<int>>> ranks(d, vector<vector<int>>(n));
         vector<vector<vector<double>>> scorePart(d, vector<vector<double>>(n));
 
         for (int i(0); i < n; i++)
         {
             for (int dim(0); dim < d; dim++)
             {
-                data[dim][i] = semgibbs.rank(dim, i);
-                scorePart[dim][i].resize(mC[dim], 1);
+                ranks[dim][i] = semgibbs.rank(dim, i);
+                scorePart[dim][i].resize(m[dim], 1);
             }
         }
 
-        vector<vector<vector<int>>> dataInit(data);
+        vector<vector<vector<int>>> dataInit(ranks);
 
         if (semgibbs.partial())
         {
@@ -109,10 +108,10 @@ RcppExport SEXP semR(SEXP X, SEXP m, SEXP K, SEXP Qsem, SEXP Bsem, SEXP Ql, SEXP
             Named("p") = wrap(semgibbs.p()),
             Named("proportion") = wrap(semgibbs.proportion()),
             Named("cluster") = wrap(semgibbs.z()),
-            Named("tik") = convertMatrix<NumericMatrix, ArrayXXd>(semgibbs.tik()),
-            Named("entropy") = convertvector<NumericVector, ArrayXd>(semgibbs.entropy()),
-            Named("partialRank") = wrap(data),
-            Named("probability") = convertMatrix<NumericMatrix, ArrayXXd>(semgibbs.probability()),
+            Named("tik") = wrap(semgibbs.tik()),
+            Named("entropy") = wrap(semgibbs.entropy()),
+            Named("partialRank") = wrap(ranks),
+            Named("probability") = wrap(semgibbs.probability()),
             //distance
             Named("distP") = wrap(semgibbs.distP()),
             Named("distMu") = wrap(semgibbs.distMu()),
@@ -125,8 +124,7 @@ RcppExport SEXP semR(SEXP X, SEXP m, SEXP K, SEXP Qsem, SEXP Bsem, SEXP Ql, SEXP
             Named("initPi") = wrap(semgibbs.initialP()),
             Named("initPartialRank") = wrap(dataInit),
             Named("initProportion") = wrap(semgibbs.initialProportion()),
-            Named("scorePartial") = wrap(scorePart) //,
-            //Named("indexPartialData")=wrap(semgibbs.indexPartialData())
+            Named("scorePartial") = wrap(scorePart)
         );
     }
     else

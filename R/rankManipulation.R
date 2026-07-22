@@ -168,7 +168,7 @@ frequence <- function(X, m = ncol(X)) {
     }
   }
 
-  res <- .Call("freqMultiR", X, m, PACKAGE = "Rankcluster")
+  res <- freqMultiR(X, m)
 
   data <- matrix(0, ncol = length(res$data[[1]]) + 1, nrow = length(res$data))
   for (i in seq_len(nrow(data))) {

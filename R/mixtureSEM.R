@@ -43,7 +43,7 @@ mixtureSEM <- function(X, g, m, Qsem, Bsem, Ql, Bl, RjSE, RjM, maxTry, run, deta
     }
   }
 
-  res <- .Call("semR", X, m, g, Qsem, Bsem, Ql, Bl, RjSE, RjM, maxTry, run, detail, PACKAGE = "Rankcluster")
+  res <- semR(X, m, g, Qsem, Bsem, Ql, Bl, RjSE, RjM, maxTry, run, detail)
   if (res$stock[1] == 2) {
     res$indexPb <- lapply(res$indexPb, unique)
     for (i in 1:d) {
