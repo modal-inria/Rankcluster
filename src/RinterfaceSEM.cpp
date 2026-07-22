@@ -69,19 +69,19 @@ List semR(NumericMatrix X, std::vector<int> m, int K, int Qsem, int Bsem,
         stock[3] = semgibbs.bic();
         stock[4] = semgibbs.icl();
         int d = m.size();
-        vector<vector<vector<int>>> ranks(d, vector<vector<int>>(n));
+        vector<vector<vector<int>>> rankData(d, vector<vector<int>>(n));
         vector<vector<vector<double>>> scorePart(d, vector<vector<double>>(n));
 
         for (int i(0); i < n; i++)
         {
             for (int dim(0); dim < d; dim++)
             {
-                ranks[dim][i] = semgibbs.rank(dim, i);
+                rankData[dim][i] = semgibbs.rank(dim, i);
                 scorePart[dim][i].resize(m[dim], 1);
             }
         }
 
-        vector<vector<vector<int>>> dataInit(ranks);
+        vector<vector<vector<int>>> dataInit(rankData);
 
         if (semgibbs.partial())
         {
@@ -110,7 +110,7 @@ List semR(NumericMatrix X, std::vector<int> m, int K, int Qsem, int Bsem,
             Named("cluster") = wrap(semgibbs.z()),
             Named("tik") = wrap(semgibbs.tik()),
             Named("entropy") = wrap(semgibbs.entropy()),
-            Named("partialRank") = wrap(ranks),
+            Named("partialRank") = wrap(rankData),
             Named("probability") = wrap(semgibbs.probability()),
             //distance
             Named("distP") = wrap(semgibbs.distP()),

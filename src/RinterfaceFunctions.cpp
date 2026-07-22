@@ -152,7 +152,7 @@ double computeProba(NumericMatrix X, NumericMatrix mu, std::vector<double> pi, s
     vector<vector<int>> muC(m.size());
     vector<vector<int>> xC(m.size());
 
-    for (int i = 0; i < (int)m.size(); i++)
+    for (int i = 0; i < static_cast<int>(m.size()); i++)
     {
         xC[i].resize(m[i]);
         muC[i].resize(m[i]);
