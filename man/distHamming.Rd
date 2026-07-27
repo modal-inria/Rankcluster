@@ -24,10 +24,10 @@ distHamming(x, y)
 
 }
 \seealso{
-Other distance: 
-\code{\link{distCayley}()},
-\code{\link{distKendall}()},
-\code{\link{distSpearman}()}
+Other distance:
+\code{\link[=distCayley]{distCayley()}},
+\code{\link[=distKendall]{distKendall()}},
+\code{\link[=distSpearman]{distSpearman()}}
 }
 \author{
 Julien Jacques

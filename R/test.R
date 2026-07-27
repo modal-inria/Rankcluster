@@ -33,7 +33,7 @@ kullback <- function(proportion1, pi1, mu1, proportion2, pi2, mu2, m) {
 
   a <- t(pi1)
   b <- t(pi2)
-  dKL <- .Call("kullback", m, mu1, mu2, a, b, proportion1, proportion2, PACKAGE = "Rankcluster")
+  dKL <- .kullback(m, mu1, mu2, a, b, proportion1, proportion2)
 
   return(dKL)
 }
@@ -118,7 +118,7 @@ checkKullback <- function(proportion1, pi1, mu1, proportion2, pi2, mu2, m) {
 khi2 <- function(data, proportion, mu, pi, nBoot = 1000) {
   checkKhi2(data, proportion, mu, pi, nBoot)
 
-  pval <- .Call("adkhi2partial", data, pi, proportion, mu, nBoot, PACKAGE = "Rankcluster")
+  pval <- adkhi2partial(data, pi, proportion, mu, nBoot)
 
   return(pval)
 }

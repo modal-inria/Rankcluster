@@ -37,7 +37,7 @@ criteria <- function(data, proportion, pi, mu, m, Ql = 500, Bl = 100, IC = 1, nb
 
   a <- t(pi)
 
-  LL <- .Call("loglikelihood", data, mu, a, proportion, m, Ql, Bl, IC, nb_cpus, PACKAGE = "Rankcluster")
+  LL <- loglikelihood(data, mu, a, proportion, m, Ql, Bl, IC, nb_cpus)
 
   if (LL$ll[1] == "pb") {
     stop("Data are not correct.")
@@ -99,16 +99,14 @@ checkCriteria <- function(data, proportion, pi, mu, m, Ql, Bl, IC, nb_cpus) {
 
 
   # check if mu contains ranks
-  for (i in 1:length(m))
-  {
+  for (i in seq_along(m)){
     if (sum(apply(mu[, (1 + cumsum(c(0, m))[i]):(cumsum(c(0, m))[i + 1]), drop = FALSE], 1, checkRank, m[i])) != nrow(mu)) {
       stop("mu is not correct")
     }
   }
 
   # check data
-  for (i in 1:length(m))
-  {
+  for (i in seq_along(m)) {
     if (sum(apply(data[, (1 + cumsum(c(0, m))[i]):(cumsum(c(0, m))[i + 1])], 1, checkTiePartialRank, m[i])) != nrow(data)) {
       stop("Data are not correct")
     }

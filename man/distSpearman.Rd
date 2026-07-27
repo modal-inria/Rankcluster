@@ -22,10 +22,10 @@ distSpearman(x, y)
 
 }
 \seealso{
-Other distance: 
-\code{\link{distCayley}()},
-\code{\link{distHamming}()},
-\code{\link{distKendall}()}
+Other distance:
+\code{\link[=distCayley]{distCayley()}},
+\code{\link[=distHamming]{distHamming()}},
+\code{\link[=distKendall]{distKendall()}}
 }
 \author{
 Julien Jacques

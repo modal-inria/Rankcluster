@@ -23,10 +23,10 @@ distCayley(x, y)
 
 }
 \seealso{
-Other distance: 
-\code{\link{distHamming}()},
-\code{\link{distKendall}()},
-\code{\link{distSpearman}()}
+Other distance:
+\code{\link[=distHamming]{distHamming()}},
+\code{\link[=distKendall]{distKendall()}},
+\code{\link[=distSpearman]{distSpearman()}}
 }
 \author{
 Julien Jacques

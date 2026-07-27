@@ -109,7 +109,6 @@ setClass(
 )
 
 
-
 ##################################################################################
 #' @title Constructor of Rankclust class
 #'
@@ -261,7 +260,8 @@ setMethod(
         classe <- which(object[object@K[index]]@entropy[, 2] == i)
         if (length(classe) != 0) {
           classe <- classe[order(object[object@K[index]]@entropy[classe, 1], decreasing = TRUE)][
-            seq_len(min(5, length(classe)))]
+            seq_len(min(5, length(classe)))
+          ]
           # if(object@algorithm=="SEM")
           print(cbind(object@data[classe, ], object[object@K[index]]@entropy[classe, ]))
           # else
@@ -285,7 +285,8 @@ setMethod(
         classe <- which(object[object@K[index]]@probability[, 2] == i)
         if (length(classe) != 0) {
           classe <- classe[order(object[object@K[index]]@probability[classe, 1], decreasing = TRUE)][
-            seq_len(min(5, length(classe)))]
+            seq_len(min(5, length(classe)))
+          ]
           # if(object@algorithm=="SEM")
           print(cbind(object@data[classe, ], object[object@K[index]]@probability[classe, ]))
           # else
@@ -320,7 +321,6 @@ setMethod(
 )
 
 
-
 #' @title Show function.
 #'
 #' @description This function shows the elements of a given object.
@@ -353,7 +353,6 @@ setMethod(
     }
   }
 )
-
 
 
 #' @rdname show-methods

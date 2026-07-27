@@ -42,15 +42,13 @@ vector<vector<vector<int>>> numMat2vvvInt(NumericMatrix XR, vector<int> const &m
     return donnees;
 }
 
-RcppExport SEXP freqMultiR(SEXP X, SEXP m)
+// [[Rcpp::export]]
+List freqMultiR(NumericMatrix X, std::vector<int> m)
 {
-    NumericVector mR(m);
-    vector<int> M = as<vector<int>>(mR);
-    NumericMatrix XR(X);
-    int const n(XR.cols()), d(M.size());
+    int const n(X.nrow()), d(m.size());
     vector<vector<vector<int>>> donnees(d, vector<vector<int>>(n));
 
-    donnees = numMat2vvvInt(XR, M);
+    donnees = numMat2vvvInt(X, m);
 
     pair<vector<vector<vector<int>>>, vector<int>> res;
     res = freqMulti(donnees);
@@ -66,7 +64,7 @@ RcppExport SEXP freqMultiR(SEXP X, SEXP m)
         compteur = 0;
         for (int i(0); i < d; i++)
         {
-            for (int k(0); k < M[i]; k++)
+            for (int k(0); k < m[i]; k++)
             {
                 data[j][compteur] = res.first[i][j][k];
                 compteur++;
@@ -77,73 +75,57 @@ RcppExport SEXP freqMultiR(SEXP X, SEXP m)
     return List::create(Named("data") = wrap(data), Named("freq") = wrap(res.second));
 }
 
-RcppExport SEXP simulISRR(SEXP n, SEXP m, SEXP mu, SEXP p)
+// [[Rcpp::export]]
+NumericMatrix simulISRR(int n, int m, std::vector<int> mu, double p)
 {
-    NumericVector muR(mu);
-    vector<int> muC = as<vector<int>>(muR);
-    int const nC = as<int>(n), mC = as<int>(m);
-    double const pC = as<double>(p);
+    vector<vector<int>> simul = simulISR(n, m, mu, p);
 
-    vector<vector<int>> simul;
-    simul = simulISR(nC, mC, muC, pC);
-
-    NumericMatrix data(nC, mC);
-    for (int i(0); i < nC; i++)
-        for (int j(0); j < mC; j++)
+    NumericMatrix data(n, m);
+    for (int i(0); i < n; i++)
+        for (int j(0); j < m; j++)
             data(i, j) = simul[i][j];
 
     return data;
 }
 
-RcppExport SEXP loglikelihood(SEXP X, SEXP mu, SEXP p, SEXP proportion, SEXP m, SEXP iterL, SEXP burnL, SEXP IC, SEXP nb_cpus)
+// [[Rcpp::export]]
+List loglikelihood(NumericMatrix X, NumericMatrix mu, NumericMatrix p,
+                   std::vector<double> proportion, std::vector<int> m,
+                   int iterL, int burnL, int IC, int nb_cpus)
 {
-    //conversion
-    NumericMatrix XR(X);
-    int n(XR.nrow()), col(XR.ncol());
+    int n(X.nrow()), col(X.ncol());
     vector<vector<int>> data(n, vector<int>(col));
     for (int i = 0; i < n; i++)
         for (int j = 0; j < col; j++)
-            data[i][j] = XR[i + j * n];
+            data[i][j] = X[i + j * n];
 
-    int nbRun = as<int>(IC);
-    int nb = as<int>(nb_cpus);
-    NumericVector proportionR(proportion);
-    NumericVector mR(m);
-
-    vector<int> mC = as<vector<int>>(mR);
-    vector<double> prop = as<vector<double>>(proportionR);
-    vector<vector<double>> pC;
-
-    pC = convertToVVd(p);
-
-    NumericMatrix muR(mu);
-    vector<vector<vector<int>>> muC;
-    muC = numMat2vvvInt(mu, mC);
+    vector<vector<double>> pC = convertToVVd(p);
+    vector<vector<vector<int>>> muC = numMat2vvvInt(mu, m);
 
     SEMparameters param;
-    param.nGibbsSE = mC;
-    param.nGibbsM = mC;
+    param.nGibbsSE = m;
+    param.nGibbsM = m;
     param.maxIt = 1;
     param.burnAlgo = 1;
-    param.nGibbsL = as<int>(iterL);
-    param.burnL = as<int>(burnL);
+    param.nGibbsL = iterL;
+    param.burnL = burnL;
     param.maxTry = 1;
     param.verbose = false;
 
-    RankCluster estimLog(data, mC, param, prop, pC, muC);
+    RankCluster estimLog(data, m, param, proportion, pC, muC);
     if (!estimLog.dataOk())
     {
         return List::create(Named("ll") = wrap("pb"));
     }
 
-    vector<double> L(nbRun, 0), bic(nbRun, 0), icl(nbRun, 0);
+    vector<double> L(IC, 0), bic(IC, 0), icl(IC, 0);
 
 #ifdef _OPENMP
-    nb = std::min(nb, omp_get_num_procs());
-#pragma omp parallel num_threads(nb)
+    nb_cpus = std::min(nb_cpus, omp_get_num_procs());
+#pragma omp parallel num_threads(nb_cpus)
     {
 #pragma omp for schedule(dynamic, 1)
-        for (int i = 0; i < nbRun; i++)
+        for (int i = 0; i < IC; i++)
         {
             RankCluster estimLogpar(estimLog);
             estimLogpar.estimateCriterion(L[i], bic[i], icl[i]);
@@ -151,7 +133,7 @@ RcppExport SEXP loglikelihood(SEXP X, SEXP mu, SEXP p, SEXP proportion, SEXP m, 
     }
 #else
     {
-        for (int i = 0; i < nbRun; i++)
+        for (int i = 0; i < IC; i++)
         {
             RankCluster estimLogpar(estimLog);
             estimLogpar.estimateCriterion(L[i], bic[i], icl[i]);
@@ -161,40 +143,34 @@ RcppExport SEXP loglikelihood(SEXP X, SEXP mu, SEXP p, SEXP proportion, SEXP m, 
 
     return List::create(Named("ll") = wrap(L),
                         Named("bic") = wrap(bic),
-                        Named("icl") = wrap(icl)); //*/
+                        Named("icl") = wrap(icl));
 }
 
-RcppExport SEXP computeProba(SEXP X, SEXP mu, SEXP pi, SEXP m)
+// [[Rcpp::export]]
+double computeProba(NumericMatrix X, NumericMatrix mu, std::vector<double> pi, std::vector<int> m)
 {
-    //conversion
-    NumericVector piR(pi), mR(m);
-    NumericMatrix muR(mu), XR(X);
-    vector<double> piC = as<vector<double>>(piR);
-    vector<vector<int>> muC(mR.size());
-    vector<vector<int>> xC(mR.size());
+    vector<vector<int>> muC(m.size());
+    vector<vector<int>> xC(m.size());
 
-    for (int i = 0; i < mR.size(); i++)
+    for (int i = 0; i < static_cast<int>(m.size()); i++)
     {
-        xC[i].resize(mR[i]);
-        muC[i].resize(mR[i]);
+        xC[i].resize(m[i]);
+        muC[i].resize(m[i]);
     }
 
     int j = 0, k = 0;
-    for (int i = 0; i < muR.ncol(); i++)
+    for (int i = 0; i < mu.ncol(); i++)
     {
-        if (k == mR[j])
+        if (k == m[j])
         {
             j++;
             k = 0;
         }
-        muC[j][k] = muR[i];
-        xC[j][k] = XR[i];
+        muC[j][k] = mu[i];
+        xC[j][k] = X[i];
 
         k++;
     }
 
-    double probabi;
-    probabi = proba(xC, muC, piC);
-
-    return wrap(probabi);
+    return proba(xC, muC, pi);
 }
