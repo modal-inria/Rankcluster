@@ -6,7 +6,7 @@
 
 #include <algorithm>  // std::min_element
 #include <cmath>      // std::log, std::exp
-#include <limits>     // std::numeric_limits
+#include <cstddef>    // std::size_t
 #include <map>
 #include <Rmath.h>    // runif
 
@@ -41,8 +41,8 @@ ComparisonStats comparaison(Rank const &x, Rank const &y, Rank const &mu)
     ajplusb.reserve(m);
     ajmoinsb.reserve(m);
     ajplusbIndex.reserve(m);
-    ajplus.reserve(m * (m - 1));
-    ajmoins.reserve(m * (m - 1));
+    ajplus.reserve(static_cast<std::size_t>(m) * static_cast<std::size_t>(m - 1));
+    ajmoins.reserve(static_cast<std::size_t>(m) * static_cast<std::size_t>(m - 1));
 
     for (int j = 1; j < m; j++)
     {
@@ -99,20 +99,13 @@ double lnProbaCond(Rank const &x, Rank const &y, Rank const &mu, double const &p
 {
     ComparisonStats cs = comparaison(x, y, mu);
 
-    // Handle boundary cases to avoid NaN from 0 * log(0)
-    if (p == 1.0)
-    {
-        if (cs.total == cs.good)
-            return 0.;
-        return -std::numeric_limits<double>::infinity();
-    }
-
-    if (p == 0.0)
-    {
-        if (cs.good == 0)
-            return 0.;
-        return -std::numeric_limits<double>::infinity();
-    }
+    // Guard the two cases that produce NaN via 0*log(0); let all other cases
+    // (including p=1 with total≠good, or p=0 with good≠0) produce -inf
+    // naturally from the formula, matching the original behavior.
+    if (p == 1.0 && cs.total == cs.good)
+        return 0.;
+    if (p == 0.0 && cs.good == 0)
+        return 0.;
 
     return cs.good * std::log(p) + (cs.total - cs.good) * std::log(1. - p);
 }

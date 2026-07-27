@@ -25,7 +25,7 @@ int sampleMultinomial(Eigen::ArrayXd const &proba)
     double alea = static_cast<double>(unif_rand());
 
     for (int j = 0; j < g; j++)
-        if (lim[j] <= alea && alea <= lim[j + 1])
+        if (lim[j] <= alea && alea < lim[j + 1])
             return j;
 
     return g - 1;
