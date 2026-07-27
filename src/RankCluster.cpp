@@ -635,7 +635,7 @@ double RankCluster::updatePKJ(int indexDim, int classNumber, int nObsClass, Rank
                               double &sumG, double &sumA_G)
 {
   double s1 = 0.;
-  vector<int> comp(2);
+  ComparisonStats comp;
 
   // computation of G and A-G (number of good and bad comparison) for log-likelihood
   sumG = 0.;
@@ -647,9 +647,9 @@ double RankCluster::updatePKJ(int indexDim, int classNumber, int nObsClass, Rank
     {
       comp = comparaison(data_[indexDim][ind].x, data_[indexDim][ind].y, mu);
 
-      s1 += comp[0];
-      sumG += comp[1];
-      sumA_G += (comp[0] - comp[1]);
+      s1 += comp.total;
+      sumG += comp.good;
+      sumA_G += (comp.total - comp.good);
     }
   }
 

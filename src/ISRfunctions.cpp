@@ -1,219 +1,221 @@
 /*
- * File containing functions associated with the ISR distribution
+ * ISRfunctions.cpp
+ *
+ * Functions associated with the ISR (Insertion Sorting Rank) distribution.
  */
+
+#include <algorithm>  // std::min_element
+#include <cmath>      // std::log, std::exp
+#include <cstddef>    // std::size_t
 #include <map>
+#include <Rmath.h>    // runif
 
 #include "ISRfunctions.h"
 #include "functions.h"
 
-using namespace std;
-
 /*
- * Computation of A(x,y) (number of comparisons) and G(x,y,mu) (number of good comparisons)
+ * Computation of A(x,y) (total comparisons) and G(x,y,mu) (good comparisons).
  *
- * These values are useful to compute the probability according to an ISR.
+ * Uses precomputed inverse-rank lookup tables to replace the repeated O(m)
+ * linear scans in positionRank with O(1) array lookups.
+ *
  * See appendix A and B: https://hal.archives-ouvertes.fr/hal-00441209v3/document
  */
-vector<int> comparaison(Rank const &x, Rank const &y, Rank const &mu)
+ComparisonStats comparaison(Rank const &x, Rank const &y, Rank const &mu)
 {
-  int const m(mu.size());
-  int gplus(0), gmoins(0), gjmoinsb(0), gjplusb(0), index(0);
-  vector<int> ajmoins, ajplus, ajplusb, ajmoinsb, ajplusbIndex;
-  ajplusb.reserve(m);           //le Aj+ en cours
-  ajmoinsb.reserve(m);          //le Aj- en cours
-  ajplusbIndex.reserve(m);      //les index du Aj+ en cours
-  ajplus.reserve(m * (m - 1));  //l'union de tt les Aj+
-  ajmoins.reserve(m * (m - 1)); //l'union de tt les Aj-
-  
-  for (int j(1); j < m; j++)
-  {
-    gjmoinsb = 0;
-    gjplusb = 0;
-    for (int i(0); i < j; i++)
+    int const m(static_cast<int>(mu.size()));
+
+    // Build inverse-rank lookup tables (1-indexed elements, 0-based positions)
+    std::vector<int> posX(m + 1, 0);
+    for (int i = 0; i < m; i++)
+        posX[x[i]] = i;
+
+    std::vector<int> posMu(m + 1, 0);
+    for (int i = 0; i < m; i++)
+        posMu[mu[i]] = i;
+
+    int gplus(0), gmoins(0);
+    std::vector<int> ajmoins, ajplus;        // cumulative unions of Aj- and Aj+
+    std::vector<int> ajplusb, ajmoinsb;      // per-j Aj+ and Aj- sets
+    std::vector<int> ajplusbIndex;           // original indices for ajplusb
+    ajplusb.reserve(m);
+    ajmoinsb.reserve(m);
+    ajplusbIndex.reserve(m);
+    // ajplus has at most one entry per j iteration (m-1 total)
+    ajplus.reserve(static_cast<std::size_t>(m - 1));
+    // ajmoins can accumulate up to m*(m-1)/2 entries in the worst case
+    ajmoins.reserve(static_cast<std::size_t>(m) * static_cast<std::size_t>(m - 1) / 2);
+
+    for (int j = 1; j < m; j++)
     {
-      //calcul Aj-
-      if (positionRank(x, y[i]) < positionRank(x, y[j]))
-      {
-        ajmoins.push_back(i);
-        ajmoinsb.push_back(i);
-      }
-      else //calcul Aj+//if (positionRank(x,y[i])>positionRank(x,y[j]))
-      {
-        ajplusb.push_back(positionRank(x, y[i]));
-        ajplusbIndex.push_back(i);
-      }
-    }
-    
-    if (ajplusb.size() > 0) //si le Aj+ en cours est non vide, on rajoute l'index du min à Aj+
-    {
-      index = min_element(ajplusb.begin(), ajplusb.end()) - ajplusb.begin();
-      ajplus.push_back(ajplusbIndex[index]);
-      
-      //calcul de G+
-      if (positionRank(mu, y[j]) < positionRank(mu, y[ajplus[ajplus.size() - 1]]))
-      {
-        gplus++;
-        gjplusb++;
-      }
-      ajplusb.erase(ajplusb.begin(), ajplusb.end());
-      ajplusbIndex.erase(ajplusbIndex.begin(), ajplusbIndex.end());
-    }
-    if (ajmoinsb.size() > 0) //si le Aj- en cours est non vide on calcule G-
-    {
-      //calcul de G-
-      for (unsigned int i(0); i < ajmoinsb.size(); i++)
-      {
-        if (positionRank(mu, y[ajmoinsb[i]]) < positionRank(mu, y[j]))
+        for (int i = 0; i < j; i++)
         {
-          gmoins++;
-          gjmoinsb++;
+            if (posX[y[i]] < posX[y[j]])
+            {
+                // y[i] comes before y[j] in x  →  belongs to Aj-
+                ajmoins.push_back(i);
+                ajmoinsb.push_back(i);
+            }
+            else
+            {
+                // y[i] comes after y[j] in x  →  candidate for Aj+
+                ajplusb.push_back(posX[y[i]]);
+                ajplusbIndex.push_back(i);
+            }
         }
-      }
-      ajmoinsb.erase(ajmoinsb.begin(), ajmoinsb.end());
+
+        if (!ajplusb.empty())
+        {
+            // The representative of Aj+ is the element of {y[i]: i in ajplus_candidates}
+            // that appears first in x, i.e. has the smallest position in x.
+            int minIdx = static_cast<int>(
+                std::min_element(ajplusb.begin(), ajplusb.end()) - ajplusb.begin());
+            ajplus.push_back(ajplusbIndex[minIdx]);
+
+            // Good comparison for Aj+: mu ranks y[j] before the Aj+ representative
+            if (posMu[y[j]] < posMu[y[ajplus.back()]])
+                gplus++;
+
+            ajplusb.clear();
+            ajplusbIndex.clear();
+        }
+
+        if (!ajmoinsb.empty())
+        {
+            // Good comparisons for Aj-: mu ranks each y[i] (i in Aj-) before y[j]
+            for (int i : ajmoinsb)
+            {
+                if (posMu[y[i]] < posMu[y[j]])
+                    gmoins++;
+            }
+            ajmoinsb.clear();
+        }
     }
-  }
-  
-  vector<int> comparaison(2, 0);
-  comparaison[0] = ajmoins.size() + ajplus.size();
-  comparaison[1] = gmoins + gplus;
-  
-  return comparaison;
+
+    return ComparisonStats{static_cast<int>(ajmoins.size() + ajplus.size()),
+                           gmoins + gplus};
 }
 
-/** Compute log p(x|y;mu,pi) according to an ISR model */
+/** Compute log p(x|y; mu, p) under the ISR model */
 double lnProbaCond(Rank const &x, Rank const &y, Rank const &mu, double const &p)
 {
-  vector<int> comp(2);
-  comp = comparaison(x, y, mu);
-  
-  // manage special case, otherwise it returns NaN
-  if (p == 1)
-  {
-    if (comp[0] == comp[1])
-      return 0.;
-  }
-  
-  if (p == 0)
-  {
-    if (comp[1] == 0)
-      return 0.;
-  }
-  
-  return comp[1] * log(p) + (comp[0] - comp[1]) * log(1. - p);
+    ComparisonStats cs = comparaison(x, y, mu);
+
+    // Guard the two cases that produce NaN via 0*log(0); let all other cases
+    // (including p=1 with total≠good, or p=0 with good≠0) produce -inf
+    // naturally from the formula, matching the original behavior.
+    if (p == 1.0 && cs.total == cs.good)
+        return 0.;
+    if (p == 0.0 && cs.good == 0)
+        return 0.;
+
+    return cs.good * std::log(p) + (cs.total - cs.good) * std::log(1. - p);
 }
 
 double probaCond(Rank const &x, Rank const &y, Rank const &mu, double const &p)
 {
-  return exp(lnProbaCond(x, y, mu, p));
+    return std::exp(lnProbaCond(x, y, mu, p));
 }
 
 
 // Simulate n samples from an ISR(mu, p)
-vector<Rank> simulISR(int const &n, int const &m, Rank const &mu, double const &p)
+std::vector<Rank> simulISR(int const &n, int const &m, Rank const &mu, double const &p)
 {
-  vector<Rank> simul(n, Rank(m, 0));
-  Rank s(m), rgTemp(m);
-  int l;
-  double correct;
-  bool compar, avance;
-  
-  initializeRank(rgTemp);
-  
-  for (int i(0); i < n; i++)
-  {
-    //simulation d'un rang aléatoire: permutation du vecteur 1 2..m
-    s = rgTemp;
-    Rshuffle(s.begin(), s.end());
-    simul[i][0] = s[0];
-    for (int j(1); j < m; j++)
+    std::vector<Rank> simul(n, Rank(m, 0));
+    Rank s(m);
+    initializeRank(s);
+
+    // Build inverse-rank lookup for mu once (mu is constant across all draws)
+    std::vector<int> posMu(m + 1, 0);
+    for (int k = 0; k < m; k++)
+        posMu[mu[k]] = k;
+
+    for (int i = 0; i < n; i++)
     {
-      l = 0;
-      avance = true;
-      while (avance && l < j)
-      {
-        correct = (double)runif(0., 1.);
-        compar = (positionRank(mu, s[j]) < positionRank(mu, simul[i][l]));
-        if ((compar && correct < p) || (!compar && correct > p))
+        // Draw a random presentation order s
+        Rshuffle(s.begin(), s.end());
+        simul[i][0] = s[0];
+
+        for (int j = 1; j < m; j++)
         {
-          for (int k(j - 1); k >= l; k--)
-            simul[i][k + 1] = simul[i][k];
-          
-          simul[i][l] = s[j];
-          avance = false;
+            int l = 0;
+            bool inserted = false;
+            while (!inserted && l < j)
+            {
+                double rnd = runif(0., 1.);
+                bool goodComp = (posMu[s[j]] < posMu[simul[i][l]]);
+                if ((goodComp && rnd < p) || (!goodComp && rnd > p))
+                {
+                    // Insert s[j] at position l, shifting elements right
+                    for (int k = j - 1; k >= l; k--)
+                        simul[i][k + 1] = simul[i][k];
+                    simul[i][l] = s[j];
+                    inserted = true;
+                }
+                else
+                {
+                    l++;
+                }
+            }
+            if (!inserted)
+                simul[i][j] = s[j];
         }
-        else
-          l++;
-      }
-      if (l == j)
-        simul[i][l] = s[j];
     }
-  }
-  return simul;
+    return simul;
 }
 
 
-// Simulate n samples from a mixture of ISR(mu, p)
-void simulMixtureISR(vector<Rank> &simul, vector<Rank> const &mu,
-                     vector<double> const &p, vector<double> const &prop)
+// Simulate a sample from a mixture of ISR distributions
+void simulMixtureISR(std::vector<Rank> &simul, std::vector<Rank> const &mu,
+                     std::vector<double> const &p, std::vector<double> const &prop)
 {
-  int classe = 0;
-  int n = simul.size();
-  int m = mu[0].size();
-  
-  Eigen::ArrayXd probaEig(prop.size());
-  for (size_t k = 0; k < prop.size(); k++)
-    probaEig(k) = prop[k];
-  
-  for (int i(0); i < n; i++)
-  {
-    // class number sample according to proportion
-    classe = sampleMultinomial(probaEig);
-    
-    // sample a rank according to the parameters of the sampled class
-    simul[i] = simulISR(1, m, mu[classe], p[classe])[0];
-  }
-}
+    int n = static_cast<int>(simul.size());
+    int m = static_cast<int>(mu[0].size());
 
-double proba(vector<Rank> const &x, vector<Rank> const &mu, vector<double> const &pi)
-{
-  int d = pi.size();
-  vector<double> probaDim(d, 0);
-  double finalProba;
-  vector<int> tabFact, listeY;
-  Rank y;
-  vector<int> m(mu.size());
-  map<int, vector<int>> diffDim;
-  
-  for (int dim = 0; dim < d; dim++)
-  {
-    m[dim] = mu[dim].size();
-    diffDim[m[dim]].push_back(dim);
-  }
-  
-  // we iterate over the different values of m (size of ranks) to limit the computation of y
-  for (map<int, vector<int>>::iterator it = diffDim.begin(); it != diffDim.end(); it++)
-  {
-    int m = it->first;
-    tabFact = tab_factorial(m);
-    listeY = listIndexOrderOfPresentation(m, tabFact);
-    double mult = 2. / (double)tabFact[m - 1];
-    
-    for (int i = 0; i < tabFact[m - 1] / 2; i++)
+    Eigen::ArrayXd probaEig(prop.size());
+    for (int k = 0; k < static_cast<int>(prop.size()); k++)
+        probaEig(k) = prop[k];
+
+    for (int i = 0; i < n; i++)
     {
-      y = index2rankNoCheck(listeY[i], m, tabFact);
-      
-      // for each dimension that have a rank of size m
-      for (int j = 0; j < (int)(it->second).size(); j++)
-        probaDim[(it->second)[j]] += probaCond(x[(it->second)[j]], y, mu[(it->second)[j]], pi[(it->second)[j]]);
+        int classe = sampleMultinomial(probaEig);
+        simul[i] = simulISR(1, m, mu[classe], p[classe])[0];
     }
-    
-    for (int j = 0; j < (int)(it->second).size(); j++)
-      probaDim[(it->second)[j]] *= mult;
-  }
-  
-  finalProba = probaDim[0];
-  for (int dim = 1; dim < d; dim++)
-    finalProba *= probaDim[dim];
-  
-  return finalProba;
+}
+
+
+double proba(std::vector<Rank> const &x, std::vector<Rank> const &mu,
+             std::vector<double> const &pi)
+{
+    int d = static_cast<int>(pi.size());
+    std::vector<double> probaDim(d, 0.);
+    std::map<int, std::vector<int>> diffDim;
+
+    for (int dim = 0; dim < d; dim++)
+        diffDim[static_cast<int>(mu[dim].size())].push_back(dim);
+
+    // Iterate over distinct rank sizes to avoid recomputing y for each dimension
+    for (auto const &kv : diffDim)
+    {
+        int m = kv.first;
+        std::vector<int> tabFact = tab_factorial(m);
+        std::vector<int> listeY  = listIndexOrderOfPresentation(m, tabFact);
+        double mult = 2. / static_cast<double>(tabFact[m - 1]);
+
+        for (int i = 0; i < static_cast<int>(tabFact[m - 1]) / 2; i++)
+        {
+            Rank y = index2rankNoCheck(listeY[i], m, tabFact);
+            for (int j : kv.second)
+                probaDim[j] += probaCond(x[j], y, mu[j], pi[j]);
+        }
+
+        for (int j : kv.second)
+            probaDim[j] *= mult;
+    }
+
+    double finalProba = probaDim[0];
+    for (int dim = 1; dim < d; dim++)
+        finalProba *= probaDim[dim];
+
+    return finalProba;
 }
