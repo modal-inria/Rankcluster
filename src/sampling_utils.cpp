@@ -4,6 +4,7 @@
  * Random number generation, shuffling, and sampling utilities.
  */
 
+#include <cmath>
 #include <vector>
 #include <Rmath.h>
 
@@ -11,7 +12,7 @@
 
 int randWrapper(const int n)
 {
-    return static_cast<int>(unif_rand() * n);
+    return static_cast<int>(std::floor(unif_rand() * n));
 }
 
 int sampleMultinomial(Eigen::ArrayXd const &proba)
@@ -22,7 +23,7 @@ int sampleMultinomial(Eigen::ArrayXd const &proba)
     for (int k = 0; k < g; k++)
         lim[k + 1] = lim[k] + proba(k);
 
-    double alea = static_cast<double>(unif_rand());
+    double alea = unif_rand();
 
     for (int j = 0; j < g; j++)
         if (lim[j] <= alea && alea < lim[j + 1])

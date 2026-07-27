@@ -41,8 +41,10 @@ ComparisonStats comparaison(Rank const &x, Rank const &y, Rank const &mu)
     ajplusb.reserve(m);
     ajmoinsb.reserve(m);
     ajplusbIndex.reserve(m);
-    ajplus.reserve(static_cast<std::size_t>(m) * static_cast<std::size_t>(m - 1));
-    ajmoins.reserve(static_cast<std::size_t>(m) * static_cast<std::size_t>(m - 1));
+    // ajplus has at most one entry per j iteration (m-1 total)
+    ajplus.reserve(static_cast<std::size_t>(m - 1));
+    // ajmoins can accumulate up to m*(m-1)/2 entries in the worst case
+    ajmoins.reserve(static_cast<std::size_t>(m) * static_cast<std::size_t>(m - 1) / 2);
 
     for (int j = 1; j < m; j++)
     {
@@ -140,7 +142,7 @@ std::vector<Rank> simulISR(int const &n, int const &m, Rank const &mu, double co
             bool inserted = false;
             while (!inserted && l < j)
             {
-                double rnd = static_cast<double>(runif(0., 1.));
+                double rnd = runif(0., 1.);
                 bool goodComp = (posMu[s[j]] < posMu[simul[i][l]]);
                 if ((goodComp && rnd < p) || (!goodComp && rnd > p))
                 {

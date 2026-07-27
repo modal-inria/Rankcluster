@@ -56,8 +56,8 @@ int rank2index(Rank const &rank, std::vector<int> const &tabFactorial)
 
     for (int j = 1; j < m - 1; j++)
     {
-        auto it = std::find(liste.begin(), liste.end(), rank[j]);
-        index += static_cast<int>(it - liste.begin()) * tabFactorial[m - j - 2];
+        auto foundIt = std::find(liste.begin(), liste.end(), rank[j]);
+        index += static_cast<int>(foundIt - liste.begin()) * tabFactorial[m - j - 2];
         liste.erase(std::remove(liste.begin(), liste.end(), rank[j]), liste.end());
     }
 
@@ -118,15 +118,15 @@ std::vector<int> listIndexOrderOfPresentation(int const &m,
                                                std::vector<int> const &tabFactorial)
 {
     std::vector<int> liste(tabFactorial[m - 1] / 2);
-    int const1 = 0, const2 = 0, ind = 0;
+    int startIdx = 0, endIdx = 0, ind = 0;
 
     for (int i = 1; i <= m - 1; i++)
     {
-        const1 = (i - 1) * (tabFactorial[m - 2] + tabFactorial[m - 3]) + 1;
-        const2 = i * tabFactorial[m - 2];
-        int nb = const2 - const1 + 1;
+        startIdx = (i - 1) * (tabFactorial[m - 2] + tabFactorial[m - 3]) + 1;
+        endIdx   = i * tabFactorial[m - 2];
+        int nb   = endIdx - startIdx + 1;
         for (int j = 0; j < nb; j++)
-            liste[ind + j] = const1 + j;
+            liste[ind + j] = startIdx + j;
         ind += nb;
     }
 
