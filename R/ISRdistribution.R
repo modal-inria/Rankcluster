@@ -68,7 +68,6 @@ simulISR <- function(n, pi, mu) {
   }
 
 
-
   res <- simulISRR(n, length(mu), mu, pi)
 
   return(res)

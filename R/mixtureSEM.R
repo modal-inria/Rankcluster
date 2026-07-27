@@ -1,4 +1,3 @@
-
 # mixtureSEM
 # @title algorithm SEM for
 # @author Grimonprez Quentin
@@ -55,139 +54,140 @@ mixtureSEM <- function(X, g, m, Qsem, Bsem, Ql, Bl, RjSE, RjM, maxTry, run, deta
     stop(
       "Problem with your data.\n The ranks have to be given in the ranking notation (see convertRank function), with the following convention:
 - missing positions are replaced by 0
-- tied are replaced by the lowest position they share\n")
+- tied are replaced by the lowest position they share\n"
+    )
   }
 
 
   # recuperation des resultats
   if (res$stock[1] == 1) { # si convergence
-      res$referenceRank <- tliste3d2mat(res$referenceRank)
-      res$initMu <- tliste3d2mat(res$initMu)
-      res$p <- liste2d2matgd(res$p)
-      res$initPi <- liste2d2matgd(res$initPi)
-      res$cluster <- res$cluster + 1
+    res$referenceRank <- tliste3d2mat(res$referenceRank)
+    res$initMu <- tliste3d2mat(res$initMu)
+    res$p <- liste2d2matgd(res$p)
+    res$initPi <- liste2d2matgd(res$initPi)
+    res$cluster <- res$cluster + 1
 
-      res$entropy <- cbind(res$entropy, res$cluster)
-      res$probability <- cbind(res$probability, res$cluster)
-      colnames(res$entropy) <- c("entropy", "cluster")
-      colnames(res$probability) <- c("probability", "cluster")
+    res$entropy <- cbind(res$entropy, res$cluster)
+    res$probability <- cbind(res$probability, res$cluster)
+    colnames(res$entropy) <- c("entropy", "cluster")
+    colnames(res$probability) <- c("probability", "cluster")
 
-      res$distMu <- liste3d2listematgd(res$distMu)
-      res$distP <- liste3d2listematgd(res$distP)
+    res$distMu <- liste3d2listematgd(res$distMu)
+    res$distP <- liste3d2listematgd(res$distP)
+
+    ### rank conversion from ordering to ranking
+    indM <- c(0, cumsum(m))
+
+    for (i in seq_along(m)) {
+      # res$initMu
+      res$initMu[, (indM[i] + 1):indM[i + 1]] <- t(
+        apply(res$initMu[, (indM[i] + 1):indM[i + 1], drop = FALSE], 1, convertRank)
+      )
+
+      # res$referenceRank
+      res$referenceRank[, (indM[i] + 1):indM[i + 1]] <- t(
+        apply(res$referenceRank[, (indM[i] + 1):indM[i + 1], drop = FALSE], 1, convertRank)
+      )
+    }
+
+
+    if (res$stock[2] == 1) { # si il y a des donnees partielles
+      res$partialRank <- tliste3d2mat(res$partialRank) ## proba a rajoute
+
+      rownames(res$partialRank) <- rep("", nrow(res$partialRank)) # enlever les cl1...
+      # colnames(res$partialRank)[1]="Index"
+      # colnames(res$partialRank)[ncol(res$rangPartial)]="Probability"
+      res$initPartialRank <- tliste3d2mat(res$initPartialRank)
+      res$scorePartial <- tliste3d2mat(res$scorePartial)
+      # colnames(res$initPartialRank)[1]="Index"
+      rownames(res$initPartialRank) <- rep("", nrow(res$initPartialRank))
+      rownames(res$scorePartial) <- rep("", nrow(res$scorePartial))
 
       ### rank conversion from ordering to ranking
-      indM <- c(0, cumsum(m))
-
-      for (i in seq_along(m)){
-        # res$initMu
-        res$initMu[, (indM[i] + 1):indM[i + 1]] <- t(
-          apply(res$initMu[, (indM[i] + 1):indM[i + 1], drop = FALSE], 1, convertRank)
+      for (i in seq_along(m)) {
+        # res$initPartialRank
+        res$initPartialRank[, (indM[i] + 1):indM[i + 1]] <- t(
+          apply(res$initPartialRank[, (indM[i] + 1):indM[i + 1], drop = FALSE], 1, convertRank)
         )
 
-        # res$referenceRank
-        res$referenceRank[, (indM[i] + 1):indM[i + 1]] <- t(
-          apply(res$referenceRank[, (indM[i] + 1):indM[i + 1], drop = FALSE], 1, convertRank)
-        )
+        # res$partialRank
+        # res$partialRank[,(indM[i]+1):indM[i+1]]=t(apply(res$partialRank[,(indM[i]+1):indM[i+1],drop=FALSE],1,convertRank))
+        for (j in 1:n) {
+          ordtemp <- order(res$partialRank[j, (indM[i] + 1):indM[i + 1]])
+          res$partialRank[j, (indM[i] + 1):indM[i + 1]] <- ordtemp
+          res$scorePartial[j, (indM[i] + 1):indM[i + 1]] <- res$scorePartial[j, ((indM[i] + 1):indM[i + 1])][ordtemp]
+        }
       }
 
 
-      if (res$stock[2] == 1) { # si il y a des donnees partielles
-          res$partialRank <- tliste3d2mat(res$partialRank) ## proba a rajoute
+      res$distPartialRank <- lapply(res$distPartialRank, FUN = function(x) {
+        listedistPartiel(x)
+      })
 
-          rownames(res$partialRank) <- rep("", nrow(res$partialRank)) # enlever les cl1...
-          # colnames(res$partialRank)[1]="Index"
-          # colnames(res$partialRank)[ncol(res$rangPartial)]="Probability"
-          res$initPartialRank <- tliste3d2mat(res$initPartialRank)
-          res$scorePartial <- tliste3d2mat(res$scorePartial)
-          # colnames(res$initPartialRank)[1]="Index"
-          rownames(res$initPartialRank) <- rep("", nrow(res$initPartialRank))
-          rownames(res$scorePartial) <- rep("", nrow(res$scorePartial))
-
-          ### rank conversion from ordering to ranking
-          for (i in seq_along(m)) {
-            # res$initPartialRank
-            res$initPartialRank[, (indM[i] + 1):indM[i + 1]] <- t(
-              apply(res$initPartialRank[, (indM[i] + 1):indM[i + 1], drop = FALSE], 1, convertRank)
-            )
-
-            # res$partialRank
-            #res$partialRank[,(indM[i]+1):indM[i+1]]=t(apply(res$partialRank[,(indM[i]+1):indM[i+1],drop=FALSE],1,convertRank))
-            for (j in 1:n) {
-              ordtemp <- order(res$partialRank[j, (indM[i] + 1):indM[i + 1]])
-              res$partialRank[j, (indM[i] + 1):indM[i + 1]] <- ordtemp
-              res$scorePartial[j, (indM[i] + 1):indM[i + 1]] <- res$scorePartial[j, ((indM[i] + 1):indM[i + 1])][ordtemp]
-            }
-          }
-
-
-          res$distPartialRank <- lapply(res$distPartialRank, FUN = function(x) {
-            listedistPartiel(x)
-          })
-
-          result <- new(
-            Class = "Output",
-            bic = res$stock[4],
-            icl = res$stock[5],
-            ll = res$stock[3],
-            proportion = res$proportion,
-            pi = res$p,
-            mu = res$referenceRank,
-            tik = res$tik,
-            partition = res$cluster,
-            entropy = res$entropy,
-            probability = res$probability,
-            convergence = TRUE,
-            partial = TRUE,
-            partialRank = res$partialRank,
-            distanceZ = res$distZ,
-            distanceMu = res$distMu,
-            distanceProp = res$distProp,
-            distancePi = res$distP,
-            distancePartialRank = res$distPartialRank,
-            piInitial = res$initPi,
-            muInitial = res$initMu,
-            partialRankInitial = res$initPartialRank,
-            proportionInitial = res$initProportion,
-            partialRankScore = res$scorePartial
-          )
-        } else {
-        result <- new(
-          Class = "Output",
-          bic = res$stock[4],
-          icl = res$stock[5],
-          ll = res$stock[3],
-          proportion = res$proportion,
-          pi = res$p,
-          mu = res$referenceRank,
-          tik = res$tik,
-          partition = res$cluster,
-          entropy = res$entropy,
-          probability = res$probability,
-          convergence = TRUE,
-          partial = FALSE,
-          distanceZ = res$distZ,
-          distanceMu = res$distMu,
-          distanceProp = res$distProp,
-          distancePi = res$distP,
-          piInitial = res$initPi,
-          muInitial = res$initMu,
-          proportionInitial = res$initProportion
-        )
-      }
-
-      if (detail) {
-        cat("RESULTS:\n")
-        cat("NUMBER OF CLUSTERS: ", g)
-        cat("\nLoglikelihood =", res$stock[3])
-        cat("\nBIC=", res$stock[4])
-        cat("\nICL=", res$stock[5])
-        cat("\nProportion:", res$proportion)
-        cat("\nProbabilities pi:\n")
-        print(res$p)
-        cat("\nReference ranks mu:\n")
-        print(res$referenceRank)
-      }
+      result <- new(
+        Class = "Output",
+        bic = res$stock[4],
+        icl = res$stock[5],
+        ll = res$stock[3],
+        proportion = res$proportion,
+        pi = res$p,
+        mu = res$referenceRank,
+        tik = res$tik,
+        partition = res$cluster,
+        entropy = res$entropy,
+        probability = res$probability,
+        convergence = TRUE,
+        partial = TRUE,
+        partialRank = res$partialRank,
+        distanceZ = res$distZ,
+        distanceMu = res$distMu,
+        distanceProp = res$distProp,
+        distancePi = res$distP,
+        distancePartialRank = res$distPartialRank,
+        piInitial = res$initPi,
+        muInitial = res$initMu,
+        partialRankInitial = res$initPartialRank,
+        proportionInitial = res$initProportion,
+        partialRankScore = res$scorePartial
+      )
     } else {
+      result <- new(
+        Class = "Output",
+        bic = res$stock[4],
+        icl = res$stock[5],
+        ll = res$stock[3],
+        proportion = res$proportion,
+        pi = res$p,
+        mu = res$referenceRank,
+        tik = res$tik,
+        partition = res$cluster,
+        entropy = res$entropy,
+        probability = res$probability,
+        convergence = TRUE,
+        partial = FALSE,
+        distanceZ = res$distZ,
+        distanceMu = res$distMu,
+        distanceProp = res$distProp,
+        distancePi = res$distP,
+        piInitial = res$initPi,
+        muInitial = res$initMu,
+        proportionInitial = res$initProportion
+      )
+    }
+
+    if (detail) {
+      cat("RESULTS:\n")
+      cat("NUMBER OF CLUSTERS: ", g)
+      cat("\nLoglikelihood =", res$stock[3])
+      cat("\nBIC=", res$stock[4])
+      cat("\nICL=", res$stock[5])
+      cat("\nProportion:", res$proportion)
+      cat("\nProbabilities pi:\n")
+      print(res$p)
+      cat("\nReference ranks mu:\n")
+      print(res$referenceRank)
+    }
+  } else {
     result <- new(Class = "Output", convergence = FALSE)
   }
 

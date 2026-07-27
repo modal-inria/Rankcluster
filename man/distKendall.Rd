@@ -27,10 +27,10 @@ distKendall(x, y, type = "ordering")
 A New Measure of Rank Correlation, M. G. Kendall
 }
 \seealso{
-Other distance: 
-\code{\link{distCayley}()},
-\code{\link{distHamming}()},
-\code{\link{distSpearman}()}
+Other distance:
+\code{\link[=distCayley]{distCayley()}},
+\code{\link[=distHamming]{distHamming()}},
+\code{\link[=distSpearman]{distSpearman()}}
 }
 \author{
 Julien Jacques

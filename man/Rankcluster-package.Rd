@@ -2,6 +2,7 @@
 % Please edit documentation in R/Rankcluster-package.R
 \docType{package}
 \name{Rankcluster-package}
+\alias{Rankcluster}
 \alias{Rankcluster-package}
 \title{Model-Based Clustering for Multivariate Partial Ranking Data}
 \description{
@@ -40,5 +41,23 @@ Computational Statistics and Data Analysis, 58, 162-176.
 
 [2] J.Jacques and C.Biernacki (2012), Model-based clustering for multivariate partial ranking data,
 Inria Research Report n 8113.
+}
+\seealso{
+Useful links:
+\itemize{
+  \item Report bugs at \url{https://github.com/modal-inria/Rankcluster/issues/}
+}
+
+}
+\author{
+\strong{Maintainer}: Quentin Grimonprez \email{quentingrim@yahoo.fr}
+
+Authors:
+\itemize{
+  \item Quentin Grimonprez \email{quentingrim@yahoo.fr}
+  \item Julien Jacques \email{julien.jacques@univ-lyon2.fr}
+  \item Christophe Biernacki \email{christophe.biernacki@inria.fr}
+}
+
 }
 \keyword{package}

@@ -43,7 +43,6 @@ distKendall_ranking <- function(x, y) {
 }
 
 
-
 distKendall_ordering <- function(x, y) {
   m <- length(x)
   distKendall_ordering <- 0

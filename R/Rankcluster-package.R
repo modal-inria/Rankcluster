@@ -43,4 +43,4 @@
 #' }
 #'
 #' @keywords package
-NULL
+"_PACKAGE"

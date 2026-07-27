@@ -37,7 +37,7 @@ data(APA)
 
 }
 \seealso{
-Other datasets: 
+Other datasets:
 \code{\link{big4}},
 \code{\link{eurovision}},
 \code{\link{quiz}},
