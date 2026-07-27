@@ -93,4 +93,3 @@ double adkhi2partial(NumericMatrix donnees, std::vector<double> p, std::vector<d
 
     return khi2partial(data, p, proportion, muC, nBootstrap);
 }
-
